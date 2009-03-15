@@ -9,6 +9,7 @@ While there are plenty of web analytics solutions, and many of them offer goal-t
 Coming soon...
 
 Here is an example of work-in-progress sales funnel visualization using FunnelCake:
+
 http://github.com/jkrall/funnel_cake/raw/master/doc/example_funnel.png
 
 == Configuration
