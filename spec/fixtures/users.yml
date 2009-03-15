@@ -1,0 +1,27 @@
+before_before:
+   id: 1
+   email: before_before@test.com
+before_during:
+   id: 2
+   email: before_during@test.com
+before_after:
+   id: 3
+   email: before_after@test.com
+before:
+   id: 4
+   email: before@test.com
+during_during:
+   id: 5
+   email: during_during@test.com
+during_after:
+   id: 6
+   email: during_after@test.com
+during:
+   id: 7
+   email: during@test.com
+after_after:
+   id: 8
+   email: after_after@test.com
+after:
+   id: 9
+   email: after@test.com

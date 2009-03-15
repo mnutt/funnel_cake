@@ -1,0 +1,21 @@
+= Funnel Cake
+
+FunnelCake is a rails engine plugin that provides sales funnel tracking functionality.
+
+While there are plenty of web analytics solutions, and many of them offer goal-tracking and even "funnels"... many businesses require a higher-level sales tracking tool.  FunnelCake aims to solve this problem by making it easy to track user "events" or conversion milestones.  It is designed to easily plug into an existing web app, attaching to your User model and overlaying a finite state machine onto your User's actions.  Controllers and views are included to make it easy to visualize conversion rates throughout your sales funnel.
+
+== Usage
+
+Coming soon...
+
+Here is an example of work-in-progress sales funnel visualization using FunnelCake:
+http://github.com/jkrall/funnel_cake/raw/master/doc/example_funnel.png
+
+== Configuration
+
+Coming soon...
+
+== Credits
+
+FunnelCake was created, and is maintained by {Joshua Krall}[http://github.com/jkrall].  More info at {Transparent Development}[http://transfs.com/devblog], the {Transparent Financial Services}[http://transfs.com] development blog.
+

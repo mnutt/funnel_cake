@@ -1,0 +1,9 @@
+sqlite3:
+  :adapter: sqlite3
+  :database: ":memory:"
+mysql:
+  adapter: mysql
+  database: tfs_test
+  username: root
+  password:
+  socket: /tmp/mysql.sock

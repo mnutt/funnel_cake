@@ -1,0 +1,12 @@
+<% graph_container = 'graph_container' if local_assigns[:graph_container].nil? %>
+<% graph_scale = 0.65 if local_assigns[:graph_scale].nil? %>
+<script type="text/javascript">
+var canviz;
+document.observe('dom:loaded', function() {
+	canviz = new Canviz('<%=graph_container%>');
+	canviz.setImagePath('/images/');
+	canviz.setScale(<%=graph_scale%>);
+	var txt = "<%=xdot_javascript%>";
+	canviz.parse(txt);
+});
+</script>

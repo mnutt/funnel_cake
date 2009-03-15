@@ -1,0 +1,37 @@
+# Generated Tue Aug 21 10:21:22 GMT 2007 by dot - Graphviz version 2.15.20070819.0440 (Tue Aug 21 09:56:32 GMT 2007)
+#
+# 
+# real	0m0.192s
+# user	0m0.162s
+# sys	0m0.025s
+
+digraph finite_state_machine {
+	node [label="\N", shape=doublecircle];
+	graph [rankdir=LR,
+		bb="0,0,832,360",
+		_draw_="c 5 -white C 5 -white P 4 0 0 0 360 832 360 832 0 ",
+		xdotversion="1.2"];
+	LR_0 [pos="41,115", width="1.14", height="1.14", _draw_="c 5 -black e 41 115 37 37 c 5 -black e 41 115 41 41 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 41 110 0 36 4 -LR_0 "];
+	LR_3 [pos="365,40", width="1.11", height="1.11", _draw_="c 5 -black e 365 40 36 36 c 5 -black e 365 40 40 40 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 365 35 0 35 4 -LR_3 "];
+	LR_4 [pos="365,319", width="1.14", height="1.14", _draw_="c 5 -black e 365 319 37 37 c 5 -black e 365 319 41 41 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 365 314 0 36 4 -LR_4 "];
+	LR_8 [pos="791,160", width="1.14", height="1.14", _draw_="c 5 -black e 791 160 37 37 c 5 -black e 791 160 41 41 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 791 155 0 36 4 -LR_8 "];
+	LR_2 [shape=circle, pos="195,159", width="1.03", height="1.03", _draw_="c 5 -black e 195 159 37 37 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 195 154 0 36 4 -LR_2 "];
+	LR_1 [shape=circle, pos="195,58", width="1.03", height="1.03", _draw_="c 5 -black e 195 58 37 37 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 195 53 0 36 4 -LR_1 "];
+	LR_6 [shape=circle, pos="365,188", width="1.03", height="1.03", _draw_="c 5 -black e 365 188 37 37 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 365 183 0 36 4 -LR_6 "];
+	LR_5 [shape=circle, pos="509,116", width="1.03", height="1.03", _draw_="c 5 -black e 509 116 37 37 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 509 111 0 36 4 -LR_5 "];
+	LR_7 [shape=circle, pos="648,88", width="1.00", height="1.00", _draw_="c 5 -black e 648 88 36 36 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 648 83 0 35 4 -LR_7 "];
+	LR_0 -> LR_2 [label="SS(B)", pos="e,159,149 81,126 102,132 128,140 149,146", lp="120,149", _draw_="c 5 -black B 4 81 126 102 132 128 140 149 146 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 148 149 159 149 150 143 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 120 144 0 40 5 -SS(B) "];
+	LR_0 -> LR_1 [label="SS(S)", pos="e,160,71 79,101 101,93 128,83 150,75", lp="120,104", _draw_="c 5 -black B 4 79 101 101 93 128 83 150 75 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 152 78 160 71 149 71 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 120 99 0 40 5 -SS(S) "];
+	LR_1 -> LR_3 [label="S($end)", pos="e,325,44 232,54 256,51 288,48 315,45", lp="278,62", _draw_="c 5 -black B 4 232 54 256 51 288 48 315 45 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 315 48 325 44 315 42 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 278 57 0 55 7 -S($end) "];
+	LR_2 -> LR_6 [label="SS(b)", pos="e,329,182 232,165 258,169 291,175 319,180", lp="278,185", _draw_="c 5 -black B 4 232 165 258 169 291 175 319 180 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 319 183 329 182 320 177 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 278 180 0 39 5 -SS(b) "];
+	LR_2 -> LR_5 [label="SS(a)", pos="e,472,116 230,148 256,140 292,130 324,125 371,119 424,116 462,116", lp="365,133", _draw_="c 5 -black B 7 230 148 256 140 292 130 324 125 371 119 424 116 462 116 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 462 120 472 116 462 113 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 365 128 0 39 5 -SS(a) "];
+	LR_2 -> LR_4 [label="S(A)", pos="e,335,291 222,185 251,212 296,254 328,284", lp="278,270", _draw_="c 5 -black B 4 222 185 251 212 296 254 328 284 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 325 286 335 291 330 281 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 278 265 0 30 4 -S(A) "];
+	LR_5 -> LR_7 [label="S(b)", pos="e,613,96 546,110 561,107 578,103 594,100 597,100 600,99 603,98", lp="579,116", _draw_="c 5 -black B 7 546 110 561 107 578 103 594 100 597 100 600 99 603 98 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 604 101 613 96 603 95 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 579 111 0 29 4 -S(b) "];
+	LR_5 -> LR_5 [label="S(a)", pos="e,522,151 496,151 496,162 501,171 509,171 514,171 518,167 520,161", lp="509,179", _draw_="c 5 -black B 7 496 151 496 162 501 171 509 171 514 171 518 167 520 161 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 523 161 522 151 517 160 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 509 174 0 29 4 -S(a) "];
+	LR_6 -> LR_6 [label="S(b)", pos="e,378,223 352,223 352,234 356,243 365,243 371,243 375,239 377,233", lp="365,251", _draw_="c 5 -black B 7 352 223 352 234 356 243 365 243 371 243 375 239 377 233 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 380 233 378 223 374 233 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 365 246 0 29 4 -S(b) "];
+	LR_6 -> LR_5 [label="S(a)", pos="e,476,133 398,171 419,161 445,148 467,137", lp="439,165", _draw_="c 5 -black B 4 398 171 419 161 445 148 467 137 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 468 140 476 133 465 134 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 439 160 0 29 4 -S(a) "];
+	LR_7 -> LR_8 [label="S(b)", pos="e,755,140 680,104 696,112 715,121 732,129 736,131 741,134 746,136", lp="717,137", _draw_="c 5 -black B 7 680 104 696 112 715 121 732 129 736 131 741 134 746 136 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 744 139 755 140 747 133 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 717 132 0 29 4 -S(b) "];
+	LR_7 -> LR_5 [label="S(a)", pos="e,538,92 613,79 598,76 580,75 564,79 558,81 552,84 547,87", lp="579,91", _draw_="c 5 -black B 7 613 79 598 76 580 75 564 79 558 81 552 84 547 87 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 545 84 538 92 548 90 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 579 86 0 29 4 -S(a) "];
+	LR_8 -> LR_6 [label="S(b)", pos="e,402,191 751,168 702,177 619,191 546,197 514,199 505,198 472,197 453,196 431,194 412,192", lp="579,202", _draw_="c 5 -black B 10 751 168 702 177 619 191 546 197 514 199 505 198 472 197 453 196 431 194 412 192 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 412 189 402 191 412 195 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 579 197 0 29 4 -S(b) "];
+	LR_8 -> LR_5 [label="S(a)", pos="e,545,125 750,155 705,150 629,141 564,129 561,129 558,128 555,127", lp="648,153", _draw_="c 5 -black B 7 750 155 705 150 629 141 564 129 561 129 558 128 555 127 ", _hdraw_="S 5 -solid S 15 -setlinewidth(1) c 5 -black C 5 -black P 3 555 124 545 125 554 130 ", _ldraw_="F 14.000000 11 -Times-Roman c 5 -black T 648 148 0 29 4 -S(a) "];
+}
