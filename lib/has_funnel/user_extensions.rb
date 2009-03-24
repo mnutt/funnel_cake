@@ -40,11 +40,12 @@ module FunnelCake
         # MINUS
         # - exited the given state before the beginning of the date range
         def find_by_starting_state(state, opts={})
+          return [] if state.nil?          
           state = state.to_sym
           return [] unless self.states.include?(state)
           
           join_frags, condition_frags = [], []
-          date_range = opts.delete(:date_range)
+          date_range = opts[:date_range]
 
           join_frags << "INNER JOIN funnel_events as ev0 ON users.id = ev0.user_id"
           condition_frags << "ev0.to = '#{state}'"
@@ -76,12 +77,13 @@ module FunnelCake
         # AND
         # - entered the end state during the date range
         def find_by_state_pair(start_state, end_state, opts={})
+          return [] if start_state.nil? or end_state.nil?
           start_state = start_state.to_sym
           end_state = end_state.to_sym
           return [] unless self.states.include?(start_state)
           return [] unless self.states.include?(end_state)          
           
-          date_range = opts.delete(:date_range)          
+          date_range = opts[:date_range]          
           join_frags, condition_frags = [], []
           
           join_frags << "INNER JOIN funnel_events as ev0 ON users.id = ev0.user_id"
@@ -110,13 +112,14 @@ module FunnelCake
         # AND
         # - entered the end state during the date range
         def find_by_transition(start_state, end_state, opts={})
+          return [] if start_state.nil? or end_state.nil?          
           start_state = start_state.to_sym
           end_state = end_state.to_sym
           return [] unless self.states.include?(start_state)
           return [] unless self.states.include?(end_state)          
           
           join_frags, condition_frags = [], []
-          date_range = opts.delete(:date_range)          
+          date_range = opts[:date_range]          
           
           join_frags << "INNER JOIN funnel_events as ev0 ON users.id = ev0.user_id"
           condition_frags << "ev0.from = '#{start_state}'"
@@ -136,6 +139,7 @@ module FunnelCake
         # By calculating the number of users in the end state, 
         # divided by the number of users in the start state
         def conversion_rate(start_state, end_state, opts={})
+          return 0.0 if start_state.nil? or end_state.nil?          
           top = find_by_state_pair(start_state, end_state, opts)
           bottom = find_by_starting_state(start_state, opts)
           return 0.0 if bottom.empty?

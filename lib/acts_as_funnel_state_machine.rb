@@ -137,8 +137,9 @@ module ScottBarron                   #:nodoc:
         def acts_as_funnel_state_machine(opts)
           self.extend(ClassMethods)
           raise NoInitialState unless opts[:initial]
-          
+
           write_inheritable_attribute :states, {}
+          write_inheritable_attribute :primary_states, []
           write_inheritable_attribute :state_events_table, {}          
           write_inheritable_attribute :initial_state, opts[:initial]
           write_inheritable_attribute :transition_table, {}
@@ -231,7 +232,7 @@ module ScottBarron                   #:nodoc:
         end
 
         def primary_states
-          Hash[read_inheritable_attribute(:states).select {|k,v| v.primary?}].keys
+          read_inheritable_attribute(:primary_states)
         end
 
         def states_table
@@ -286,10 +287,12 @@ module ScottBarron                   #:nodoc:
         def state(name, opts={})
           state = SupportingClasses::State.new(name.to_sym, opts)
           read_inheritable_attribute(:states)[name.to_sym] = state
-
+          
           state_events_table[name.to_sym] = []
         
           define_method("#{state.name}?") { current_state == state.name }
+          
+          read_inheritable_attribute(:primary_states) << name.to_sym if opts[:primary]==true
         end
         
         # Wraps ActiveRecord::Base.find to conveniently find all records in

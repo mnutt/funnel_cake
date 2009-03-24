@@ -1,12 +1,48 @@
 <% graph_container = 'graph_container' if local_assigns[:graph_container].nil? %>
-<% graph_scale = 0.65 if local_assigns[:graph_scale].nil? %>
+<% graph_scale = 0.75 if local_assigns[:graph_scale].nil? %>
 <script type="text/javascript">
 var canviz;
+var funnelChart;
+var updateCanviz = function(start, end) {
+	start = -start;
+	end = -end;
+	$('spinner').appear({ duration: 0.5 });
+	new Ajax.Request('/funnel_events/xdot_callback', 
+		{
+			asynchronous:true, 
+			evalScripts:true, 
+			parameters: {
+				authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
+				start_days_ago: start,
+				end_days_ago: end						
+			},
+			onComplete:function(){
+				$('funnel_container').setStyle({height: $('graph_container').style.height});
+				$('funnel_container_chart').setStyle({height: $('funnel_container_chart').style.height});
+			}
+		}
+	);
+	$('daterange_label').update('Date Range: '+start+' days ago to '+end+' days ago');
+};
+
 document.observe('dom:loaded', function() {
+	var dateSlider = new Control.Slider(['handle_min', 'handle_max'], 'date_slider', {
+	   spans: ["slider_span"],		
+		range: $R(-45, 0),
+		values: [-45, -30, -21, -14, -7, -6, -5, -4, -3, -2, -1, 0],
+		sliderValue: [-14, 0.00001],
+		restricted: true,
+		onChange: function(varr){ 
+			updateCanviz(varr[0],varr[1]);
+		},
+		onSlide: function(varr){
+			$('daterange_label').update('Date Range: '+-varr[0]+' days ago to '+-varr[1]+' days ago');			
+		}
+	});
 	canviz = new Canviz('<%=graph_container%>');
 	canviz.setImagePath('/images/');
 	canviz.setScale(<%=graph_scale%>);
-	var txt = "<%=xdot_javascript%>";
-	canviz.parse(txt);
+	updateCanviz(-14, 0);
+	funnelChart = new FunnelChart( $('funnel_container'), [], {} );	
 });
 </script>

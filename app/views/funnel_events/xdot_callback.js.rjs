@@ -1,0 +1,39 @@
+
+# System call out to graphviz dot, to lay out the funnel graph
+f = IO.popen("dot -Txdot ", "w+")
+dotcode = render :partial=>'graph_dot', :locals=>{:date_range=>@daterange}
+f.write(dotcode + "\n")
+f.close_write
+xdot = f.read 
+
+# Send the canviz javascript down the pipe
+page << "canviz.parse('#{escape_javascript(xdot)}');"
+
+# Construct array of node data for funnel labels
+previousState = :unknown
+nodeStr = "var nodes = ["
+nodeArray = []
+User.primary_states.each_with_index do |state, i|
+  nextState = User.primary_states[i+1]
+  perc = User.conversion_rate(state, nextState, {:date_range=>@daterange})*100.0
+  curNode = <<STR
+    {
+      name: '#{state.to_s.titleize}',
+      position: {x: $('#{state}_node').positionedOffset().left, y: $('#{state}_node').positionedOffset().top},
+      size: {width: $('#{state}_node').getWidth(), height: $('#{state}_node').getHeight()},
+      rate: '#{number_to_percentage(perc, :precision=>1)}'
+    }
+STR
+  nodeArray << curNode
+  previousState = state
+end
+
+nodeStr += nodeArray.join(",")
+nodeStr += "].sortBy(function(s) { return s.position.y });"
+
+# Send node label data down the pipe, and request a redraw of the funnelChart
+page << nodeStr
+page << "funnelChart.funnel_nodes = nodes;"
+page << "funnelChart.redraw();"
+
+page.visual_effect :fade, 'spinner', :duration=>0.5
