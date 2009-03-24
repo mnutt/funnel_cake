@@ -1,4 +1,0 @@
-<%= render :partial => 'canviz_script' %>
-<h3>Funnel Events</h3>
-<div id="graph_container" style="border: 1px solid;"></div>
-<div id="debug_output"></div>

@@ -221,7 +221,7 @@ var Entity = Class.create({
 									text = new Element('span');
 								}
 								text.setAttribute('id', this.name.replace(/->/,'to').replace(/[^\w]/ig,'_'));
-								text.addClassName('graph_node_label');								
+								text.addClassName('graph_label');					
 								text.update(str);
 								text.setStyle({
 									fontSize: Math.round(font_size * ctx_scale * this.canviz.bbScale) + 'px',

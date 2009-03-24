@@ -1,4 +1,4 @@
-class CreateFunnelEvents < ActiveRecord::Migration
+class AddNameUrlToFunnelEvents < ActiveRecord::Migration
   def self.up
     add_column :funnel_events, :url, :string
     add_column :funnel_events, :name, :string    

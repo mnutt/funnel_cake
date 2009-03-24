@@ -1,16 +1,17 @@
+<% daterange = 2.weeks.ago..DateTime.now %>
 digraph finite_state_machine {
 	node [shape = box];
 <% User.states_table.each do |s, state| -%>
 	<% if state.primary? -%>
-	<%=s%> [label = "<%= s.to_s.titleize %>", style="setlinewidth(1.0)", color=blue, fontname=Helvetica];
+	<%=s%> [label = "<%= s.to_s.titleize + ": " + User.find_by_starting_state(s, {:date_range=>daterange}).count.to_s %>", style="setlinewidth(1.0)", color=blue, fontname=Helvetica];
 	<% else -%>
-	<%=s%> [label = "<%= s.to_s.titleize %>", style="setlinewidth(0.75)", color=black, fontname=Helvetica];
+	<%=s%> [label = "<%= s.to_s.titleize + ": " + User.find_by_starting_state(s, {:date_range=>daterange}).count.to_s %>", style="setlinewidth(0.75)", color=black, fontname=Helvetica];
 	<% end -%>
 <% end -%>
 
 <% User.event_table.each do |ev_name, ev| -%>
 	<% User.transition_table[ev_name].each do |trans| -%>
-		<%=trans.from%> -> <%=trans.to%> [ label = "<%= ev_name.to_s.titleize %>", style="setlinewidth(3.0)", color=saddlebrown, fontname=Helvetica ];
+		<%=trans.from%> -> <%=trans.to%> [ label = "<%= User.find_by_transition(trans.from, trans.to, {:date_range=>daterange}).count %>", style="setlinewidth(3.0)", color=saddlebrown, fontname=Helvetica ];
 	<% end -%>
 <% end -%>
 }
