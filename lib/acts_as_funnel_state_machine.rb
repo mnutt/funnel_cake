@@ -269,7 +269,11 @@ module ScottBarron                   #:nodoc:
           et = read_inheritable_attribute(:event_table)
           e = et[event.to_sym] = SupportingClasses::Event.new(event, opts, tt, state_events_table, self, &block)
 
-          define_method("#{event.to_s}!") { e.fire(self) }
+          define_method("#{event.to_s}!") do |*values|
+            raise ArgumentError, "wrong number of arguments (#{values.size} for 1)" if values.length > 1
+            data = values.first.nil? ? {} : values.first
+            e.fire(self, data)
+          end
         end
         
         # Define a state of the system. +state+ can take an optional Proc object

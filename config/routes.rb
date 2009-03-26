@@ -3,6 +3,6 @@
 # 
 ActionController::Routing::Routes.draw do |map|
 
-  map.resources :funnel_events  
+  map.resources :funnel_events, {:collection=>{:diagram=>:any}}
   
 end

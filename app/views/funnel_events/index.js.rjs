@@ -1,0 +1,13 @@
+
+remove_old_rows = <<HERE
+  var lastRow = $$('tr.funnel_event').last();
+  for(i=0; i<#{@funnel_events.count}; i++) {
+    var oldLastRow = lastRow;
+    lastRow = oldLastRow.previousSiblings().first();
+    oldLastRow.fade({duration: 0.5, afterFinish: function(e){ $(e.element.id).remove() }});
+  }
+HERE
+
+page << remove_old_rows
+
+page.insert_html :after, 'funnel_events_header', :partial => 'funnel_event', :collection=>@funnel_events

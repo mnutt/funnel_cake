@@ -1,11 +1,21 @@
 class FunnelEventsController < ApplicationController
 
-  def setup_includes
-    super
-    @stylesheets = ['admin']
+  def index
+    limit = params[:limit].nil? ? 25 : params[:limit]
+
+    respond_to do |format|
+      format.html do
+        @funnel_events = FunnelEvent.find(:all, :limit=>limit, :include=>[:user, :funnel_visitor], :order=>'created_at DESC')
+      end
+      format.js do 
+        timestamp = params[:timestamp].to_datetime
+        @funnel_events = FunnelEvent.find(:all, :limit=>limit, :include=>[:user, :funnel_visitor], 
+                                                :order=>'created_at DESC', :conditions=>['created_at > ?',timestamp])
+      end
+    end
   end
 
-  def index
+  def diagram
     @javascripts.push 'excanvas'
     @javascripts.push 'funnel_chart'    
     @javascripts.push 'canviz'
@@ -19,5 +29,6 @@ class FunnelEventsController < ApplicationController
       format.js { render }
     end
   end
+
    
 end

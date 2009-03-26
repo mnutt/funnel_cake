@@ -1,73 +1,73 @@
 before_before:
    id: 10
-   hash: 1010
+   key: 1010
    user_id: 10
 before_during:
    id: 11
-   hash: 1111
+   key: 1111
    user_id: 11
 before_after:
    id: 12
-   hash: 1212
+   key: 1212
    user_id: 12
 before:
    id: 13
-   hash: 1313
+   key: 1313
    user_id: 13
 during_during:
    id: 14
-   hash: 1414
+   key: 1414
    user_id: 14   
 during_after:
    id: 15
-   hash: 1515
+   key: 1515
    user_id: 15   
 during:
    id: 16
-   hash: 1616
+   key: 1616
    user_id: 16
 after_after:
    id: 17
-   hash: 1717
+   key: 1717
    user_id: 17
 after:
    id: 18
-   hash: 1818
+   key: 1818
    user_id: 18
 
 visitor_only_before_before:
    id: 19
-   hash: 1919
+   key: 1919
    user_id: 
 visitor_only_before_during:
    id: 20
-   hash: 2020
+   key: 2020
    user_id: 
 visitor_only_before_after:
    id: 21
-   hash: 2121
+   key: 2121
    user_id: 
 visitor_only_before:
    id: 22
-   hash: 2222
+   key: 2222
    user_id: 
 visitor_only_during_during:
    id: 23
-   hash: 2323
+   key: 2323
    user_id: 
 visitor_only_during_after:
    id: 24
-   hash: 2424
+   key: 2424
    user_id:    
 visitor_only_during:
    id: 25
-   hash: 2525
+   key: 2525
    user_id: 
 visitor_only_after_after:
    id: 26
-   hash: 2626
+   key: 2626
    user_id: 
 visitor_only_after:
    id: 27
-   hash: 2727
+   key: 2727
    user_id: 

@@ -63,17 +63,8 @@ module Test
   end
 end
 
-module Spec
-  module Rails
-    module Example
-      # Model examples live in $RAILS_ROOT/spec/models/.
-      #
-      # Model examples use Spec::Rails::Example::ModelExampleGroup, which
-      # provides support for fixtures and some custom expectations via extensions
-      # to ActiveRecord::Base.
-      class ModelExampleGroup < ActiveSupport::TestCase
-        Spec::Example::ExampleGroupFactory.register(:model, self)
-      end
-    end
-  end
-end
+require 'spec/example/model_example_group'
+require 'spec/example/render_observer'
+require 'spec/example/functional_example_group'
+require 'spec/example/controller_example_group'
+

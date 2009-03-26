@@ -1,7 +1,7 @@
 class CreateFunnelVisitors < ActiveRecord::Migration
   def self.up
     create_table :funnel_visitors do |t|
-      t.string :hash
+      t.string :key
       t.integer :user_id
 
       t.timestamps

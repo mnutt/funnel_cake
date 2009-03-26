@@ -11,6 +11,7 @@ end
 
 describe "using has_funnel on a User model" do
   class TestUser < ActiveRecord::Base
+    set_table_name :users
   end
   class FunnelEvent < ActiveRecord::Base
   end
@@ -77,6 +78,34 @@ describe "using has_funnel on a User model" do
 end
 
 describe "for instance methods on a acts_as_funnel model" do
-  describe "when logging transitions" do
+  before(:each) do
+    @user = TestUser.new
+  end
+  describe "when responding to a state_machine transition" do
+    it "should create a new FunnelEvent" do
+      @fe = mock('funnel_events')
+      @fe.should_receive(:create).with(:from=>"from", :to=>"to", :name=>"event", :url=>"url")
+      @user.should_receive(:funnel_events).and_return(@fe)
+      @user.log_transition("from", "to", "event", {:url=>"url"}, {})
+    end
+  end
+  describe "when performing a funnel event" do
+    before(:each) do
+      @user.stub!(:valid_events).and_return([:do_a, :do_b])
+    end
+    it "should log an error and return if the event is not valid for the current state" do
+      @user.should_receive(:valid_events).and_return([:do_c, :do_d])
+      @user.stub!(:current_state).and_return([:state_a])      
+      logger = mock('logger')
+      logger.stub!(:debug)
+      @user.stub!(:logger).and_return(logger)
+      @user.should_not_receive(:do_b!)
+      @user.log_funnel_event(:do_b, {:url=>"url"})
+    end
+    it "should call send() with the appropriate event name" do
+      @user.should_receive(:do_b!)
+      @user.log_funnel_event(:do_b, {:url=>"url"})
+    end
   end
 end
+

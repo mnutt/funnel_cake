@@ -15,7 +15,8 @@ ActiveRecord::Schema.define(:version => 1) do
   end
   
   create_table :funnel_visitors, :force => true do |t|
-   t.string :hash
+   t.string :key
+   t.string :state   
    t.integer :user_id
   end
 end
