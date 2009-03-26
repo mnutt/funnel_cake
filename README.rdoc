@@ -9,10 +9,8 @@ While there are plenty of web analytics solutions, and many of them offer goal-t
 FunnelCake is composed of a few parts:
 
 * Rails Plugin code that can be easily mixed into your existing User model and application controllers:
-  * A User model directive: has_funnel, which provides state_machine and tracking capabilities for your 
-  existing user model
-  * An ApplicationController directive: has_visitor_tracking, which adds a before_filter and some utility
-  methods for tracking "visitors" to your site and linking them up to Users when they authenticate
+  * A User model directive: has_funnel, which provides state_machine and tracking capabilities for your existing user model
+  * An ApplicationController directive: has_visitor_tracking, which adds a before_filter and some utility methods for tracking "visitors" to your site and linking them up to Users when they authenticate
 * A core FunnelCake::Engine class that contains the logic for calculating conversion rates and other stats
 * A rails engine that provides models and controllers for viewing and managing the funnel event data
 
