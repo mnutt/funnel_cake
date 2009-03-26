@@ -1,30 +1,38 @@
-
 $:.unshift(File.dirname(__FILE__) + '/../lib')
 RAILS_ROOT = File.dirname(__FILE__)
 
 require 'rubygems'
 require 'test/unit'
+require 'active_support'
 require 'active_record'
 require 'active_record/fixtures'
+require 'action_controller'
 require "#{File.dirname(__FILE__)}/../init"
 
 
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
 ActiveRecord::Base.configurations = config
-ActiveRecord::Base.logger = nil #Logger.new(File.dirname(__FILE__) + "/../debug.log")
+ActiveRecord::Base.logger = Logger.new(File.dirname(__FILE__) + "/../log/debug.log")
 ActiveRecord::Base.establish_connection(config[ENV['DB'] || 'mysql'])
 
 load(File.dirname(__FILE__) + "/schema.rb") if File.exist?(File.dirname(__FILE__) + "/schema.rb")
 
-Test::Unit::TestCase.fixture_path = File.dirname(__FILE__) + "/fixtures/"
-$LOAD_PATH.unshift(Test::Unit::TestCase.fixture_path)
+class ActiveSupport::TestCase #:nodoc:
+  superclass_delegating_accessor :fixture_path
+  superclass_delegating_accessor :use_transactional_fixtures
+  superclass_delegating_accessor :use_instantiated_fixtures  
+end
+ActiveSupport::TestCase.fixture_path = File.dirname(__FILE__) + "/fixtures/"
+$LOAD_PATH.unshift(ActiveSupport::TestCase.fixture_path)
 
-class Test::Unit::TestCase #:nodoc:
+class ActiveSupport::TestCase #:nodoc:
+  include ActiveRecord::TestFixtures
+  
   def create_fixtures(*table_names)
     if block_given?
-      Fixtures.create_fixtures(Test::Unit::TestCase.fixture_path, table_names) { yield }
+      Fixtures.create_fixtures(ActiveSupport::TestCase.fixture_path, table_names) { yield }
     else
-      Fixtures.create_fixtures(Test::Unit::TestCase.fixture_path, table_names)
+      Fixtures.create_fixtures(ActiveSupport::TestCase.fixture_path, table_names)
     end
   end
 
@@ -39,30 +47,22 @@ end
 
 require 'spec/interop/test'
 
-module Spec
-  module Rails
 
-    module Example
-      class RailsExampleGroup < Test::Unit::TestCase
-        
-        # Rails >= r8570 uses setup/teardown_fixtures explicitly
-        # However, Rails >= r8664 extracted these out to use ActiveSupport::Callbacks.
-        # The latter case is handled at the TestCase level, in interop/testcase.rb
-        # unless ActiveSupport.const_defined?(:Callbacks) and self.include?(ActiveSupport::Callbacks)
-          before(:each) do
-            setup_fixtures if self.respond_to?(:setup_fixtures)
-          end
-          after(:each) do
-            teardown_fixtures if self.respond_to?(:teardown_fixtures)
-          end
-        # end
-        
-        Spec::Example::ExampleGroupFactory.default(self)
-        
+module Test
+  module Unit
+    class TestCase
+      # Edge rails (r8664) introduces class-wide setup & teardown callbacks for Test::Unit::TestCase.
+      # Make sure these still get run when running TestCases under rspec:
+      prepend_before(:each) do
+        run_callbacks :setup if respond_to?(:run_callbacks)
+      end
+      append_after(:each) do
+        run_callbacks :teardown if respond_to?(:run_callbacks)
       end
     end
   end
 end
+
 module Spec
   module Rails
     module Example
@@ -71,7 +71,7 @@ module Spec
       # Model examples use Spec::Rails::Example::ModelExampleGroup, which
       # provides support for fixtures and some custom expectations via extensions
       # to ActiveRecord::Base.
-      class ModelExampleGroup < RailsExampleGroup
+      class ModelExampleGroup < ActiveSupport::TestCase
         Spec::Example::ExampleGroupFactory.register(:model, self)
       end
     end

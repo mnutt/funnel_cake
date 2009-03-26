@@ -1,4 +1,3 @@
-
 class FunnelEventsController < ApplicationController
 
   def setup_includes

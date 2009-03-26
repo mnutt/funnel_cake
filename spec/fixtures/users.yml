@@ -25,3 +25,31 @@ after_after:
 after:
    id: 9
    email: after@test.com
+
+visitor_before_before:
+   id: 10
+   email: visitor_before_before@test.com
+visitor_before_during:
+   id: 11
+   email: visitor_before_during@test.com
+visitor_before_after:
+   id: 12
+   email: visitor_before_after@test.com
+visitor_before:
+   id: 13
+   email: visitor_before@test.com
+visitor_during_during:
+   id: 14
+   email: visitor_during_during@test.com
+visitor_during_after:
+   id: 15
+   email: visitor_during_after@test.com
+visitor_during:
+   id: 16
+   email: visitor_during@test.com
+visitor_after_after:
+   id: 17
+   email: visitor_after_after@test.com
+visitor_after:
+   id: 18
+   email: visitor_after@test.com

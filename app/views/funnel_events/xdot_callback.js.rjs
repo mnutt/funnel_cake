@@ -15,7 +15,7 @@ nodeStr = "var nodes = ["
 nodeArray = []
 User.primary_states.each_with_index do |state, i|
   nextState = User.primary_states[i+1]
-  perc = User.conversion_rate(state, nextState, {:date_range=>@daterange})*100.0
+  perc = FunnelCake::Engine.conversion_rate(state, nextState, {:date_range=>@daterange})*100.0
   curNode = <<STR
     {
       name: '#{state.to_s.titleize}',
