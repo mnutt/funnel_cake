@@ -8,6 +8,9 @@ module FunnelCake
 
       module ClassMethods
         def has_visitor_tracking(opts = {})
+          opts[:cookie_name] = 'visitor_tracker' if opts[:cookie_name].nil?
+          write_inheritable_attribute :cookie_name, opts[:cookie_name]
+          
           # set up a callback to prefilter visitors and get them registered
           before_filter :track_visitor_as_user
                     
@@ -77,7 +80,7 @@ module FunnelCake
         
         # Is the current visitor registered?  We check the cookie state to find out
         def visitor_registered?
-          cookies[:transfs_ut].nil? == false
+          cookies[self.class.read_inheritable_attribute(:cookie_name)].nil? == false
         end
         
         # Register the current visitor (without checking anything first, just do it)
@@ -85,7 +88,7 @@ module FunnelCake
         # - Set the cookie value for this visitor
         def register_funnel_visitor
           @current_visitor = FunnelCake::Engine.visitor_class.create(:key=>FunnelCake::RandomId.generate(50))
-          cookies[:transfs_ut] = {
+          cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
             :value => @new_visitor.key
           }
         end
@@ -93,8 +96,8 @@ module FunnelCake
         # returns the current FunnelVisitor object, using the visitor's cookie
         def current_visitor
           return @current_visitor unless @current_visitor.nil?
-          return nil if cookies[:transfs_ut].nil?
-          @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookies[:transfs_ut])
+          return nil if cookies[self.class.read_inheritable_attribute(:cookie_name)].nil?
+          @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookies[self.class.read_inheritable_attribute(:cookie_name)])
           return @current_visitor
         end
         
