@@ -8,6 +8,8 @@
 	 <%= funnel_event.funnel_visitor.user.email unless funnel_event.funnel_visitor.nil? or funnel_event.funnel_visitor.user.nil? %>
 	 </td>
     <td><%= funnel_event.funnel_visitor.key[0..15]+'...' unless funnel_event.funnel_visitor.nil? %></td>	 
+    <td><%= funnel_event.funnel_visitor.ip unless funnel_event.funnel_visitor.nil? %></td>	 
+    <td><%= funnel_event.referer %></td>	 	 
     <td><%#= human_time(funnel_event.created_at) %><%=funnel_event.created_at.to_s(:short)%>
 	 <span id='datetime_<%=funnel_event.id%>' style="display: none;"><%=funnel_event.created_at%></span></td>
   </tr>

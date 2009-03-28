@@ -56,7 +56,7 @@ module FunnelCake
         # Utility method for logging a page visit
         # - sets the url data string automatically using the request_uri
         def log_funnel_page_visit
-          log_funnel_event(:view_page, {:url=>request.request_uri})
+          log_funnel_event(:view_page, {:url=>request.request_uri, :referer=>request.referer})
         end
         
         # Utility method for syncing the current visitor to the current user
@@ -87,7 +87,10 @@ module FunnelCake
         # - We create a new FunnelVisitor here, using a new random hex key
         # - Set the cookie value for this visitor
         def register_funnel_visitor
-          @current_visitor = FunnelCake::Engine.visitor_class.create(:key=>FunnelCake::RandomId.generate(50))
+          @current_visitor = FunnelCake::Engine.visitor_class.create(
+                              :key=>FunnelCake::RandomId.generate(50),
+                              :ip=>request.remote_ip.to_s
+                              )
           cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
             :value => @current_visitor.key,
             :expires => 1.year.from_now
