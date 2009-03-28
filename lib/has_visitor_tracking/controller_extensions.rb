@@ -89,7 +89,8 @@ module FunnelCake
         def register_funnel_visitor
           @current_visitor = FunnelCake::Engine.visitor_class.create(:key=>FunnelCake::RandomId.generate(50))
           cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
-            :value => @current_visitor.key
+            :value => @current_visitor.key,
+            :expires => 1.year.from_now
           }
         end
         
