@@ -94,7 +94,10 @@ module FunnelCake
         # Create a FunnelEvent, as a callback to a state_machine transition
         def log_transition(from, to, event, data, opts)  
           self.funnel_events.create( :from=>from.to_s, :to=>to.to_s, 
-                                    :url=>data[:url], :name=>event.to_s)
+                                    :url=>data[:url], 
+                                    :referer=>data[:referer],
+                                    :user_agent=>data[:user_agent],
+                                    :name=>event.to_s)
         end
         
         # Utility method for logging funnel events from within application code
