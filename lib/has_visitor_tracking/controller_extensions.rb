@@ -17,11 +17,11 @@ module FunnelCake
           # include the instance methods
           include FunnelCake::HasVisitorTracking::ControllerExtensions::InstanceMethods
         end
-        
-        
       end
 
       module InstanceMethods
+        
+        protected
         
         # This is a before_filter callback for registering new visitors
         # - admin users are ignored
