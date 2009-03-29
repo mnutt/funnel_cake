@@ -54,7 +54,9 @@ module FunnelCake
         # Utility method for logging a page visit
         # - sets the url data string automatically using the request_uri
         def log_funnel_page_visit
-          log_funnel_event(:view_page, {:url=>request.request_uri, :referer=>request.referer})
+          log_funnel_event(:view_page, {:url=>request.request_uri, 
+                                        :referer=>request.referer,
+                                        :user_agent=>request.env["HTTP_USER_AGENT"].to_s})
         end
         
         # Utility method for syncing the current visitor to the current user
