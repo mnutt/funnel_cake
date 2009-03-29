@@ -1,0 +1,18 @@
+<table class='admin_vtable'>
+	<tr><th>ID:</th><td><%= @funnel_event.id %></td></tr>
+	<tr><th>Name:</th><td><%= @funnel_event.name %></td></tr>
+	<tr><th>From:</th><td><%= @funnel_event.from %></td></tr>
+	<tr><th>To:</th><td><%= @funnel_event.to %></td></tr>
+	<tr><th>URL:</th><td><%= @funnel_event.url.sub(/https?:\/\/[^\/]+/,'') unless @funnel_event.url.nil? %></td></tr>
+	<tr><th>Email:</th><td><%= @funnel_event.user.email unless @funnel_event.user.nil? %>
+	<%= @funnel_event.funnel_visitor.user.email unless @funnel_event.funnel_visitor.nil? or @funnel_event.funnel_visitor.user.nil? %>
+	</td></tr>
+	<tr><th>Visitor Key:</th><td><%= @funnel_event.funnel_visitor.key[0..5]+'...' unless @funnel_event.funnel_visitor.nil? %></td></tr>
+	<tr><th>IP:</th><td><%= @funnel_event.funnel_visitor.ip unless @funnel_event.funnel_visitor.nil? %></td></tr>
+	<tr><th>Referer:</th><td><%= @funnel_event.referer %></td></tr>
+	<tr><th>User-Agent:</th><td><%= @funnel_event.user_agent %></td></tr>	
+
+	<tr><th>Date:</th><td><%#= human_time(@funnel_event.created_at) %><%=@funnel_event.created_at.to_s(:short)%>
+	<span id='datetime_<%=@funnel_event.id%>' style="display: none;"><%=@funnel_event.created_at%></span></td></tr>
+</p>
+<%= link_to 'Back', funnel_events_path %>

@@ -14,6 +14,15 @@ class FunnelEventsController < ApplicationController
       end
     end
   end
+  
+  # GET /funnel_events/1
+  def show
+    @funnel_event = FunnelEvent.find(params[:id])
+    
+    respond_to do |format|
+      format.html # show.html.erb
+    end
+  end
 
   def diagram
     @javascripts.push 'excanvas'
