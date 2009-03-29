@@ -85,9 +85,7 @@ module FunnelCake
           return true if respond_to?(:ignore_visitor?) and ignore_visitor?
           
           # ignore search engine bots
-          # return true if request.env["HTTP_USER_AGENT"][/Googlebot/]
-          # return true if request.env["HTTP_USER_AGENT"][/msnbot/]
-          # return true if request.env["HTTP_USER_AGENT"][/Yahoo/]
+          return true if request.env["HTTP_USER_AGENT"][/Googlebot|msnbot|Yahoo|Baidu|Teoma/]
           return true if funnel_browser_name=='other'
           
           # check funnel-ignore list
