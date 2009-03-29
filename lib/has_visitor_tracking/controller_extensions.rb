@@ -82,6 +82,11 @@ module FunnelCake
           return true if respond_to?(:internal_visitor?) and internal_visitor?
           return true if respond_to?(:ignore_visitor?) and ignore_visitor?
           
+          # ignore search engine bots
+          return true if request.env["HTTP_USER_AGENT"][/Googlebot/]
+          return true if request.env["HTTP_USER_AGENT"][/msnbot/]
+          return true if request.env["HTTP_USER_AGENT"][/Yahoo/]
+          
           # check funnel-ignore list
           return true unless FunnelIgnore.find_by_ip(request.remote_ip.to_s).nil?
           
