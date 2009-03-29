@@ -85,9 +85,10 @@ module FunnelCake
           return true if respond_to?(:ignore_visitor?) and ignore_visitor?
           
           # ignore search engine bots
-          return true if request.env["HTTP_USER_AGENT"][/Googlebot/]
-          return true if request.env["HTTP_USER_AGENT"][/msnbot/]
-          return true if request.env["HTTP_USER_AGENT"][/Yahoo/]
+          # return true if request.env["HTTP_USER_AGENT"][/Googlebot/]
+          # return true if request.env["HTTP_USER_AGENT"][/msnbot/]
+          # return true if request.env["HTTP_USER_AGENT"][/Yahoo/]
+          return true if funnel_browser_name=='other'
           
           # check funnel-ignore list
           return true unless FunnelIgnore.find_by_ip(request.remote_ip.to_s).nil?
@@ -121,6 +122,29 @@ module FunnelCake
           @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookies[self.class.read_inheritable_attribute(:cookie_name)])
           return @current_visitor
         end
+        
+        
+        def funnel_browser_name
+          @funnel_browser_name ||= begin
+            ua = request.env['HTTP_USER_AGENT'].downcase
+            
+            if ua.index('msie') && !ua.index('opera') && !ua.index('webtv')
+              'ie'+ua[ua.index('msie')+5].chr
+            elsif ua.index('gecko/') 
+              'gecko'
+            elsif ua.index('opera')
+              'opera'
+            elsif ua.index('konqueror') 
+              'konqueror'
+            elsif ua.index('applewebkit/')
+              'safari'
+            elsif ua.index('mozilla/')
+              'gecko'
+            else
+              'other'
+            end
+          end
+        end  
         
       end
     end  
