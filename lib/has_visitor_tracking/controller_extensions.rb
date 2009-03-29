@@ -26,8 +26,7 @@ module FunnelCake
         # This is a before_filter callback for registering new visitors
         # - admin users are ignored
         def track_visitor_as_user
-          return if respond_to?(:internal_visitor?) and internal_visitor?
-          return if respond_to?(:ignore_visitor?) and ignore_visitor?          
+          return if ignore_funnel_tracking?
           register_funnel_visitor unless visitor_registered?
         end
         
@@ -39,8 +38,7 @@ module FunnelCake
         # - if there is no valid current visitor, register one
         # - finally... logs an error if we have no current visitor (because that shouldn't happen!)
         def log_funnel_event(event, data={})
-          return if respond_to?(:internal_visitor?) and internal_visitor?
-          return if respond_to?(:ignore_visitor?) and ignore_visitor?          
+          return if ignore_funnel_tracking?
           if logged_in?
             current_user.log_funnel_event(event, data)
             return
@@ -77,6 +75,18 @@ module FunnelCake
         end
         
         private
+        
+        # should we ignore this visitor?
+        def ignore_funnel_tracking?
+          # check user-overrideable methods
+          return true if respond_to?(:internal_visitor?) and internal_visitor?
+          return true if respond_to?(:ignore_visitor?) and ignore_visitor?
+          
+          # check funnel-ignore list
+          return true unless FunnelIgnore.find_by_ip(request.remote_ip.to_s).nil?
+          
+          return false
+        end
         
         # Is the current visitor registered?  We check the cookie state to find out
         def visitor_registered?

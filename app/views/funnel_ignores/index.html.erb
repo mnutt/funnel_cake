@@ -1,0 +1,22 @@
+<h1>Funnel Ignore List</h1>
+
+<table>
+  <tr>
+	 <th>Name</th>
+	 <th>IP</th>
+	 <th colspan='3'></th>
+  </tr>
+<% @funnel_ignores.each do |funnel_ignore| %>
+  <tr>
+	 <td><%= funnel_ignore.name %></td>
+	 <td><%= funnel_ignore.ip %></td>	 
+    <td><%= link_to 'Show', funnel_ignore %></td>
+    <td><%= link_to 'Edit', edit_funnel_ignore_path(funnel_ignore) %></td>
+    <td><%= link_to 'Destroy', funnel_ignore, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New funnel_ignore', new_funnel_ignore_path %>
