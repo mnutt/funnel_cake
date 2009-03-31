@@ -124,7 +124,8 @@ module FunnelCake
         
         def funnel_browser_name
           @funnel_browser_name ||= begin
-            ua = request.env['HTTP_USER_AGENT'].downcase
+            ua = request.env['HTTP_USER_AGENT'] || ''
+            ua.downcase!
             
             if ua.index('msie') && !ua.index('opera') && !ua.index('webtv')
               'ie'+ua[ua.index('msie')+5].chr
