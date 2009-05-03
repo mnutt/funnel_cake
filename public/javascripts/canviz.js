@@ -1,5 +1,6 @@
 // $Id: canviz.js 239 2008-12-24 04:09:16Z ryandesign.com $
 
+
 var Tokenizer = Class.create({
 	initialize: function(str) {
 		this.str = str;
@@ -111,8 +112,9 @@ var Entity = Class.create({
 		if (!redraw_canvas_only) {
 			this.initBB();
 			var bb_div = new Element('div');
-			bb_div.setAttribute('id', this.name.replace(/->/,'to').replace(/[^\w]/ig,'_')+'_node');
-			bb_div.addClassName('graph_node');
+			var nodetype = this.defaultAttrHashName.replace(/Attrs/,'');
+			bb_div.setAttribute('id', this.name.replace(/->/,'to').replace(/[^\w]/ig,'_')+'_'+nodetype);
+			bb_div.addClassName('graph_'+nodetype);
 			this.canviz.elements.appendChild(bb_div);
 		}
 		this.drawAttrs.each(function(draw_attr) {
@@ -189,7 +191,6 @@ var Entity = Class.create({
 							var text_width = Math.round(ctx_scale * tokenizer.takeNumber());
 							var str = tokenizer.takeString();
 							if (!redraw_canvas_only && !/^\s*$/.test(str)) {
-//								debug('draw text ' + str + ' ' + l + ' ' + t + ' ' + text_align + ' ' + text_width);
 								str = str.escapeHTML();
 								do {
 									matches = str.match(/ ( +)/);
@@ -201,6 +202,7 @@ var Entity = Class.create({
 										str = str.replace(/  +/, spaces);
 									}
 								} while (matches);
+/*
 								var text;
 								var href = this.getAttr('URL', true) || this.getAttr('href', true);
 								if (href) {
@@ -222,7 +224,15 @@ var Entity = Class.create({
 								}
 								text.setAttribute('id', this.name.replace(/->/,'to').replace(/[^\w]/ig,'_'));
 								text.addClassName('graph_label');					
-								text.update(str);
+*/
+								bb_div.update(str);
+								bb_div.setStyle({
+									fontSize: Math.round(font_size * ctx_scale * this.canviz.bbScale) + 'px',
+									fontFamily: font_family,
+									color: ctx.strokeStyle,
+									textAlign: (-1 == text_align) ? 'left' : (1 == text_align) ? 'right' : 'center'
+								});								
+/*								
 								text.setStyle({
 									fontSize: Math.round(font_size * ctx_scale * this.canviz.bbScale) + 'px',
 									fontFamily: font_family,
@@ -234,6 +244,7 @@ var Entity = Class.create({
 									width: (2 * text_width) + 'px'
 								});
 								this.canviz.elements.appendChild(text);
+*/
 							}
 							break;
 						case 'C': // set fill color
@@ -302,9 +313,10 @@ var Entity = Class.create({
 					bb_div.setStyle({
 						position: 'absolute',
 						left:   Math.round(ctx_scale * this.bbRect.l + this.canviz.padding) + 'px',
-						top:    Math.round(ctx_scale * this.bbRect.t + this.canviz.padding) + 'px',
+						top:    Math.round(ctx_scale * this.bbRect.t + this.canviz.padding) - 0.25*Math.round(ctx_scale * this.bbRect.getHeight()) + 6 + 'px',
 						width:  Math.round(ctx_scale * this.bbRect.getWidth()) + 'px',
-						height: Math.round(ctx_scale * this.bbRect.getHeight()) + 'px'
+						height: Math.round(ctx_scale * this.bbRect.getHeight()) - 8 + 'px',
+						paddingTop: 0.25*Math.round(ctx_scale * this.bbRect.getHeight()) + 'px'						
 					});
 				}
 				ctx.restore();
@@ -792,3 +804,4 @@ function debug(str, escape) {
 	}
 	$('debug_output').innerHTML += '&raquo;' + str + '&laquo;<br />';
 }
+

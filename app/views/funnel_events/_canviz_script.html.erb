@@ -3,7 +3,8 @@
 <script type="text/javascript">
 var canviz;
 var funnelChart;
-var updateCanviz = function(start, end) {
+var updateCanviz = function(start, end, redraw) {
+	if (!redraw) { redraw = 0;	}
 	start = -start;
 	end = -end;
 	$('spinner').appear({ duration: 0.5 });
@@ -14,7 +15,8 @@ var updateCanviz = function(start, end) {
 			parameters: {
 				authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
 				start_days_ago: start,
-				end_days_ago: end						
+				end_days_ago: end,
+				drawchart: redraw			
 			},
 			onComplete:function(){
 				$('funnel_container').setStyle({height: $('graph_container').style.height});
@@ -42,7 +44,7 @@ document.observe('dom:loaded', function() {
 	canviz = new Canviz('<%=graph_container%>');
 	canviz.setImagePath('/images/');
 	canviz.setScale(<%=graph_scale%>);
-	updateCanviz(-14, 0);
+	updateCanviz(-14, 0, true);
 	funnelChart = new FunnelChart( $('funnel_container'), [], {} );	
 });
 </script>

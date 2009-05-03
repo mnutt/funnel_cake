@@ -1,50 +1,25 @@
-<style>
-div.slider {
-	background-color: #AAA;
-	height: 2px;
-	position: relative;
-	width: 300px;
-	margin: 10px;
-}
-div.slider div.handle {
-	background-color: #0000AA;
-	cursor: move;
-	height: 10px;
-	position: absolute;
-	width: 5px;
-	top: -6px;
-}
-div.slider div.span {
-	background-color: #009933;
-	cursor: move;
-	height: 5px;
-	position: absolute;
-	width: 8px;
-	z-index: -10;
-	top: -4px;
-}
-div.spinner {
-	width: 32px;
-	height: 32px;
-	position: absolute;
-	top: 100px;
-	left: 400px;	
-}
-</style>
-<h3>Conversion Funnel - <span id="daterange_label">Date Range</span></h3>
 <%= render :partial => 'canviz_script', :locals=>{:graph_scale=>0.65} %>
-<div id="date_slider" class="slider">
-  <div id="handle_min" class="handle left"></div>
-  <div id="handle_max" class="handle right"></div>
-  <div id="slider_span" class="span"></div>  
+<div class="section span-12">
+	<h3 id="daterange_label">Date Range</h3>
+	<div id="date_slider" class="slider">
+	  <div id="handle_min" class="handle left"></div>
+	  <div id="handle_max" class="handle right"></div>
+	  <div id="slider_span" class="span"></div>  
+	</div>
 </div>
-<div id="graph" class="graph">
+<div id="graph" class="section span-12">
 	<div id="spinner" class="spinner">
 		<img src='/images/ajax-loader.gif' />
 	</div>
-	<div class="graph_container" id="graph_container" style="float: left;"></div>
-	<div class="funnel_container" id="funnel_container" style="float: left; width: 200px; height: 800px;">
-		<canvas id='funnel_container_chart' width='200' height='800' style='border: 0; padding: 0;'></canvas>
+	<div class="column span-6">
+		<h2>Funnel Diagram</h2>
+		<div class="graph_container" id="graph_container" style="float: left;"></div>
+	</div>
+	<div class="column span-5 last">
+		<h2>Primary Conversion Rates</h2>
+		<div class="funnel_container" id="funnel_container" style="float: left; width: 200px; height: 800px;">
+			<canvas id='funnel_container_chart' width='200' height='800' style='border: 0; padding: 0;'></canvas>
+		</div>
 	</div>	
 	<div class="debug_output" id="debug_output"></div>
 </div>

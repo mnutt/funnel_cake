@@ -39,16 +39,12 @@ module FunnelCake
         # - finally... logs an error if we have no current visitor (because that shouldn't happen!)
         def log_funnel_event(event, data={})
           return if ignore_funnel_tracking?
-          if logged_in?
-            current_user.log_funnel_event(event, data)
-            return
-          end
           register_funnel_visitor if current_visitor.nil?
           unless current_visitor.nil?
             current_visitor.log_funnel_event(event, data)
             return
           end
-          logger.debug "Couldn't Log FunnelCake Event: #{event}  No User or FunnelVisitor found!"
+          logger.debug "Couldn't Log FunnelCake Event: #{event}  No FunnelVisitor found!"
         end
         
         # Utility method for logging a page visit
@@ -107,6 +103,8 @@ module FunnelCake
                               :key=>FunnelCake::RandomId.generate(50),
                               :ip=>request.remote_ip.to_s
                               )
+          @current_visitor.user = current_user if logged_in?
+          @current_visitor.save
           cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
             :value => @current_visitor.key,
             :expires => 1.year.from_now
@@ -116,8 +114,12 @@ module FunnelCake
         # returns the current FunnelVisitor object, using the visitor's cookie
         def current_visitor
           return @current_visitor unless @current_visitor.nil?
-          return nil if cookies[self.class.read_inheritable_attribute(:cookie_name)].nil?
-          @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookies[self.class.read_inheritable_attribute(:cookie_name)])
+          if logged_in?
+            @current_visitor = current_user.visitor
+          else 
+            cookie = cookies[self.class.read_inheritable_attribute(:cookie_name)]
+            @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookie) unless cookie.nil?
+          end
           return @current_visitor
         end
         

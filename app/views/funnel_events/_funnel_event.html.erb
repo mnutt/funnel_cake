@@ -4,9 +4,7 @@
     <td><%= funnel_event.from %></td>
     <td><%= funnel_event.to %></td>
     <td><%= funnel_event.url.sub(/https?:\/\/[^\/]+/,'') unless funnel_event.url.nil? %></td>	 	 	 
-    <td><%= funnel_event.user.email unless funnel_event.user.nil? %>
-	 <%= funnel_event.funnel_visitor.user.email unless funnel_event.funnel_visitor.nil? or funnel_event.funnel_visitor.user.nil? %>
-	 </td>
+    <td><%= funnel_event.funnel_visitor.user.email unless funnel_event.funnel_visitor.nil? or funnel_event.funnel_visitor.user.nil? %></td>
     <td><%= funnel_event.funnel_visitor.key[0..5]+'...' unless funnel_event.funnel_visitor.nil? %></td>	 
     <td><%= funnel_event.funnel_visitor.ip unless funnel_event.funnel_visitor.nil? %></td>	 
     <td><%#= human_time(funnel_event.created_at) %><%=funnel_event.created_at.to_s(:short)%>

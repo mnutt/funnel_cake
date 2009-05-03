@@ -1,29 +1,36 @@
 
-# System call out to graphviz dot, to lay out the funnel graph
-f = IO.popen("dot -Txdot ", "w+")
-dotcode = render :partial=>'graph_dot', :locals=>{:date_range=>@daterange}
-f.write(dotcode + "\n")
-f.close_write
-xdot = f.read 
 
 # Send the canviz javascript down the pipe
-page << "canviz.parse('#{escape_javascript(xdot)}');"
+if params[:drawchart]=="true"
+  xdot = render :partial=>'graph.xdot.erb'
+  page << "canviz.parse('#{escape_javascript(xdot)}');"
+end
+
+# Adjust graph labels
+FunnelVisitor.states_table.each do |s, state|
+  page << "$('#{s.to_s}_node').update('#{s.to_s.titleize + ": " + FunnelCake::Engine.find_by_starting_state(s, {:date_range=>@daterange}).count.to_s}');"
+  page << "$('#{s.to_s}_node').addClassName('primary');" if state.primary?
+end
+FunnelVisitor.event_table.each do |ev_name, ev|
+  FunnelVisitor.transition_table[ev_name].each do |trans|
+    page << "$('#{trans.from}_to_#{trans.to}_edge').update('#{FunnelCake::Engine.find_by_transition(trans.from, trans.to, {:date_range=>@daterange}).count.to_s}');"
+  end
+end
 
 # Construct array of node data for funnel labels
 previousState = :unknown
 nodeStr = "var nodes = ["
 nodeArray = []
-User.primary_states.each_with_index do |state, i|
-  nextState = User.primary_states[i+1]
+FunnelVisitor.primary_states.each_with_index do |state, i|
+  nextState = FunnelVisitor.primary_states[i+1]
   perc = FunnelCake::Engine.conversion_rate(state, nextState, {:date_range=>@daterange})*100.0
-  curNode = <<STR
-    {
-      name: '#{state.to_s.titleize}',
-      position: {x: $('#{state}_node').positionedOffset().left, y: $('#{state}_node').positionedOffset().top},
-      size: {width: $('#{state}_node').getWidth(), height: $('#{state}_node').getHeight()},
-      rate: '#{number_to_percentage(perc, :precision=>1)}'
-    }
-STR
+  curNode = ''
+  curNode += '  {'
+  curNode += "    name: '#{state.to_s.titleize}',"
+  curNode += "    position: {x: $('#{state}_node').positionedOffset().left, y: $('#{state}_node').positionedOffset().top},"
+  curNode += "    size: {width: $('#{state}_node').getWidth(), height: $('#{state}_node').getHeight()},"
+  curNode += "    rate: '#{number_to_percentage(perc, :precision=>1)}'"
+  curNode += "  }"
   nodeArray << curNode
   previousState = state
 end

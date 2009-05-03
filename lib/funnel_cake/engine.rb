@@ -32,7 +32,7 @@ module FunnelCake
     def self.find_by_starting_state(state, opts={})
       return [] if state.nil?          
       state = state.to_sym
-      return [] unless user_class.states.include?(state)
+      return [] unless FunnelVisitor.states.include?(state)
       
       date_range = opts[:date_range]
 
@@ -40,15 +40,13 @@ module FunnelCake
       condition_frags << "#{event_class.table_name}.to = '#{state}'"
       condition_frags << "#{event_class.table_name}.created_at < '#{date_range.end.to_s(:db)}'" unless date_range.nil?
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      entering_a_events = event_class.find(:all, :include=>[:user, :funnel_visitor], :conditions=>condition_frags.join(" AND "))
-      entering_a_user_visitors = entering_a_events.collect {|ev| user_or_visitor_from_event(ev) }.uniq
+      entering_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
 
       condition_frags = []
       condition_frags << "#{event_class.table_name}.from = '#{state}'"
       condition_frags << "#{event_class.table_name}.created_at < '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      leaving_a_events = event_class.find(:all, :include=>[:user, :funnel_visitor], :conditions=>condition_frags.join(" AND "))
-      leaving_a_user_visitors = leaving_a_events.collect {|ev| user_or_visitor_from_event(ev) }.uniq
+      leaving_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
       
       return entering_a_user_visitors - leaving_a_user_visitors
     end    
@@ -65,8 +63,8 @@ module FunnelCake
       return [] if start_state.nil? or end_state.nil?
       start_state = start_state.to_sym
       end_state = end_state.to_sym
-      return [] unless user_class.states.include?(start_state)
-      return [] unless user_class.states.include?(end_state)          
+      return [] unless FunnelVisitor.states.include?(start_state)
+      return [] unless FunnelVisitor.states.include?(end_state)          
       
       date_range = opts[:date_range]          
       
@@ -75,16 +73,14 @@ module FunnelCake
       condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
       condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?      
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      leaving_a_events = event_class.find(:all, :include=>[:user, :funnel_visitor], :conditions=>condition_frags.join(" AND "))
-      leaving_a_user_visitors = leaving_a_events.collect {|ev| user_or_visitor_from_event(ev) }.uniq
+      leaving_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
 
       condition_frags = []
       condition_frags << "#{event_class.table_name}.to = '#{end_state}'"
       condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
       condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?      
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      entering_b_events = event_class.find(:all, :include=>[:user, :funnel_visitor], :conditions=>condition_frags.join(" AND "))
-      entering_b_user_visitors = entering_b_events.collect {|ev| user_or_visitor_from_event(ev) }.uniq
+      entering_b_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
       
       leaving_a_user_visitors & entering_b_user_visitors
     end        
@@ -101,8 +97,8 @@ module FunnelCake
       return [] if start_state.nil? or end_state.nil?          
       start_state = start_state.to_sym
       end_state = end_state.to_sym
-      return [] unless user_class.states.include?(start_state)
-      return [] unless user_class.states.include?(end_state)          
+      return [] unless FunnelVisitor.states.include?(start_state)
+      return [] unless FunnelVisitor.states.include?(end_state)          
       
       date_range = opts[:date_range]          
 
@@ -112,8 +108,7 @@ module FunnelCake
       condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
       condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?      
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      events = event_class.find(:all, :include=>[:user, :funnel_visitor], :conditions=>condition_frags.join(" AND "))
-      user_visitors = events.collect {|ev| user_or_visitor_from_event(ev) }.uniq
+      user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
 
       user_visitors
     end            
@@ -132,13 +127,5 @@ module FunnelCake
       return top.count.to_f / bottom.count.to_f
     end    
     
-    private
-    
-    def self.user_or_visitor_from_event(ev)
-      return ev.user unless ev.user.nil?
-      return ev.funnel_visitor.user unless ev.funnel_visitor.nil? or ev.funnel_visitor.user.nil?
-      return ev.funnel_visitor
-    end
-
   end
 end
