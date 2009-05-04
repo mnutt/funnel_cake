@@ -4,16 +4,38 @@
 if params[:drawchart]=="true"
   xdot = render :partial=>'graph.xdot.erb'
   page << "canviz.parse('#{escape_javascript(xdot)}');"
+  
+  page << "$('funnel_info').update('');"
+#  FunnelVisitor.states_table.each do |s, state|
+#    info = "<div id='#{s.to_s}_node_info' style='display: none;'></div>"
+#    page.insert_html :bottom, 'funnel_info', info
+#    page << "Event.observe('#{s.to_s}_node', 'click', function(event) { $('#{s.to_s}_node_info').toggle(); });"
+#  end
+#  FunnelVisitor.event_table.each do |ev_name, ev|
+#    FunnelVisitor.transition_table[ev_name].each do |trans|
+#      info = "<div id='#{trans.from}_to_#{trans.to}_edge_info' style='display: none;'></div>"
+#      page.insert_html :bottom, 'funnel_info', info
+#      page << "Event.observe('#{trans.from}_to_#{trans.to}_edge', 'click', function(event) { $('#{trans.from}_to_#{trans.to}_edge_info').toggle(); });"
+#    end
+#  end
 end
 
 # Adjust graph labels
 FunnelVisitor.states_table.each do |s, state|
-  page << "$('#{s.to_s}_node').update('#{s.to_s.titleize + ": " + FunnelCake::Engine.find_by_starting_state(s, {:date_range=>@daterange}).count.to_s}');"
-  page << "$('#{s.to_s}_node').addClassName('primary');" if state.primary?
+  count = FunnelCake::Engine.find_by_starting_state(s, {:date_range=>@daterange}).count
+  page.replace_html "#{s}_node", "#{s.to_s.titleize + ": " + count.to_s}"
+  page << "$('#{s}_node').addClassName('primary');" if state.primary?
+
+  #info = list.collect{|fv| "#{fv.id}: #{fv.state} #{fv.user.email unless fv.user.nil?}"}.join("<br />\n")
+  #page.replace_html "#{s}_node_info", "<h3>#{s}</h3><p>#{info}</p>"
 end
 FunnelVisitor.event_table.each do |ev_name, ev|
   FunnelVisitor.transition_table[ev_name].each do |trans|
-    page << "$('#{trans.from}_to_#{trans.to}_edge').update('#{FunnelCake::Engine.find_by_transition(trans.from, trans.to, {:date_range=>@daterange}).count.to_s}');"
+    count = FunnelCake::Engine.find_by_transition(trans.from, trans.to, {:date_range=>@daterange}).count
+    page.replace_html "#{trans.from}_to_#{trans.to}_edge", count.to_s
+
+    #info = list.collect{|fv| "#{fv.id}: #{fv.state} #{fv.user.email unless fv.user.nil?}"}.join("<br />\n")    
+    #page.replace_html "#{trans.from}_to_#{trans.to}_edge_info", "<h3>#{trans.from} to #{trans.to}</h3><p>#{info}</p>"
   end
 end
 
@@ -23,13 +45,13 @@ nodeStr = "var nodes = ["
 nodeArray = []
 FunnelVisitor.primary_states.each_with_index do |state, i|
   nextState = FunnelVisitor.primary_states[i+1]
-  perc = FunnelCake::Engine.conversion_rate(state, nextState, {:date_range=>@daterange})*100.0
+  stats = FunnelCake::Engine.conversion_stats(state, nextState, {:date_range=>@daterange})
   curNode = ''
   curNode += '  {'
   curNode += "    name: '#{state.to_s.titleize}',"
   curNode += "    position: {x: $('#{state}_node').positionedOffset().left, y: $('#{state}_node').positionedOffset().top},"
   curNode += "    size: {width: $('#{state}_node').getWidth(), height: $('#{state}_node').getHeight()},"
-  curNode += "    rate: '#{number_to_percentage(perc, :precision=>1)}'"
+  curNode += "    rate: '<span class=\"count_stats\">#{stats[:start_count].to_i}</span><span class=\"rate_stats\"><br />#{number_to_percentage(stats[:rate]*100.0, :precision=>1)}</span><br /><span class=\"count_stats\">#{stats[:end_count].to_i}</span>'"
   curNode += "  }"
   nodeArray << curNode
   previousState = state

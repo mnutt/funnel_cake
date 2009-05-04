@@ -45,3 +45,10 @@ div.primary {
 div.graph_edge {
 	margin-left: 20px;
 }
+
+span.count_stats {
+	color: #666;
+}
+span.rate_stats {
+	font-weight: bold;
+}

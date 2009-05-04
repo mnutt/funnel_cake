@@ -27,12 +27,13 @@ var updateCanviz = function(start, end, redraw) {
 	$('daterange_label').update('Date Range: '+start+' days ago to '+end+' days ago');
 };
 
+var dateSlider
 document.observe('dom:loaded', function() {
-	var dateSlider = new Control.Slider(['handle_min', 'handle_max'], 'date_slider', {
+	dateSlider = new Control.Slider(['handle_min', 'handle_max'], 'date_slider', {
 	   spans: ["slider_span"],		
 		range: $R(-45, 0),
 		values: [-45, -30, -21, -14, -7, -6, -5, -4, -3, -2, -1, 0],
-		sliderValue: [-14, 0.00001],
+		sliderValue: [-30, 0.00001],
 		restricted: true,
 		onChange: function(varr){ 
 			updateCanviz(varr[0],varr[1]);
@@ -44,7 +45,7 @@ document.observe('dom:loaded', function() {
 	canviz = new Canviz('<%=graph_container%>');
 	canviz.setImagePath('/images/');
 	canviz.setScale(<%=graph_scale%>);
-	updateCanviz(-14, 0, true);
+	updateCanviz(-30, 0, true);
 	funnelChart = new FunnelChart( $('funnel_container'), [], {} );	
 });
 </script>

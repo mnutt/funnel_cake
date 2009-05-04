@@ -30,6 +30,7 @@ class FunnelVisitor < ActiveRecord::Base
   def log_funnel_event(event, data={})
     unless self.valid_events.include?(event.to_sym)
       logger.debug "#{self.class.to_s} couldn't log FunnelCake event: #{event} This event is not valid for state: #{self.current_state}" 
+      p "#{self.class.to_s} couldn't log FunnelCake event: #{event} This event is not valid for state: #{self.current_state}"
       return
     end
     self.send(event.to_s+"!", data)

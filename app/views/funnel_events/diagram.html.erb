@@ -6,12 +6,13 @@
 	  <div id="handle_max" class="handle right"></div>
 	  <div id="slider_span" class="span"></div>  
 	</div>
-</div>
-<div id="graph" class="section span-12">
+	<p>Node counts represent number of eligible visitors <em>starting</em> in each state during the period.<br/>Edge count represent visitor transitions between states during the period.</p>
 	<div id="spinner" class="spinner">
 		<img src='/images/ajax-loader.gif' />
 	</div>
-	<div class="column span-6">
+</div>
+<div id="graph" class="section span-12">
+	<div class="column span-7">
 		<h2>Funnel Diagram</h2>
 		<div class="graph_container" id="graph_container" style="float: left;"></div>
 	</div>
@@ -20,6 +21,11 @@
 		<div class="funnel_container" id="funnel_container" style="float: left; width: 200px; height: 800px;">
 			<canvas id='funnel_container_chart' width='200' height='800' style='border: 0; padding: 0;'></canvas>
 		</div>
-	</div>	
+	</div>
+</div>
+<div class="section span-12">
 	<div class="debug_output" id="debug_output"></div>
+	<div class="section"	id="funnel_info">
+		
+	</div>
 </div>
