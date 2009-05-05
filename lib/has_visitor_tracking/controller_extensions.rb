@@ -44,7 +44,7 @@ module FunnelCake
             current_visitor.log_funnel_event(event, data)
             return
           end
-          logger.debug "Couldn't Log FunnelCake Event: #{event}  No FunnelVisitor found!"
+          logger.info "Couldn't Log FunnelCake Event: #{event}  No FunnelVisitor found!"
         end
         
         # Utility method for logging a page visit
@@ -61,11 +61,11 @@ module FunnelCake
         # - otherwise, sets the .user of the current_visitor
         def sync_funnel_visitor
           if not logged_in?
-            logger.debug "Couldn't sync FunnelVisitor to nil User"
+            logger.info "Couldn't sync FunnelVisitor to nil User"
             return
           end
           if current_visitor.nil?
-            logger.debug "Couldn't sync nil FunnelVisitor to current User: #{current_user}"
+            logger.info "Couldn't sync nil FunnelVisitor to current User: #{current_user.inspect}"
             return
           end
           current_visitor.user = current_user
@@ -77,8 +77,7 @@ module FunnelCake
         # should we ignore this visitor?
         def ignore_funnel_tracking?
           # check user-overrideable methods
-          return true if respond_to?(:internal_visitor?) and internal_visitor?
-          return true if respond_to?(:ignore_visitor?) and ignore_visitor?
+          return true if respond_to?(:ignore_funnel_visitor?) and ignore_funnel_visitor?
           
           # ignore search engine bots
           return true if request.env["HTTP_USER_AGENT"] and request.env["HTTP_USER_AGENT"][/Googlebot|msnbot|Yahoo|Baidu|Teoma/]
@@ -114,12 +113,19 @@ module FunnelCake
         # returns the current FunnelVisitor object, using the visitor's cookie
         def current_visitor
           return @current_visitor unless @current_visitor.nil?
+          
+          # Check if we're logged in first, set the current_visitor from the current_user
           if logged_in?
             @current_visitor = current_user.visitor
-          else 
+          end
+          
+          # If we are not logged in, or if the current_user has no visitor, 
+          # then try to find the visitor by the cookie key
+          if @current_visitor.nil?
             cookie = cookies[self.class.read_inheritable_attribute(:cookie_name)]
             @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookie) unless cookie.nil?
           end
+          
           return @current_visitor
         end
         

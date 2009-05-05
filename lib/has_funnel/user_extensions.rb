@@ -23,15 +23,6 @@ module FunnelCake
       
       module InstanceMethods
         
-        # Create a FunnelEvent, as a callback to a state_machine transition
-        def log_transition(from, to, event, data, opts)
-          if self.visitor.nil?
-            logger.debug "#{self.class.to_s} couldn't log FunnelCake event: #{event}. The associated funnel visitor is missing." 
-            return
-          end
-          self.visitor.log_transition(from, to, event, data, opts)
-        end
-        
         # Utility method for logging funnel events from within application code
         # (This is probably how most funnel events will be triggered)
         # - First check if the event is legal... if not, log an error I guess!
