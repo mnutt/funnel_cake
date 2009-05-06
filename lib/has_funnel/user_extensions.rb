@@ -12,7 +12,7 @@ module FunnelCake
           
           # Set up the FunnelVisitor model association
           opts[:visitor_class_name] = 'FunnelVisitor' if opts[:visitor_class_name].nil?
-          params = {:class_name=>opts[:visitor_class_name]}
+          params = {:class_name=>opts[:visitor_class_name], :dependent=>:destroy}
           params[:foreign_key] = opts[:visitor_foreign_key] unless opts[:visitor_foreign_key].nil?
           has_one :visitor, params
 

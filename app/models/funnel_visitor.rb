@@ -1,6 +1,6 @@
 class FunnelVisitor < ActiveRecord::Base
   # Set up the FunnelEvent model association
-  has_many :funnel_events, :class_name=>'FunnelEvent'
+  has_many :funnel_events, :class_name=>'FunnelEvent', :dependent=>:destroy
   
   # Set up state machine           
   acts_as_funnel_state_machine :initial=>:unknown, :validate_on_transitions=>false, 
