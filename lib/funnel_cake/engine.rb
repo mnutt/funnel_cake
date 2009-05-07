@@ -22,7 +22,7 @@ module FunnelCake
       @@event_class_name.constantize
     end
 
-    # Specialized method for finding users/visitors who are "eligible" for
+    # Method for finding users/visitors who are "eligible" for
     # transitioning from a given state, for a given time period
     # (Used in calculating conversion rates)
     # We qualify users who:
@@ -55,7 +55,29 @@ module FunnelCake
     end    
     
 
-    # Specialized method for finding users/visitors who transitioned
+    # Method for finding users/visitors who transitioned
+    # into a given state, for a given time period
+    # (Used in calculating conversion rates)
+    # We qualify users who:
+    # - entered the given state during the date range
+    def self.find_by_ending_state(state, opts={})
+      return [] if state.nil?
+      state = state.to_sym
+      return [] unless FunnelVisitor.states.include?(state)
+      
+      date_range = opts[:date_range]
+
+      condition_frags = []
+      condition_frags << "#{event_class.table_name}.to = '#{state}'"
+      condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?      
+      condition_frags << opts[:conditions] unless opts[:conditions].nil?
+      leaving_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
+
+      leaving_a_user_visitors
+    end    
+
+    # Method for finding users/visitors who transitioned
     # into a given state, from a given state, for a given time period
     # (Used in calculating conversion rates)
     # We qualify users who:
@@ -78,18 +100,13 @@ module FunnelCake
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
 
-      condition_frags = []
-      condition_frags << "#{event_class.table_name}.to = '#{end_state}'"
-      condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
-      condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?      
-      condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      entering_b_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
+      entering_b_user_visitors = find_by_ending_state(end_state, opts)
 
       leaving_a_user_visitors & entering_b_user_visitors
     end        
             
     
-    # Specialized method for finding users who transitioned
+    # Method for finding users who transitioned
     # into a given state, from a given state, WITH NO STATES INBETWEEN, 
     # for a given time period
     # We qualify users who:

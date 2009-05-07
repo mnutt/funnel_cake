@@ -224,12 +224,14 @@ var Entity = Class.create({
 								}
 								text.setAttribute('id', this.name.replace(/->/,'to').replace(/[^\w]/ig,'_'));
 								text.addClassName('graph_label');					
-*/
-								bb_div.update(str);
-								bb_div.setStyle({
+
+								Remove these styles:
 									fontSize: Math.round(font_size * ctx_scale * this.canviz.bbScale) + 'px',
 									fontFamily: font_family,
 									color: ctx.strokeStyle,
+*/
+								bb_div.update(str);
+								bb_div.setStyle({
 									textAlign: (-1 == text_align) ? 'left' : (1 == text_align) ? 'right' : 'center'
 								});								
 /*								

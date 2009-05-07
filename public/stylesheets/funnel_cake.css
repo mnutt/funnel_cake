@@ -37,6 +37,8 @@ div.graph_attrs {
 div.graph_node {
 	border: 1px solid #000;
 	background-color: #EAEAEA;
+	font-size: 10px;
+	line-height: 11px;
 }
 div.primary {
 	border: 1px solid #00F;
