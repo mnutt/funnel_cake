@@ -24,7 +24,7 @@ end
 FunnelVisitor.states_table.each do |s, state|
   start_count = FunnelCake::Engine.find_by_starting_state(s, {:date_range=>@daterange}).count
   end_count = FunnelCake::Engine.find_by_ending_state(s, {:date_range=>@daterange}).count  
-  page.replace_html "#{s}_node", "(#{end_count.to_s}) <b>#{s.to_s.titleize}: #{start_count.to_s}</b>"
+  page.replace_html "#{s}_node", "#{end_count.to_s} &rarr; <b>#{s.to_s.titleize}: #{start_count.to_s}</b>"
   page << "$('#{s}_node').addClassName('primary');" if state.primary?
 
   #info = list.collect{|fv| "#{fv.id}: #{fv.state} #{fv.user.email unless fv.user.nil?}"}.join("<br />\n")

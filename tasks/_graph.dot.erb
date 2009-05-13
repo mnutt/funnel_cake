@@ -2,9 +2,9 @@ digraph finite_state_machine {
 	node [shape = box];
 <% FunnelVisitor.states_table.each do |s, state| -%>
 	<% if state.primary? -%>
-	<%=s%> [label = "<%= s.to_s.titleize + ": XXX" %>", style="setlinewidth(1.0)", color=white, fontname=Helvetica];
+	<%=s%> [label = "XXX -> <%= s.to_s.titleize + ": XXX" %>", style="setlinewidth(1.0)", color=white, fontname=Helvetica];
 	<% else -%>
-	<%=s%> [label = "<%= s.to_s.titleize + ": XXX" %>", style="setlinewidth(0.75)", color=white, fontname=Helvetica];
+	<%=s%> [label = "XXX -> <%= s.to_s.titleize + ": XXX" %>", style="setlinewidth(0.75)", color=white, fontname=Helvetica];
 	<% end -%>
 <% end -%>
 

@@ -51,7 +51,7 @@ module FunnelCake
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
       
-      entering_a_user_visitors - leaving_a_user_visitors
+      (entering_a_user_visitors - leaving_a_user_visitors).uniq
     end    
     
 
@@ -74,7 +74,7 @@ module FunnelCake
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
 
-      leaving_a_user_visitors
+      leaving_a_user_visitors.uniq
     end    
 
     # Method for finding users/visitors who transitioned
@@ -130,7 +130,7 @@ module FunnelCake
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
 
-      user_visitors
+      user_visitors.uniq
     end            
     
         
@@ -149,8 +149,7 @@ module FunnelCake
       return {:rate=>0.0} if start_state.nil? or end_state.nil?      
       
       state_pair_visitors = self.find_by_state_pair(start_state, end_state, opts)
-      starting_state_visitors = self.find_by_starting_state(start_state, opts) | state_pair_visitors
-      
+      starting_state_visitors = self.find_by_starting_state(start_state, opts).to_a | state_pair_visitors
       stats = {}
       stats[:end_count] = state_pair_visitors.count.to_f
       stats[:start_count] = starting_state_visitors.count.to_f
