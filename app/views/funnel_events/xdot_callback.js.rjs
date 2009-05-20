@@ -4,7 +4,7 @@
 if params[:drawchart]=="true"
   xdot = render :partial=>'graph.xdot.erb'
   page << "canviz.parse('#{escape_javascript(xdot)}');"
-  
+
   page << "$('funnel_info').update('');"
 #  FunnelVisitor.states_table.each do |s, state|
 #    info = "<div id='#{s.to_s}_node_info' style='display: none;'></div>"
@@ -22,8 +22,8 @@ end
 
 # Adjust graph labels
 FunnelVisitor.states_table.each do |s, state|
-  start_count = FunnelCake::Engine.find_by_starting_state(s, {:date_range=>@daterange}).count
-  end_count = FunnelCake::Engine.find_by_ending_state(s, {:date_range=>@daterange}).count  
+  start_count = FunnelCake::Engine.find_by_starting_state(s, {:date_range=>@daterange}).length
+  end_count = FunnelCake::Engine.find_by_ending_state(s, {:date_range=>@daterange}).length
   page.replace_html "#{s}_node", "#{end_count.to_s} &rarr; <b>#{s.to_s.titleize}: #{start_count.to_s}</b>"
   page << "$('#{s}_node').addClassName('primary');" if state.primary?
 
@@ -32,10 +32,10 @@ FunnelVisitor.states_table.each do |s, state|
 end
 FunnelVisitor.event_table.each do |ev_name, ev|
   FunnelVisitor.transition_table[ev_name].each do |trans|
-    count = FunnelCake::Engine.find_by_transition(trans.from, trans.to, {:date_range=>@daterange}).count
+    count = FunnelCake::Engine.find_by_transition(trans.from, trans.to, {:date_range=>@daterange}).length
     page.replace_html "#{trans.from}_to_#{trans.to}_edge", count.to_s
 
-    #info = list.collect{|fv| "#{fv.id}: #{fv.state} #{fv.user.email unless fv.user.nil?}"}.join("<br />\n")    
+    #info = list.collect{|fv| "#{fv.id}: #{fv.state} #{fv.user.email unless fv.user.nil?}"}.join("<br />\n")
     #page.replace_html "#{trans.from}_to_#{trans.to}_edge_info", "<h3>#{trans.from} to #{trans.to}</h3><p>#{info}</p>"
   end
 end
