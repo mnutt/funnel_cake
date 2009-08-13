@@ -1,0 +1,37 @@
+<div class="section span-12">
+	<h3 id="daterange_label">Date Range</h3>
+	<%= select_tag "date", options_for_select([45, 30, 21, 14, 7, 6, 5, 4, 3, 2, 1, 0].collect{|v|[v,v]}, 14),
+									:id=>'date_chooser', :class=>'chooser', :onchange=>"updatePage(this.value);" %>
+</div>
+<div class="section">
+	<div class="column span-8">
+		<h2>Funnel Diagram</h2>
+		<%= render 'funnel_diagram' %>
+	</div>
+	<div class="column span-9 last">
+		<h2>Primary Conversion Rates</h2>
+		<%= render 'funnel_chart' %>
+		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px;">
+			<% FunnelVisitor.primary_states.each do |state| %>
+				<%= render 'state_graph', :state=>state if next_state_from(state) %>
+			<% end %>
+			<%= render 'state_graph_update' %>
+		</div>
+	</div>
+</div>
+<div class="section span-12">
+	<div class="debug_output" id="debug_output"></div>
+	<div class="section"	id="funnel_info"></div>
+</div>
+<script type="text/javascript">
+var updatePage = function(period) {
+	updateFunnelDiagram(period);
+	updateFunnelChart(period);
+	updateStateGraphs(period);
+	$('daterange_label').update('Date Range: '+period+' days ago to today');
+};
+
+document.observe('dom:loaded', function() {
+	updatePage($('date_chooser').value);
+});
+</script>

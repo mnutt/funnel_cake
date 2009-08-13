@@ -36,12 +36,15 @@ module FunnelCake
 
       date_range = opts[:date_range]
       attrition_period = opts[:attrition_period]
-      attrition_period = (opts[:date_range].end-opts[:date_range].begin) if !attrition_period.nil? and (attrition_period > (opts[:date_range].end-opts[:date_range].begin))
+      attrition_period = FunnelVisitor.state_options(state)[:attrition_period] unless FunnelVisitor.state_options(state)[:attrition_period].nil?
+      unless attrition_period.nil?
+        attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period > ((date_range.end - date_range.begin)*2.0)
+      end
 
       condition_frags = []
       condition_frags << "#{event_class.table_name}.to = '#{state}'"
       condition_frags << "#{event_class.table_name}.created_at < '#{date_range.end.to_s(:db)}'" unless date_range.nil?
-      condition_frags << "#{event_class.table_name}.created_at > '#{(date_range.end - attrition_period).to_s(:db)}'" unless date_range.nil? or attrition_period.nil?
+      condition_frags << "#{event_class.table_name}.created_at > '#{(date_range.end - attrition_period).to_s(:db)}'" unless (date_range.nil? or attrition_period.nil?)
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       entering_a_user_visitors = FunnelVisitor.find(:all, :joins=>[:funnel_events], :conditions=>condition_frags.join(" AND "))
 
@@ -147,7 +150,6 @@ module FunnelCake
     # and number of users in the start state
     def self.conversion_stats(start_state, end_state, opts={})
       return {:rate=>0.0} if start_state.nil? or end_state.nil?
-
       state_pair_visitors = self.find_by_state_pair(start_state, end_state, opts)
       starting_state_visitors = self.find_by_starting_state(start_state, opts).to_a | state_pair_visitors
       stats = {}

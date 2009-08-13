@@ -1,5 +1,16 @@
 class FunnelEventsController < ApplicationController
 
+  before_filter :setup_funnel_cake_includes
+  def setup_funnel_cake_includes
+    @javascripts.push 'excanvas'
+    @javascripts.push 'funnel_chart'
+    @javascripts.push 'canviz'
+    @javascripts.push 'path'
+    @javascripts.push 'x11colors'
+    @javascripts.push 'flotr-0.2.0-alpha'
+    @stylesheets.push 'funnel_cake'
+  end
+
   def index
     limit = params[:limit].nil? ? 25 : params[:limit]
 
@@ -7,37 +18,57 @@ class FunnelEventsController < ApplicationController
       format.html do
         @funnel_events = FunnelEvent.find(:all, :limit=>limit, :include=>[:user, :funnel_visitor], :order=>'created_at DESC')
       end
-      format.js do 
+      format.js do
         timestamp = params[:timestamp].to_datetime
-        @funnel_events = FunnelEvent.find(:all, :limit=>limit, :include=>[:user, :funnel_visitor], 
+        @funnel_events = FunnelEvent.find(:all, :limit=>limit, :include=>[:user, :funnel_visitor],
                                                 :order=>'created_at DESC', :conditions=>['created_at > ?',timestamp])
       end
     end
   end
-  
+
   # GET /funnel_events/1
   def show
     @funnel_event = FunnelEvent.find(params[:id])
-    
+
     respond_to do |format|
       format.html # show.html.erb
     end
   end
 
   def diagram
-    @javascripts.push 'excanvas'
-    @javascripts.push 'funnel_chart'    
-    @javascripts.push 'canviz'
-    @javascripts.push 'path'
-    @javascripts.push 'x11colors'    
-  end
-    
-  def xdot_callback
-    @daterange = params[:start_days_ago].to_i.days.ago .. params[:end_days_ago].to_i.days.ago
+    @daterange = params[:start_days_ago].to_i.days.ago .. 0.days.ago
     respond_to do |format|
       format.js { render }
     end
   end
 
-   
+  def chart
+    @daterange = params[:start_days_ago].to_i.days.ago .. 0.days.ago
+    respond_to do |format|
+      format.js { render }
+    end
+  end
+
+  def state_graph
+    @time_period = params[:days].to_i.days
+    @state = params[:state]
+    respond_to do |format|
+      format.js { render }
+    end
+  end
+
+
+  def overview
+  end
+
+  def dashboard
+  end
+
+  def dashboard_detail
+    @time_period = params[:days].to_i
+    @state = params[:state]
+    render :layout=>false
+  end
+
+
 end

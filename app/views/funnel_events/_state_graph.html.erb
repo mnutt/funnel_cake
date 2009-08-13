@@ -1,0 +1,5 @@
+<% style = '' if local_assigns[:style].nil? %>
+<div class='state_graph_container' id='state_graph_<%= state %>_container' style='<%=style%>'>
+	<div class='state_graph' id='state_graph_<%= state %>'></div>
+	<img class='spinner state_graph_spinner' id='state_graph_<%= state %>_spinner' src='/images/ajax-loader.gif'>
+</div>

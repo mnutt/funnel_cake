@@ -1,0 +1,7 @@
+# Construct array of node data for funnel labels
+# Send node label data down the pipe, and request a redraw of the funnelChart
+page << funnel_event_nodes_javascript(@daterange)
+page << "funnelChart.funnel_nodes = nodes;"
+page << "funnelChart.updateLabels();"
+
+page.visual_effect :fade, 'funnel_chart_spinner', :duration=>0.5

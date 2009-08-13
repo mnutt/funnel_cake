@@ -1,0 +1,29 @@
+<script type="text/javascript">
+var updateFunnelDiagram = function(period) {
+	$('funnel_diagram_spinner').appear({ duration: 0.5 });
+	new Ajax.Request('diagram',
+		{
+			asynchronous:true,
+			evalScripts:true,
+			method:'get',
+			parameters: {
+				authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
+				start_days_ago: period
+			}
+		}
+	);
+};
+
+var canviz;
+document.observe('dom:loaded', function() {
+	canviz = new Canviz('funnel_diagram_container');
+	canviz.setImagePath('/images/');
+	canviz.setScale(0.6);
+	canviz.parse('<%= escape_javascript(render("diagram.xdot.erb")) %>');
+	$('funnel_diagram_spinner').style.top = $('funnel_diagram_container').positionedOffset().top+'px';
+	$('funnel_diagram_spinner').style.left = $('funnel_diagram_container').positionedOffset().left+'px';
+});
+</script>
+<div class="funnel_diagram_container" id="funnel_diagram_container" style="float: left;"></div>
+<img class='spinner' id='funnel_diagram_spinner' src='/images/ajax-loader.gif' />
+<p># entered state &rarr; State Name: # eligible to move forward</p>

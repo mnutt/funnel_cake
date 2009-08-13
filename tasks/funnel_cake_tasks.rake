@@ -10,21 +10,21 @@ namespace :funnel_cake do
     src = Dir.glob(File.dirname(__FILE__) + "/../public/*")
     puts "Copying assets to #{dest}"
     FileUtils.cp_r(src, dest)
-    
+
     #
     # Generate xdot code
     #
-    erbcode = File.open(File.dirname(__FILE__) + "/_graph.dot.erb").read
+    erbcode = File.open(File.dirname(__FILE__) + "/_diagram.dot.erb").read
     dotcode = ERB.new(erbcode, nil, '-').result(binding)
 
     r = IO.popen("dot -Txdot ", "w+")
     r.write(dotcode + "\n")
     r.close_write
     xdot = r.read
-    
+
     FileUtils.mkdir_p(File.join(RAILS_ROOT, 'app', 'views', 'funnel_events'))
-    w = File.open(File.join(RAILS_ROOT, 'app', 'views', 'funnel_events', '_graph.xdot.erb'), 'w')
+    w = File.open(File.join(RAILS_ROOT, 'app', 'views', 'funnel_events', '_diagram.xdot.erb'), 'w')
     w.write(xdot)
     w.close
-  end  
+  end
 end

@@ -1,0 +1,17 @@
+digraph finite_state_machine {
+	node [shape = box];
+<% FunnelVisitor.states_table.each do |s, state| -%>
+	<% if state.primary? -%>
+	<%=s%> [label = "________ -> <%= s.to_s.titleize + ": ________" %>", style="setlinewidth(1.0)", color=white, fontname=Helvetica];
+	<% else -%>
+	<%=s%> [label = "________ -> <%= s.to_s.titleize + ": ________" %>", style="setlinewidth(0.75)", color=white, fontname=Helvetica];
+	<% end -%>
+<% end -%>
+
+<% FunnelVisitor.event_table.each do |ev_name, ev| -%>
+	<% FunnelVisitor.transition_table[ev_name].each do |trans| -%>
+		<%=trans.from%> -> <%=trans.to%> [ label = "  _____", style="setlinewidth(3.0)", color=saddlebrown, fontname=Helvetica, arrowsize=1.25 ];
+	<% end -%>
+<% end -%>
+}
+

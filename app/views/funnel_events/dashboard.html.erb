@@ -1,0 +1,41 @@
+<div class="section span-12">
+	<h3 id="daterange_label" style='display: inline;'>Date Range</h3>&nbsp;&nbsp;&nbsp;
+	<%= select_tag "date", options_for_select([45, 30, 21, 14, 7, 6, 5, 4, 3, 2, 1, 0].collect{|v|[v,v]}, 14),
+									:id=>'date_chooser', :class=>'chooser', :onchange=>"updatePage(this.value);" %>
+	<br /><br />
+</div>
+<div class="section span-12">
+	<h2>Conversion Rates</h2>
+	<p>Click on a conversion stat for more details...</p>
+	<div class="column span-4">
+		<%= render 'funnel_chart' %>
+	</div>
+	<div class='column span-8 last' id='state_chart_container'>
+	</div>
+</div>
+<div class="section span-12">
+	<div class="debug_output" id="debug_output"></div>
+	<div class="section"	id="funnel_info"></div>
+</div>
+<%= render 'state_graph_update' %>
+<script type="text/javascript">
+var updatePage = function(period) {
+	updateFunnelChart(period);
+	updateStateGraphs(period);
+	$('daterange_label').update('Date Range: '+period+' days ago to today');
+};
+
+document.observe('dom:loaded', function() {
+
+	$$('.funnel_rate_label').each(function(label) {
+		var label_state = label.id.sub(/funnel_rate_/,'');
+		label.observe('click', function() {
+			<%= remote_function :url=>'dashboard_detail', :update=>'state_chart_container', :position=>:bottom,
+													:method=>:get, :with=>"'days='+$('date_chooser').value+'&state='+label_state" %>
+		});
+	});
+
+
+	updatePage($('date_chooser').value);
+});
+</script>
