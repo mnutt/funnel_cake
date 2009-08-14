@@ -1,30 +1,9 @@
-<script type="text/javascript">
-var updateFunnelChart = function(period) {
-	$('funnel_chart_spinner').appear({ duration: 0.5 });
-	new Ajax.Request('chart',
-		{
-			asynchronous:true,
-			evalScripts:true,
-			method:'get',
-			parameters: {
-				authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
-				start_days_ago: period
-			}
-		}
-	);
-};
-
-var funnelChart;
-document.observe('dom:loaded', function() {
-	funnelChart = new FunnelChart( $('funnel_chart_container'), [], {} );
-	<%= funnel_event_nodes_javascript(30.days.ago..0.days.ago) %>
-	funnelChart.funnel_nodes = nodes;
-	funnelChart.redraw();
-	$('funnel_chart_spinner').style.top = $('funnel_chart_container').positionedOffset().top+'px';
-	$('funnel_chart_spinner').style.left = $('funnel_chart_container').positionedOffset().left+'px';
-});
+<% default_period = 30 if local_assigns[:default_period].nil? %>
+<%- Analytics::Visitor.primary_states.each_with_index do |state, i| -%>
+ 	<%= render 'funnel_stage', :state=>state, :date_range=>(default_period.days.ago..0.days.ago), :top_label=>(i==0) if next_state_from(state) %>
+<%- end -%>
+<img class='spinner' id='funnel_chart_spinner' src='/images/ajax-loader.gif' style='display: none;'/>
+<script type='text/javascript'>
+	var funnelChart = new FunnelChart('.funnel_stage');
+	funnelChart.draw();
 </script>
-<div class="funnel_chart_container" id="funnel_chart_container" style="float: left; width: 200px; height: 1000px;">
-	<canvas id='funnel_chart' width='200' height='1000' style='border: 0; padding: 0;'></canvas>
-</div>
-<img class='spinner' id='funnel_chart_spinner' src='/images/ajax-loader.gif' />

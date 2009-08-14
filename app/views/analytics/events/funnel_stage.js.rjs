@@ -1,0 +1,7 @@
+id = "#{@state}-#{@next_state}"
+
+page << "$('funnel_stage_#{id}').down('.start_count').update('#{@stats[:start_count]}');"
+page << "$('funnel_stage_#{id}').down('.rate_stats').update('#{number_to_percentage(@stats[:rate]*100.0, :precision=>1)}');"
+page << "$('funnel_stage_#{id}').down('.end_count').update('#{@stats[:end_count]}');"
+
+page.visual_effect :fade, "funnel_stage_#{@state}-#{@next_state}_spinner", :duration=>0.25

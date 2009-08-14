@@ -49,14 +49,21 @@ module Analytics::EventsHelper
   	node_str
   end
 
+  def day_within_current_period(time_period)
+    ((DateTime.now.beginning_of_day - DateTime.now.beginning_of_year).days.to_i % time_period.to_i)/1.day
+  end
+
+  def current_period(time_period)
+    day_within_current_period(time_period).days.ago.beginning_of_day...0.days.ago.beginning_of_day
+  end
+
   def state_graph_data(state, time_period)
     next_state = next_state_from(state)
     periods_per_year = (1.year / time_period).round
 
     num_periods = 6.months / time_period
-    day_within_current_period = ((DateTime.now.beginning_of_day - DateTime.now.beginning_of_year).days.to_i % time_period.to_i)/1.day
     current_period_num = ((DateTime.now.beginning_of_day - DateTime.now.beginning_of_year).days.to_f / time_period.to_f).floor
-    current_period = day_within_current_period.days.ago.beginning_of_day...0.days.ago.beginning_of_day
+    current_period = current_period(time_period)
 
     data_hash = { :rate=>[], :number=>[], :xaxis_ticks=>[] }
     0.upto(num_periods-1) do |period_num|

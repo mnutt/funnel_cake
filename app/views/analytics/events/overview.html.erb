@@ -10,7 +10,11 @@
 	</div>
 	<div class="column span-9 last">
 		<h2>Primary Conversion Rates</h2>
-		<%= render 'funnel_chart' %>
+		<div class="column span-3">
+			<%- Analytics::Visitor.primary_states.each_with_index do |state, i| -%>
+			 	<%= render 'funnel_stage', :state=>state, :date_range=>(Date.today.day.days.ago..0.days.ago), :top_label=>(i==0) if next_state_from(state) %>
+			<%- end -%>
+		</div>
 		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px;">
 			<% Analytics::Visitor.primary_states.each do |state| %>
 				<%= render 'state_graph', :state=>state if next_state_from(state) %>
@@ -26,12 +30,14 @@
 <script type="text/javascript">
 var updatePage = function(period) {
 	updateFunnelDiagram(period);
-	updateFunnelChart(period);
+	funnelChart.refreshData(period, 0);
 	updateStateGraphs(period);
 	$('daterange_label').update('Date Range: '+period+' days ago to today');
 };
 
+var funnelChart = new FunnelChart('.funnel_stage');
 document.observe('dom:loaded', function() {
+	funnelChart.draw();
 	updatePage($('date_chooser').value);
 });
 </script>

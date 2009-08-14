@@ -42,16 +42,19 @@ class Analytics::EventsController < ApplicationController
     end
   end
 
-  def chart
-    @daterange = params[:start_days_ago].to_i.days.ago .. 0.days.ago
+  def state_graph
+    @time_period = params[:days].to_i.days
+    @state = params[:state]
     respond_to do |format|
       format.js { render }
     end
   end
 
-  def state_graph
-    @time_period = params[:days].to_i.days
+  def funnel_stage
+    date_range = params[:date_range_start].to_i.days.ago..params[:date_range_end].to_i.days.ago
     @state = params[:state]
+    @next_state = params[:next_state]
+    @stats = FunnelCake::Engine.conversion_stats(@state, @next_state, {:date_range=>date_range, :attrition_period=>1.month})
     respond_to do |format|
       format.js { render }
     end
