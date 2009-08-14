@@ -1,0 +1,13 @@
+  <tr id='funnel_event_<%=funnel_event.id%>' class='funnel_event'>
+    <td><%= funnel_event.id %></td>
+    <td><%= funnel_event.name %></td>
+    <td><%= funnel_event.from %></td>
+    <td><%= funnel_event.to %></td>
+    <td><%= funnel_event.url.sub(/https?:\/\/[^\/]+/,'') unless funnel_event.url.nil? %></td>
+    <td><%= funnel_event.visitor.user.email unless funnel_event.visitor.nil? or funnel_event.visitor.user.nil? %></td>
+    <td><%= funnel_event.visitor.key[0..5]+'...' unless funnel_event.visitor.nil? %></td>
+    <td><%= funnel_event.visitor.ip unless funnel_event.visitor.nil? %></td>
+    <td><%#= human_time(funnel_event.created_at) %><%=funnel_event.created_at.to_s(:short)%>
+	 <span id='datetime_<%=funnel_event.id%>' style="display: none;"><%=funnel_event.created_at%></span></td>
+	 <td><%=link_to 'Show', analytics_event_path(funnel_event)%></td>
+  </tr>

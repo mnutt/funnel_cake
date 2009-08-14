@@ -1,6 +1,8 @@
-class FunnelVisitor < ActiveRecord::Base
-  # Set up the FunnelEvent model association
-  has_many :funnel_events, :class_name=>'FunnelEvent', :dependent=>:destroy
+class Analytics::Visitor < ActiveRecord::Base
+  set_table_name :funnelcake_visitors
+
+  # Set up the Analytics::Event model association
+  has_many :events, :class_name=>'Analytics::Event', :dependent=>:destroy
 
   # Set up state machine
   acts_as_funnel_state_machine :initial=>:unknown, :validate_on_transitions=>false,
@@ -14,7 +16,7 @@ class FunnelVisitor < ActiveRecord::Base
   belongs_to :user, :class_name=>'User', :foreign_key=>:user_id
 
 
-  # Create a FunnelEvent, as a callback to a state_machine transition
+  # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)
     self.funnel_events.create( :from=>from.to_s, :to=>to.to_s,
                               :url=>data[:url],

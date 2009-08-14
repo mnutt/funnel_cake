@@ -1,6 +1,6 @@
-<h1>Editing funnel_ignore</h1>
+<h1>New ignore</h1>
 
-<% form_for(@funnel_ignore) do |f| %>
+<% form_for(@ignore) do |f| %>
   <%= f.error_messages %>
   <p>
     <%= f.label :ip %><br />
@@ -11,9 +11,8 @@
     <%= f.text_field :name %>
   </p>
   <p>
-    <%= f.submit 'Update' %>
+    <%= f.submit 'Create' %>
   </p>
 <% end %>
 
-<%= link_to 'Show', @funnel_ignore %> |
-<%= link_to 'Back', funnel_ignores_path %>
+<%= link_to 'Back', analytics_ignores_path %>

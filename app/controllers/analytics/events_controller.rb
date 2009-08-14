@@ -1,4 +1,4 @@
-class FunnelEventsController < ApplicationController
+class Analytics::EventsController < ApplicationController
 
   before_filter :setup_funnel_cake_includes
   def setup_funnel_cake_includes
@@ -16,19 +16,19 @@ class FunnelEventsController < ApplicationController
 
     respond_to do |format|
       format.html do
-        @funnel_events = FunnelEvent.find(:all, :limit=>limit, :include=>[:user, :funnel_visitor], :order=>'created_at DESC')
+        @events = Analytics::Event.find(:all, :limit=>limit, :include=>[:user, :visitor], :order=>'created_at DESC')
       end
       format.js do
         timestamp = params[:timestamp].to_datetime
-        @funnel_events = FunnelEvent.find(:all, :limit=>limit, :include=>[:user, :funnel_visitor],
+        @events = Analytics::Event.find(:all, :limit=>limit, :include=>[:user, :visitor],
                                                 :order=>'created_at DESC', :conditions=>['created_at > ?',timestamp])
       end
     end
   end
 
-  # GET /funnel_events/1
+  # GET /events/1
   def show
-    @funnel_event = FunnelEvent.find(params[:id])
+    @event = Analytics::Event.find(params[:id])
 
     respond_to do |format|
       format.html # show.html.erb
@@ -61,14 +61,13 @@ class FunnelEventsController < ApplicationController
   def overview
   end
 
-  def dashboard
+  def conversions
   end
 
-  def dashboard_detail
+  def conversions_detail
     @time_period = params[:days].to_i
     @state = params[:state]
     render :layout=>false
   end
-
 
 end

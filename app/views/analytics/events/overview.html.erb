@@ -12,7 +12,7 @@
 		<h2>Primary Conversion Rates</h2>
 		<%= render 'funnel_chart' %>
 		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px;">
-			<% FunnelVisitor.primary_states.each do |state| %>
+			<% Analytics::Visitor.primary_states.each do |state| %>
 				<%= render 'state_graph', :state=>state if next_state_from(state) %>
 			<% end %>
 			<%= render 'state_graph_update' %>

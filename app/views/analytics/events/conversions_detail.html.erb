@@ -1,19 +1,19 @@
-<div class='dashboard_item'>
-	<h3><%= @state.to_s.titleize %> for the past <%=@time_period%> days:</h3>&nbsp;&nbsp;&nbsp;&nbsp;<%= link_to_function 'Close', "this.up('.dashboard_item').remove();" %>
-	<div class='dashboard_graph' id='dashboard_graph_<%=@state%>'>
+<div class='conversions_item'>
+	<h3><%= @state.to_s.titleize %> for the past <%=@time_period%> days:</h3>&nbsp;&nbsp;&nbsp;&nbsp;<%= link_to_function 'Close', "this.up('.conversions_item').remove();" %>
+	<div class='conversions_graph' id='conversions_graph_<%=@state%>'>
 		<%= render 'state_graph', :state=>@state %>
 	</div>
-	<div class='dashboard_graph_notes' id='dashboard_graph_notes_<%=@state%>' style='clear: both;'>
+	<div class='conversions_graph_notes' id='conversions_graph_notes_<%=@state%>' style='clear: both;'>
 		<%- visitors = state_graph_visitors(@state, @time_period.days) -%>
 		<b>Eligible Visitors: <%= visitors[0].length %></b><br/>
-		<table class='dashboard_notes'>
+		<table class='conversions_notes'>
 			<% visitors[0][0,20].each do |v| %>
 			<tr><td><%= v.user ? v.user.try(:name) : v.ip %></td><td><%= v.user.try(:email) %></td><td><%= v.created_at.to_s(:short) %></td></tr>
 			<% end %>
 			<%= '<tr><td colspan="3">...</td></tr>' if visitors[0].length > 20 %>
 		</table>
 		<b>Transitioned Visitors: <%= visitors[1].length %></b><br/>
-		<table class='dashboard_notes'>
+		<table class='conversions_notes'>
 			<% visitors[1][0,10].each do |v| %>
 			<tr><td><%= v.user.try(:name) %></td><td><%= v.user.try(:email) %></td><td><%= v.created_at.to_s(:short) %></td></tr>
 			<% end %>

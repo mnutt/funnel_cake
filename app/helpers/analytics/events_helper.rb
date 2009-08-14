@@ -1,7 +1,7 @@
-module FunnelEventsHelper
+module Analytics::EventsHelper
 
   # Grab raw position data from the diagram xdot
-  XDOT_FILE = File.join(RAILS_ROOT, 'app', 'views', 'funnel_events', '_diagram.xdot.erb')
+  XDOT_FILE = File.join(RAILS_ROOT, 'app', 'views', 'analytics', 'events', '_diagram.xdot.erb')
   RAW_STATE_POSITIONS_ARR = File.open(XDOT_FILE).read.split(/\n/).
                           collect { |l| l.match(/(\w+) \[label=\".*pos=\"(\d+,\d+)\"/) }.
                           delete_if {|m| m.nil?}.
@@ -14,15 +14,15 @@ module FunnelEventsHelper
   POS_SCALE = 0.6 * 96/72
 
   def state_position(state)
-    FunnelVisitor.primary_states.index(state.to_sym) * 100
+    Analytics::Visitor.primary_states.index(state.to_sym) * 120
     # pos = STATE_POSITIONS[state.to_sym]
     # return 0 if pos.nil?
     # pos[:top]*POS_SCALE - POS_PADDING
   end
 
   def next_state_from(state)
-    i = FunnelVisitor.primary_states.index(state.to_sym)
-    FunnelVisitor.primary_states[i+1]
+    i = Analytics::Visitor.primary_states.index(state.to_sym)
+    Analytics::Visitor.primary_states[i+1]
   end
 
   def funnel_event_node_javascript(state, daterange)
@@ -41,7 +41,7 @@ module FunnelEventsHelper
   def funnel_event_nodes_javascript(daterange)
   	node_str = 'var nodes = ['
   	node_array = []
-  	FunnelVisitor.primary_states.each_with_index do |state, i|
+  	Analytics::Visitor.primary_states.each_with_index do |state, i|
     	node_array << funnel_event_node_javascript(state, daterange)
   	end
   	node_str += node_array.join(",\n")

@@ -31,7 +31,7 @@ div.state_graph_container {
 	float:left;
 	padding-top:20px;
 	width:325px;
-	height:130px;
+	height:100px;
 }
 div.state_graph {
 	width:325px;
@@ -55,7 +55,7 @@ img.state_graph_spinner {
 	left: 0px;
 }
 
-div.dashboard_item {
+div.conversions_item {
 	float: left;
 	border: 1px solid #888;
 	border-radius: 10px;
@@ -63,11 +63,11 @@ div.dashboard_item {
 	padding:15px;
 	background-color: #F0FAFF;
 }
-div.dashboard_item h3 {
+div.conversions_item h3 {
 	display: inline;
 }
 
-table.dashboard_notes td {
+table.conversions_notes td {
 	line-height: 15px;
 	padding: 0px 10px;
 }

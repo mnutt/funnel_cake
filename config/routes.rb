@@ -4,7 +4,9 @@
 ActionController::Routing::Routes.draw do |map|
 
   # Uncomment these, or copy them to your own config/routes.rb
-  # map.resources :funnel_events, {:collection=>{:diagram=>:get, :stats_graph=>:get}}
-  # map.resources :funnel_ignores
+  # map.namespace :analytics do |analytics|
+  #   analytics.resources :events, {:collection=>{:diagram=>:get, :stats_graph=>:get}}
+  #   analytics.resources :ignores
+  # end
 
 end

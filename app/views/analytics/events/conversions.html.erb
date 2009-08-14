@@ -30,7 +30,7 @@ document.observe('dom:loaded', function() {
 	$$('.funnel_rate_label').each(function(label) {
 		var label_state = label.id.sub(/funnel_rate_/,'');
 		label.observe('click', function() {
-			<%= remote_function :url=>'dashboard_detail', :update=>'state_chart_container', :position=>:bottom,
+			<%= remote_function :url=>'conversions_detail', :update=>'state_chart_container', :position=>:bottom,
 													:method=>:get, :with=>"'days='+$('date_chooser').value+'&state='+label_state" %>
 		});
 	});

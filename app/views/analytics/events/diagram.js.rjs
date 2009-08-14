@@ -2,14 +2,14 @@
 funnel_options = {:date_range=>@daterange, :attrition_period=>1.month}
 
 # Adjust diagram labels
-FunnelVisitor.states_table.each do |s, state|
+Analytics::Visitor.states_table.each do |s, state|
   start_count = FunnelCake::Engine.find_by_starting_state(s, funnel_options).length
   end_count = FunnelCake::Engine.find_by_ending_state(s, funnel_options).length
   page.replace_html "#{s}_node", "#{end_count.to_s} &rarr; <b>#{s.to_s.titleize}: #{start_count.to_s}</b>"
   page << "$('#{s}_node').addClassName('primary');" if state.primary?
 end
-FunnelVisitor.event_table.each do |ev_name, ev|
-  FunnelVisitor.transition_table[ev_name].each do |trans|
+Analytics::Visitor.event_table.each do |ev_name, ev|
+  Analytics::Visitor.transition_table[ev_name].each do |trans|
     count = FunnelCake::Engine.find_by_transition(trans.from, trans.to, funnel_options).length
     page.replace_html "#{trans.from}_to_#{trans.to}_edge", count.to_s
   end

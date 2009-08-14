@@ -1,0 +1,27 @@
+<h3>Last <%=@events.size%> Conversion Funnel Events - <%=human_time(@events.first.created_at) unless @events.empty?%> to <%=human_time(@events.last.created_at) unless @events.empty?%></h3>
+<h4><%=link_to 'View Funnel Diagram & Conversion Rates', '/events/diagram' %></h4>
+<table class='admin_table' id='events'>
+  <tr class='admin_table_header' id='events_header'>
+    <th>ID</th>
+    <th>Event</th>
+    <th>From</th>
+    <th>To</th>
+    <th>URL</th>
+    <th>Email</th>
+    <th>Visitor Key</th>
+    <th>IP</th>
+	 <th>Date</th>
+	 <th></th>
+  </tr>
+	<%= render :partial => 'event', :collection=>@events %>
+</table>
+<script type="text/javascript">
+function timestampParam(){
+	 var timestamp_id = $$('tr.event').first().childElements().first().innerHTML;
+	 var timestamp = $('datetime_'+timestamp_id).innerHTML;
+	 return encodeURI(timestamp);
+}
+</script>
+<%= periodically_call_remote(:url=>{:controller=>'analytics/events', :action => 'index', :format=>:js},
+										:frequency=>10, :method=>:get,
+										:with => "'timestamp=' + timestampParam()") %>

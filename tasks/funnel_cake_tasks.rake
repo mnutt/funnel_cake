@@ -22,8 +22,8 @@ namespace :funnel_cake do
     r.close_write
     xdot = r.read
 
-    FileUtils.mkdir_p(File.join(RAILS_ROOT, 'app', 'views', 'funnel_events'))
-    w = File.open(File.join(RAILS_ROOT, 'app', 'views', 'funnel_events', '_diagram.xdot.erb'), 'w')
+    FileUtils.mkdir_p(File.join(RAILS_ROOT, 'app', 'views', 'analytics', 'events'))
+    w = File.open(File.join(RAILS_ROOT, 'app', 'views', 'analytics', 'events', '_diagram.xdot.erb'), 'w')
     w.write(xdot)
     w.close
   end

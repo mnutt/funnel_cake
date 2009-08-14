@@ -1,0 +1,22 @@
+<h1>Funnel Ignore List</h1>
+
+<table>
+  <tr>
+	 <th>Name</th>
+	 <th>IP</th>
+	 <th colspan='3'></th>
+  </tr>
+<% @ignores.each do |ignore| %>
+  <tr>
+	 <td><%= ignore.name %></td>
+	 <td><%= ignore.ip %></td>
+    <td><%= link_to 'Show', ignore %></td>
+    <td><%= link_to 'Edit', edit_analytics_ignore_path(ignore) %></td>
+    <td><%= link_to 'Destroy', ignore, :confirm => 'Are you sure?', :method => :delete %></td>
+  </tr>
+<% end %>
+</table>
+
+<br />
+
+<%= link_to 'New ignore', new_analytics_ignore_path %>
