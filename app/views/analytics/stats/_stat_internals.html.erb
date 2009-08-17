@@ -1,0 +1,6 @@
+<%- title = @title if local_assigns[:title].nil? -%>
+<%- value = @value if local_assigns[:value].nil? -%>
+<%- id = "stat_#{@stat_name}" if local_assigns[:id].nil? -%>
+	<h2><%= value %></h2>
+	<h3><%= title %></h3>
+	<img class='spinner' id='<%=id%>_spinner' src='/images/ajax-loader.gif' style='display: none;'/>

@@ -1,0 +1,3 @@
+
+page.replace_html "stat_#{@stat_name}", :partial=>'analytics/stats/stat_internals'
+page << "Cufon.refresh();"

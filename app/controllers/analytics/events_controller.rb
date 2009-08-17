@@ -11,6 +11,9 @@ class Analytics::EventsController < ApplicationController
     @stylesheets.push 'funnel_cake'
   end
 
+  helper 'analytics/common'
+  helper 'analytics/stats'
+
   def index
     limit = params[:limit].nil? ? 25 : params[:limit]
 
@@ -42,35 +45,7 @@ class Analytics::EventsController < ApplicationController
     end
   end
 
-  def state_graph
-    @time_period = params[:days].to_i.days
-    @state = params[:state]
-    respond_to do |format|
-      format.js { render }
-    end
-  end
-
-  def funnel_stage
-    date_range = params[:date_range_start].to_i.days.ago..params[:date_range_end].to_i.days.ago
-    @state = params[:state]
-    @next_state = params[:next_state]
-    @stats = FunnelCake::Engine.conversion_stats(@state, @next_state, {:date_range=>date_range, :attrition_period=>1.month})
-    respond_to do |format|
-      format.js { render }
-    end
-  end
-
-
   def overview
-  end
-
-  def conversions
-  end
-
-  def conversions_detail
-    @time_period = params[:days].to_i
-    @state = params[:state]
-    render :layout=>false
   end
 
 end

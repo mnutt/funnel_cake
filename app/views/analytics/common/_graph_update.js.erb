@@ -1,20 +1,17 @@
-<script type="text/javascript">
 var updateStateGraphs = function(period) {
 	$$('.state_graph').each(function(e){
 		var state_name = e.id.sub(/state_graph_/,'');
 		$('state_graph_'+state_name+'_spinner').appear({duration: 0.5});
-		new Ajax.Request('state_graph',
+		new Ajax.Request('/analytics/states/'+state_name+'/graph_data',
 			{
 				asynchronous:true,
 				evalScripts:true,
 				method:'get',
 				parameters: {
 					authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
-					state: state_name,
-					days: period
+					time_period: period
 				}
 			}
 		);
 	});
 };
-</script>

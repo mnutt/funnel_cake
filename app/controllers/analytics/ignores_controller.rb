@@ -1,4 +1,7 @@
 class Analytics::IgnoresController < ApplicationController
+
+  helper 'analytics/common'
+
   # GET /ignores
   # GET /ignores.xml
   def index

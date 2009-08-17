@@ -1,0 +1,21 @@
+var updateStats = function(periodEnd, periodStart) {
+	$$('.stat').each(function(e){
+		var stat_name_state = e.id.sub(/stat_/,'');
+		var stat_name = stat_name_state.split(/-/)[0];
+		var state = stat_name_state.split(/-/)[1];
+		$('stat_'+stat_name+'-'+state+'_spinner').appear({duration: 0.5});
+		new Ajax.Request('/analytics/stats/'+stat_name,
+			{
+				asynchronous:true,
+				evalScripts:true,
+				method:'get',
+				parameters: {
+					authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
+					date_range_start: periodEnd,
+					date_range_end: periodStart,
+					state: state
+				}
+			}
+		);
+	});
+};

@@ -53,7 +53,7 @@ span.rate_stats {
 
 div.state_graph_container {
 	float:left;
-	padding-top:20px;
+	padding-bottom:20px;
 	width:325px;
 	height:100px;
 }
@@ -79,7 +79,7 @@ img.state_graph_spinner {
 	left: 0px;
 }
 
-div.conversions_item {
+div.stage_detail {
 	float: left;
 	border: 1px solid #888;
 	border-radius: 10px;
@@ -87,11 +87,32 @@ div.conversions_item {
 	padding:15px;
 	background-color: #F0FAFF;
 }
-div.conversions_item h3 {
+div.stage_detail h3 {
 	display: inline;
 }
 
-table.conversions_notes td {
+div.visitors_notes td {
 	line-height: 15px;
 	padding: 0px 10px;
+}
+
+div.big_stat {
+	background-color: #E0EFFF;
+	-moz-border-radius: 10px;
+	border-radius: 10px;
+	border: 1px solid #ACACAC;
+	float: left;
+	padding: 8px;
+	margin: 3px;
+}
+div.big_stat h2 {
+	font-size: 40px;
+	margin-bottom: 0.5em;
+	padding-bottom: 0em;
+	background: none;
+	display: inline;
+}
+div.big_stat h3 {
+	display: inline;
+	font-size: 20px;
 }

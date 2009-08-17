@@ -1,0 +1,64 @@
+function periodStart(period) {
+	if (period=='monthly') {
+		return '<%= Date.today.beginning_of_month %>';
+	}
+	else if (period=='biweekly') {
+		return '<%= current_period(2.weeks).begin %>';
+	}
+	else if (period=='weekly') {
+		return '<%= current_period(1.week).begin %>';
+	}
+	return '<%= current_period(2.weeks).begin %>';
+}
+
+function periodEnd(period) {
+	if (period=='monthly') {
+		return '<%= Date.today.end_of_month %>';
+	}
+	else if (period=='biweekly') {
+		return '<%= current_period(2.weeks).end %>';
+	}
+	else if (period=='weekly') {
+		return '<%= current_period(1.week).end %>';
+	}
+	return '<%= current_period(2.weeks).end %>';
+}
+
+
+function dayWithinPeriod(period) {
+	if (period=='monthly') {
+		return <%= Date.today.day %>;
+	}
+	else if (period=='biweekly') {
+		return <%= day_within_current_period(2.weeks) %>;
+	}
+	else if (period=='weekly') {
+		return <%= day_within_current_period(1.week) %>;
+	}
+	return 14;
+}
+
+function periodDays(period) {
+	if (period=='monthly') {
+		return 30;
+	}
+	else if (period=='biweekly') {
+		return 14;
+	}
+	else if (period=='weekly') {
+		return 7;
+	}
+	return 14;
+}
+
+function setPeriodLabel(period) {
+	if (period=='monthly') {
+		$('daterange_label').update('<%=monthly_header%>');
+	}
+	else if (period=='biweekly') {
+		$('daterange_label').update('<%=biweekly_header%>');
+	}
+	else if (period=='weekly') {
+		$('daterange_label').update('<%=weekly_header%>');
+	}
+}
