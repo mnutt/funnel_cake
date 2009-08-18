@@ -1,0 +1,70 @@
+<div class='section'>
+	<h1>Funnel Visitors</h1>
+	<p>Showing visitors from the past month...</p>
+	<div class='section'>
+		<h2>Visitors with Users</h2>
+		<table class='admin_table'>
+		  <tr class='admin_table_header'>
+				<th>ID</th>
+				<th>Key</th>
+				<th>IP</th>
+				<th>User</th>
+				<th>State</th>
+				<th>Landing URL / Referer</th>
+				<th>Created At</th>
+				<th>Updated At</th>
+				<th colspan='2'></th>
+		</tr>
+		<% @visitors_with_users.each do |visitor| %>
+		  <tr>
+				<td><%= link_to visitor.id, analytics_visitor_path(visitor) %></td>
+				<td><%= visitor.key[0,8] %>...</td>
+				<td><%= visitor.ip %></td>
+				<td><%= link_to visitor.user_id, user_path(visitor.user_id), :popup=>true if visitor.user_id %></td>
+				<td><%= visitor.state %></td>
+				<td>
+					<%= visitor.events.first.try(:url) %><br />
+					<%= visitor.events.first.try(:referer) %>
+				</td>
+				<td><%= visitor.created_at.to_s(:short) %></td>
+				<td><%= visitor.updated_at.to_s(:short) %></td>
+				<td><%= link_to 'Edit', edit_analytics_visitor_path(visitor) %></td>
+				<td><%= link_to 'Destroy', analytics_visitor_path(visitor), :confirm => 'Are you sure?', :method => :delete %></td>
+		  </tr>
+		<% end %>
+		</table>
+	</div>
+
+	<div class='section'>
+		<h2>Visitors without Users</h2>
+		<table class='admin_table'>
+		  <tr class='admin_table_header'>
+				<th>ID</th>
+				<th>Key</th>
+				<th>IP</th>
+				<th>State</th>
+				<th>Landing URL / Referer</th>
+				<th>Created At</th>
+				<th>Updated At</th>
+				<th colspan='2'></th>
+		  </tr>
+		<% @visitors_without_users.each do |visitor| %>
+		  <tr>
+				<td><%= link_to visitor.id, analytics_visitor_path(visitor) %></td>
+				<td><%= visitor.key[0,8] %>...</td>
+				<td><%= visitor.ip %></td>
+				<td><%= visitor.state %></td>
+				<td>
+					<%= visitor.events.first.try(:url) %><br />
+					<%= visitor.events.first.try(:referer) %>
+				</td>
+				<td><%= visitor.created_at.to_s(:short) %></td>
+				<td><%= visitor.updated_at.to_s(:short) %></td>
+				<td><%= link_to 'Edit', edit_analytics_visitor_path(visitor) %></td>
+				<td><%= link_to 'Destroy', analytics_visitor_path(visitor), :confirm => 'Are you sure?', :method => :delete %></td>
+		  </tr>
+		<% end %>
+		</table>
+	</div>
+
+</div>

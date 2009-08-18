@@ -1,0 +1,33 @@
+<h1>Visitor: <%= @visitor.id %></h1>
+
+<h2>Details</h2>
+<p>
+	<%= @visitor.key %><br />
+	<%= @visitor.ip %><br />
+	<%= @visitor.state %><br />
+	<%= @visitor.user.try(:name) %> <%= @visitor.user.try(:email) %> <%= @visitor.user.try(:created_at) %><br />
+	<%= @visitor.created_at %><br />
+	<%= @visitor.updated_at %><br />
+	<b>Landing Page:</b> <%= @visitor.events.first.try(:url) %><br />
+	<b>Referer:</b> <%= @visitor.events.first.try(:referer) %>
+</p>
+
+<h2>Funnel Events</h2>
+<table class='admin_table' id='events'>
+  <tr class='admin_table_header' id='events_header'>
+    <th>ID</th>
+    <th>Event</th>
+    <th>From</th>
+    <th>To</th>
+    <th>URL</th>
+    <th>Email</th>
+    <th>Visitor Key</th>
+    <th>IP</th>
+	 <th>Date</th>
+	 <th></th>
+  </tr>
+	<%= render :partial=>'analytics/events/event', :collection=>@visitor.events %>
+</table>
+
+<%= link_to 'Edit', edit_analytics_visitor_path(@visitor) %> |
+<%= link_to 'Back', analytics_visitors_path %>

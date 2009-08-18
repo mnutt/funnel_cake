@@ -15,6 +15,11 @@ class Analytics::Visitor < ActiveRecord::Base
   # Add association for User model
   belongs_to :user, :class_name=>'User', :foreign_key=>:user_id
 
+  named_scope :recent, :conditions=>["created_at > ?", 1.months.ago]
+  named_scope :with_user, :conditions=>"user_id IS NOT NULL"
+  named_scope :without_user, :conditions=>"user_id IS NULL"
+  named_scope :including_events, :include=>:events
+  named_scope :ordered, :order=>'created_at DESC'
 
   # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)

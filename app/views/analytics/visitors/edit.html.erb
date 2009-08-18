@@ -1,0 +1,14 @@
+<h1>Editing Visitor</h1>
+
+<% form_for(@visitor) do |f| %>
+  <%= f.error_messages %>
+  <p><%= f.label :key %>&nbsp;<%= f.text_field :key %></p>
+  <p><%= f.label :ip %>&nbsp;<%= f.text_field :ip %></p>
+  <p><%= f.label :state %>&nbsp;<%= f.text_field :state %></p>
+  <p>
+    <%= f.submit 'Update' %>
+  </p>
+<% end %>
+
+<%= link_to 'Show', @visitor %> |
+<%= link_to 'Back', analytics_visitors_path %>

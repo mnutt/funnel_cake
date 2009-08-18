@@ -1,5 +1,5 @@
 <h3>Last <%=@events.size%> Conversion Funnel Events - <%=human_time(@events.first.created_at) unless @events.empty?%> to <%=human_time(@events.last.created_at) unless @events.empty?%></h3>
-<h4><%=link_to 'View Funnel Diagram & Conversion Rates', '/events/diagram' %></h4>
+<h4><%=link_to 'View Funnel Stages', analytics_stages_path %></h4>
 <table class='admin_table' id='events'>
   <tr class='admin_table_header' id='events_header'>
     <th>ID</th>
