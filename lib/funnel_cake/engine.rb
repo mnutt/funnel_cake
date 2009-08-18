@@ -149,16 +149,21 @@ module FunnelCake
     # Returns: number of users in the end state,
     # and number of users in the start state
     def self.conversion_stats(start_state, end_state, opts={})
-      return {:rate=>0.0, :end_count=>0, :start_count=>0} if start_state.nil? or end_state.nil?
-      state_pair_visitors = self.find_by_state_pair(start_state, end_state, opts)
-      starting_state_visitors = self.find_by_starting_state(start_state, opts).to_a | state_pair_visitors
-      stats = {}
-      stats[:end_count] = state_pair_visitors.length.to_f
-      stats[:start_count] = starting_state_visitors.length.to_f
+      Rails.cache.fetch("FunnelCake::Engine.conversion_stats:#{start_state}-#{end_state}-#{opts.inspect}") do
+        if start_state.nil? or end_state.nil?
+          {:rate=>0.0, :end_count=>0, :start_count=>0}
+        else
+          state_pair_visitors = self.find_by_state_pair(start_state, end_state, opts)
+          starting_state_visitors = self.find_by_starting_state(start_state, opts).to_a | state_pair_visitors
+          stats = {}
+          stats[:end_count] = state_pair_visitors.length.to_f
+          stats[:start_count] = starting_state_visitors.length.to_f
 
-      stats[:rate] = 0.0
-      stats[:rate] = stats[:end_count] / stats[:start_count] if stats[:start_count] != 0.0
-      return stats
+          stats[:rate] = 0.0
+          stats[:rate] = stats[:end_count] / stats[:start_count] if stats[:start_count] != 0.0
+          stats
+        end
+      end
     end
 
 
