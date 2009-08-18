@@ -1,7 +1,7 @@
 <div class="section span-12">
 	<h1><span>Funnel Stages</span></h1>
 	<div class="section span-12">
-		<%= render :partial => 'analytics/common/daterange_input', :style=>'font-size: 14px' %>
+		<%= render :partial => 'analytics/common/filter_fields_input', :style=>'font-size: 14px' %>
 		<%= render :partial => 'analytics/common/daterange_label' %>
 	</div>
 	<div class="section span-12">
@@ -18,10 +18,12 @@
 </div>
 <script type="text/javascript">
 <%= render 'analytics/common/graph_update.js' %>
-<%= render 'analytics/common/daterange_update.js' %>
+<%= render 'analytics/common/filter_fields_update.js' %>
 
-	var updateAnalyticsStats = function(period) {
-		funnelChart.refreshData(periodStart(period), periodEnd(period));
+	var updateAnalyticsStats = function() {
+		<%= render :partial => 'analytics/common/grab_filter_fields.js' %>
+
+		funnelChart.refreshData(periodStart(period), periodEnd(period), opts);
 		setPeriodLabel(period);
 		if (currentState) {
 			funnelChartClickHandler($('funnel_stage_'+currentState).down('.funnel_rate_label'));
@@ -38,16 +40,20 @@
 		var p_start = periodStart($('date_period').value);
 		var p_end = periodEnd($('date_period').value);
 
+		<%= render :partial => 'analytics/common/grab_filter_fields.js' %>
+
+		var params = $H({
+			authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
+			date_range_start: p_start,
+			date_range_end: p_end
+		}).merge(opts);
+
 		var label_state = label.id.sub(/funnel_rate_/,'');
 		new Ajax.Updater('state_info_container', 'stages/'+state+'-'+next_state+'/detail',
 			{
 				asynchronous:true,
 				method:'get',
-				parameters: {
-					authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
-					date_range_start: p_start,
-					date_range_end: p_end
-				},
+				parameters: params,
 				onComplete: function() {
 					updateStateGraphs(periodDays($('date_period').value));
 				}

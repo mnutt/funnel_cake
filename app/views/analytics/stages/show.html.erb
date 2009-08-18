@@ -1,7 +1,7 @@
 <div class="section span-12">
 	<h1><span><%=@state.to_s.titleize%></span> to <span><%=@next_state.to_s.titleize%></span></h1>
 	<div class="section span-12">
-		<%= render :partial => 'analytics/common/daterange_input', :style=>'font-size: 14px' %>
+		<%= render :partial => 'analytics/common/filter_fields_input', :style=>'font-size: 14px' %>
 		<%= render :partial => 'analytics/common/daterange_label' %>
 	</div>
 </div>
@@ -18,7 +18,7 @@
 </div>
 <script type="text/javascript">
 <%= render 'analytics/common/graph_update.js' %>
-<%= render 'analytics/common/daterange_update.js' %>
+<%= render 'analytics/common/filter_fields_update.js' %>
 <%= render 'analytics/common/visitors_update.js' %>
 
 	var updateAnalyticsStats = function(period) {

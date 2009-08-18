@@ -1,6 +1,4 @@
-class Analytics::VisitorsController < ApplicationController
-
-  helper 'analytics/common'
+class Analytics::VisitorsController < Analytics::CommonController
 
   # GET /visitors
   # GET /visitors.xml

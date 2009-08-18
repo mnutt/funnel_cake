@@ -1,7 +1,7 @@
 <div id='stage_detail_<%=@state%>-<%=@next_state%>' class='stage_detail'>
 	<h3><%= link_to "#{@state.to_s.titleize} to #{@next_state.to_s.titleize}", analytics_stage_path("#{@state}-#{@next_state}") %></h3>
 	<div class='visitors_notes_container' id='visitors_notes_container_<%=@state%>-<%=@next_state%>' style='clear: both;'>
-		<%= render 'visitors', :state=>@state, :date_range=>@date_range %>
+		<%= render 'visitors', :state=>@state, :options=>@options %>
 	</div>
 	<%= render 'analytics/states/graph', :state=>@next_state, :time_period=>(@date_range.end.to_date - @date_range.begin.to_date).to_i.days %>
 </div>

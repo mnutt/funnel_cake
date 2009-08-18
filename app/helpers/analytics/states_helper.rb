@@ -1,7 +1,9 @@
 module Analytics::StatesHelper
 
-  def state_graph_data(state, time_period)
-    Rails.cache.fetch("FunnelCake::StatesHelper.state_graph_data:#{state}-#{time_period}", :expires_in=>1.day) do
+  def state_graph_data(state, options)
+    Rails.cache.fetch("FunnelCake::StatesHelper.state_graph_data:#{state}-#{options.inspect}", :expires_in=>1.day) do
+      time_period = @options[:time_period]
+
       next_state = next_state_from(state)
       periods_per_year = (1.year / time_period).round
 
@@ -11,7 +13,7 @@ module Analytics::StatesHelper
 
       data_hash = { :rate=>[], :number=>[], :xaxis_ticks=>[] }
       0.upto(num_periods-1) do |period_num|
-        stats = FunnelCake::Engine.conversion_stats(state, next_state, {:date_range=>current_period, :attrition_period=>time_period})
+        stats = FunnelCake::Engine.conversion_stats(state, next_state, {:date_range=>current_period, :attrition_period=>time_period}.merge(options) )
 
         data_hash[:rate] << [ current_period_num - period_num, stats[:rate]*100.0 ]
         data_hash[:number] << [ current_period_num - period_num, stats[:end_count] ]

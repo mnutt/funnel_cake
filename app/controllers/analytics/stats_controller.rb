@@ -1,17 +1,4 @@
-class Analytics::StatsController < ApplicationController
-
-  before_filter :setup_funnel_cake_includes
-  def setup_funnel_cake_includes
-    @javascripts.push 'excanvas'
-    @javascripts.push 'funnel_chart'
-    @javascripts.push 'canviz'
-    @javascripts.push 'path'
-    @javascripts.push 'x11colors'
-    @javascripts.push 'flotr-0.2.0-alpha'
-    @stylesheets.push 'funnel_cake'
-  end
-
-  helper 'analytics/common'
+class Analytics::StatsController < Analytics::CommonController
 
   # def index
   #   respond_to do |format|
@@ -28,10 +15,12 @@ class Analytics::StatsController < ApplicationController
     end
     @stat = params[:id]
 
+    @options = add_filter_options({:date_range=>@date_range})
+
     if @stat == 'entered_state_count'
       state = params[:state].to_sym
       @title = state.to_s.titleize
-      @value = FunnelCake::Engine.find_by_ending_state(state, {:date_range=>@date_range}).length
+      @value = FunnelCake::Engine.find_by_ending_state(state, @options).length
       @stat_name = "#{@stat}-#{state}"
     else
       @title = 'Unknown'

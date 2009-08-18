@@ -1,16 +1,20 @@
-var updateStateGraphs = function(period) {
+var updateStateGraphs = function(period, opts) {
+	if (!opts) opts = {};
 	$$('.state_graph').each(function(e){
 		var state_name = e.id.sub(/state_graph_/,'');
 		$('state_graph_'+state_name+'_spinner').appear({duration: 0.5});
+
+		var params = $H({
+			authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
+			time_period: period
+		}).merge(opts);
+
 		new Ajax.Request('/analytics/states/'+state_name+'/graph_data',
 			{
 				asynchronous:true,
 				evalScripts:true,
 				method:'get',
-				parameters: {
-					authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
-					time_period: period
-				}
+				parameters: params
 			}
 		);
 	});

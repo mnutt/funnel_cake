@@ -54,7 +54,8 @@ module FunnelCake
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 
-      (entering_a_user_visitors - leaving_a_user_visitors).uniq
+      all = (entering_a_user_visitors - leaving_a_user_visitors).uniq
+      filter_visitors(all, opts)
     end
 
 
@@ -77,7 +78,7 @@ module FunnelCake
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 
-      leaving_a_user_visitors.uniq
+      filter_visitors(leaving_a_user_visitors.uniq, opts)
     end
 
     # Method for finding users/visitors who transitioned
@@ -105,7 +106,8 @@ module FunnelCake
 
       entering_b_user_visitors = find_by_ending_state(end_state, opts)
 
-      leaving_a_user_visitors & entering_b_user_visitors
+      all = leaving_a_user_visitors & entering_b_user_visitors
+      filter_visitors(all, opts)
     end
 
 
@@ -133,7 +135,7 @@ module FunnelCake
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 
-      user_visitors.uniq
+      filter_visitors(user_visitors.uniq, opts)
     end
 
 
@@ -166,6 +168,37 @@ module FunnelCake
       end
     end
 
+    private
+
+    # Filters Visitors from a list per an options hash
+    # For example:
+    # :has_event_with=>{ :url=>'/some_url' }
+    # :has_event_matching=>{ :url=>'url_match' }
+    # or...
+    # :first_event_with=>{ :referer=>'/referer_url' }
+    # :first_event_matching=>{ :referer=>'referer_match' }
+    def self.filter_visitors(visitors, opts={})
+
+      opts[:has_event_with].each do |filter, value|
+        visitors.delete_if { |v| v.events.find(:first, :conditions=>["#{filter} = ?", value]).nil? } unless value.blank?
+      end if opts[:has_event_with]
+
+      opts[:has_event_matching].each do |filter, value|
+        visitors.delete_if { |v| v.events.find(:first, :conditions=>"#{filter} LIKE '%#{value}%'").nil? } unless value.blank?
+      end if opts[:has_event_matching]
+
+      opts[:first_event_with].each do |filter, value|
+        visitors.delete_if { |v| v.events.first.attributes[filter.to_s] != value } unless value.blank?
+      end if opts[:first_event_with]
+
+      opts[:first_event_matching].each do |filter, value|
+        visitors.delete_if do |v|
+          (v.events.first.attributes[filter.to_s] ? v.events.first.attributes[filter.to_s].match(value) : nil).nil? unless value.blank?
+        end
+      end if opts[:first_event_matching]
+
+      return visitors
+    end
 
   end
 end

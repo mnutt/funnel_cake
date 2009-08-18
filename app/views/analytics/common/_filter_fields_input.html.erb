@@ -1,0 +1,20 @@
+<%- style = '' if local_assigns[:style].nil? -%>
+<div class="column span-6">
+	<h3 style='display: inline;'>Date Period:</h3>
+	<%= select_tag 'date_period',
+	  options_for_select([['Monthly','monthly'],['Bi-Weekly', 'biweekly'], ['Weekly', 'weekly']], :selected=>'biweekly'),
+		:onchange=>"updateAnalyticsStats();", :style=>"#{style}"
+	%><br />
+	<h3 style='display: inline;'>Landing Page (match):</h3>
+	<%= text_field_tag 'landing_page_match', '',
+		:onchange=>"updateAnalyticsStats();", :style=>"#{style}"
+	%><br />
+	<h3 style='display: inline;'>Referer (match):</h3>
+	<%= text_field_tag 'referer_match', '',
+		:onchange=>"updateAnalyticsStats();", :style=>"#{style}"
+	%><br />
+	<h3 style='display: inline;'>Visited Page (match):</h3>
+	<%= text_field_tag 'visited_page_match', '',
+		:onchange=>"updateAnalyticsStats();", :style=>"#{style}"
+	%>
+</div>

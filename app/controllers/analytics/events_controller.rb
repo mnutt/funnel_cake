@@ -1,17 +1,5 @@
-class Analytics::EventsController < ApplicationController
+class Analytics::EventsController < Analytics::CommonController
 
-  before_filter :setup_funnel_cake_includes
-  def setup_funnel_cake_includes
-    @javascripts.push 'excanvas'
-    @javascripts.push 'funnel_chart'
-    @javascripts.push 'canviz'
-    @javascripts.push 'path'
-    @javascripts.push 'x11colors'
-    @javascripts.push 'flotr-0.2.0-alpha'
-    @stylesheets.push 'funnel_cake'
-  end
-
-  helper 'analytics/common'
   helper 'analytics/stats'
 
   def index
@@ -40,6 +28,7 @@ class Analytics::EventsController < ApplicationController
 
   def diagram
     @daterange = params[:start_days_ago].to_i.days.ago .. 0.days.ago
+    @options = add_filter_options({:date_range=>@daterange, :attrition_period=>1.month})
     respond_to do |format|
       format.js { render }
     end

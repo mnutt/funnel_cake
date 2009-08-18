@@ -1,5 +1,5 @@
 <%- next_state = next_state_from(state) if local_assigns[:next_state].nil? -%>
-<%- visitors = state_graph_visitors(state, date_range) -%>
+<%- visitors = state_graph_visitors(state, options) -%>
 <div class='visitors_notes' id='visitors_notes_<%=state%>-<%=next_state%>' style='clear: both;'>
 	<b>Eligible Visitors: <%= visitors[0].length %></b><br/>
 	<table class='visitors_before_notes'>

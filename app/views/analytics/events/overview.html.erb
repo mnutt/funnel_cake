@@ -1,7 +1,6 @@
 <div class="section span-12">
-	<h3 id="daterange_label">Date Range</h3>
-	<%= select_tag "date", options_for_select([45, 30, 21, 14, 7, 6, 5, 4, 3, 2, 1, 0].collect{|v|[v,v]}, 14),
-									:id=>'date_chooser', :class=>'chooser', :onchange=>"updatePage(this.value);" %>
+	<%= render :partial => 'analytics/common/filter_fields_input', :style=>'font-size: 14px' %>
+	<%= render :partial => 'analytics/common/daterange_label' %>
 </div>
 <div class="section">
 	<div class="column span-8">
@@ -12,14 +11,15 @@
 		<h2>Primary Conversion Rates</h2>
 		<div class="column span-3">
 			<%- Analytics::Visitor.primary_states.each_with_index do |state, i| -%>
-			 	<%= render 'funnel_stage', :state=>state, :date_range=>(Date.today.day.days.ago..0.days.ago), :top_label=>(i==0) if next_state_from(state) %>
+			 	<%= render 'analytics/stages/stage', :state=>state,
+							:date_range=>current_period(2.weeks),
+							:top_label=>(i==0) if next_state_from(state) %>
 			<%- end -%>
 		</div>
 		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px;">
-			<% Analytics::Visitor.primary_states.each do |state| %>
-				<%= render 'state_graph', :state=>state if next_state_from(state) %>
-			<% end %>
-			<%= render 'state_graph_update' %>
+			<%- Analytics::Visitor.primary_states.each do |state| -%>
+				<%= render 'analytics/states/graph', :state=>state if next_state_from(state) %>
+			<%- end -%>
 		</div>
 	</div>
 </div>
@@ -28,16 +28,23 @@
 	<div class="section"	id="funnel_info"></div>
 </div>
 <script type="text/javascript">
-var updatePage = function(period) {
-	updateFunnelDiagram(period);
-	funnelChart.refreshData(period, 0);
-	updateStateGraphs(period);
-	$('daterange_label').update('Date Range: '+period+' days ago to today');
-};
+<%= render 'analytics/common/filter_fields_update.js' %>
+<%= render 'analytics/common/graph_update.js' %>
 
-var funnelChart = new FunnelChart('.funnel_stage');
-document.observe('dom:loaded', function() {
+	var updateAnalyticsStats = function() {
+		<%= render :partial => 'analytics/common/grab_filter_fields.js' %>
+
+		funnelChart.refreshData(periodStart(period), periodEnd(period), opts);
+		updateStateGraphs(periodDays(period), opts);
+		updateFunnelDiagram(periodDays(period), opts);
+		setPeriodLabel(period)
+	}
+
+	var funnelChart = new FunnelChart('.funnel_stage', {
+		padding: 10,
+		authenticity_token: '<%=escape_javascript(form_authenticity_token)%>'
+	});
 	funnelChart.draw();
-	updatePage($('date_chooser').value);
-});
+
+	updateAnalyticsStats();
 </script>

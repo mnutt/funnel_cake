@@ -1,0 +1,10 @@
+		var period = $('date_period').value;
+		var landing_page_match = $('landing_page_match').value;
+		var referer_match = $('referer_match').value;
+		var visited_page_match = $('visited_page_match').value;
+		var opts = {
+			filter_data: $H({
+				first_event_matching: { url: landing_page_match, referer: referer_match },
+				has_event_matching: { url: visited_page_match }
+			}).toJSON()
+		};

@@ -86,27 +86,31 @@ FunnelChart.prototype = {
 		});
 	},
 
-	refreshData: function(date_range_start, date_range_end) {
+	refreshData: function(date_range_start, date_range_end, opts) {
+		if (!opts) opts = {};
 		var me = this;
 		$$(this.selector).each(function(e){
 			var states = e.id.replace(/funnel_stage_/,'');
 			var top_state = states.split(/-/)[0];
 			var bottom_state = states.split(/-/)[1];
-
 			e.down('.spinner').appear({duration: 0.25});
+
+			var params = $H({
+				authenticity_token: me.settings.authenticity_token,
+				date_range_start: date_range_start,
+				date_range_end: date_range_end
+			}).merge(opts);
+
 			new Ajax.Request('/analytics/stages/'+top_state+'-'+bottom_state+'/stats',
 				{
 					asynchronous:true,
 					evalScripts:true,
 					method:'get',
-					parameters: {
-						authenticity_token: me.settings.authenticity_token,
-						date_range_start: date_range_start,
-						date_range_end: date_range_end
-					}
+					parameters: params
 				}
 			);
 		});
 	}
 
 };
+

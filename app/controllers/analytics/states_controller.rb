@@ -1,15 +1,4 @@
-class Analytics::StatesController < ApplicationController
-
-  before_filter :setup_funnel_cake_includes
-  def setup_funnel_cake_includes
-    @javascripts.push 'excanvas'
-    @javascripts.push 'funnel_chart'
-    @javascripts.push 'canviz'
-    @javascripts.push 'path'
-    @javascripts.push 'x11colors'
-    @javascripts.push 'flotr-0.2.0-alpha'
-    @stylesheets.push 'funnel_cake'
-  end
+class Analytics::StatesController < Analytics::CommonController
 
   helper 'analytics/common'
 
@@ -28,6 +17,7 @@ class Analytics::StatesController < ApplicationController
   def graph_data
     @time_period = params[:time_period].to_i.days
     @state = params[:id]
+    @options = add_filter_options({:time_period=>@time_period})
     respond_to do |format|
       format.js { render }
     end
