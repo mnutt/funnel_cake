@@ -7,7 +7,7 @@ class Analytics::CommonController < ApplicationController
     @javascripts.push 'canviz'
     @javascripts.push 'path'
     @javascripts.push 'x11colors'
-    @javascripts.push 'flotr-0.2.0-alpha'
+    @javascripts.push 'flotr.debug-0.2.0-alpha'
     @stylesheets.push 'funnel_cake'
   end
 

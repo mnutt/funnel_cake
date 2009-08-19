@@ -14,11 +14,11 @@ class Analytics::StagesController < Analytics::CommonController
   end
 
   def show
+    @date_range = params[:date_range_start].to_date..params[:date_range_end].to_date if (params[:date_range_start] and params[:date_range_end])
+    @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
     respond_to do |format|
       format.html # show.html.erb
       format.js do
-        @date_range = params[:date_range_start].to_date..params[:date_range_end].to_date
-        @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
         render
       end
     end
