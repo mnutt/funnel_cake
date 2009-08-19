@@ -68,10 +68,12 @@ div.state_graph {
 img.spinner {
 	width: 20px;
 	height: 20px;
-	position: absolute;
+	z-index: 10;
+}
+img.funnel_chart_spinner {
 	top: -100px;
 	left: -100px;
-	z-index: 10;
+	position: absolute;
 }
 img.state_graph_spinner {
 	position: relative;

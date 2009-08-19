@@ -16,6 +16,11 @@ class Analytics::StagesController < Analytics::CommonController
   def show
     respond_to do |format|
       format.html # show.html.erb
+      format.js do
+        @date_range = params[:date_range_start].to_date..params[:date_range_end].to_date
+        @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
+        render
+      end
     end
   end
 
@@ -25,14 +30,6 @@ class Analytics::StagesController < Analytics::CommonController
     @stats = FunnelCake::Engine.conversion_stats(@state, @next_state, @options)
     respond_to do |format|
       format.js { render }
-    end
-  end
-
-  def detail
-    @date_range = params[:date_range_start].to_date..params[:date_range_end].to_date
-    @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
-    respond_to do |format|
-      format.html { render :layout=>false }
     end
   end
 

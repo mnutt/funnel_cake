@@ -10,4 +10,4 @@ HERE
 
 page << remove_old_rows
 
-page.insert_html :after, 'events_header', :partial => 'event', :collection=>@funnel_events
+page.insert_html :after, 'events_header', :partial => 'event', :collection=>@events

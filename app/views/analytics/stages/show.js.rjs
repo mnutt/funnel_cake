@@ -1,0 +1,6 @@
+
+page.visual_effect :fade, 'state_info_container_spinner', :duration=>0.3
+page.replace_html 'state_info_container', render('detail')
+page.delay(0.4) do
+  page.visual_effect :appear, 'state_info_container', :duration=>0.3
+end

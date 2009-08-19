@@ -12,6 +12,7 @@
 														:top_label=>(i==0) if next_state_from(state) %>
 			<%- end -%>
 		</div>
+		<img class='spinner' id='state_info_container_spinner' src='/images/ajax-loader.gif' style='display: none;'/>
 		<div class='column span-8 last' id='state_info_container'>
 		</div>
 	</div>
@@ -48,10 +49,14 @@
 			date_range_end: p_end
 		}).merge(opts);
 
+		$('state_info_container_spinner').show();
+		$('state_info_container').hide();
+
 		var label_state = label.id.sub(/funnel_rate_/,'');
-		new Ajax.Updater('state_info_container', 'stages/'+state+'-'+next_state+'/detail',
+		new Ajax.Request('stages/'+state+'-'+next_state,
 			{
 				asynchronous:true,
+				evalScripts:true,
 				method:'get',
 				parameters: params,
 				onComplete: function() {

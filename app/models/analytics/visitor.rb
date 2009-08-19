@@ -23,7 +23,7 @@ class Analytics::Visitor < ActiveRecord::Base
 
   # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)
-    self.funnel_events.create( :from=>from.to_s, :to=>to.to_s,
+    self.events.create( :from=>from.to_s, :to=>to.to_s,
                               :url=>data[:url],
                               :referer=>data[:referer],
                               :user_agent=>data[:user_agent],

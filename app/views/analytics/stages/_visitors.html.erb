@@ -1,14 +1,14 @@
 <%- next_state = next_state_from(state) if local_assigns[:next_state].nil? -%>
 <%- visitors = state_graph_visitors(state, options) -%>
 <div class='visitors_notes' id='visitors_notes_<%=state%>-<%=next_state%>' style='clear: both;'>
-	<b>Eligible Visitors: <%= visitors[0].length %></b><br/>
+	<h3>Eligible Visitors: <%= visitors[0].length %></h3>
 	<table class='visitors_before_notes'>
 		<% visitors[0][0,20].each do |v| %>
 		<tr><td><%= link_to v.id, analytics_visitor_path(v) %></td><td><%= v.user ? v.user.try(:name) : v.ip %></td><td><%= v.user.try(:email) %></td><td><%= v.created_at.to_s(:short) %></td></tr>
 		<% end %>
 		<%= '<tr><td colspan="3">...</td></tr>' if visitors[0].length > 20 %>
-	</table>
-	<b>Transitioned Visitors: <%= visitors[1].length %></b><br/>
+	</table><br />
+	<h3>Transitioned Visitors: <%= visitors[1].length %></h3>
 	<table class='visitors_after_notes'>
 		<% visitors[1][0,10].each do |v| %>
 		<tr><%= link_to v.id, analytics_visitor_path(v) %></td><td><%= v.user.try(:name) %></td><td><%= v.user.try(:email) %></td><td><%= v.created_at.to_s(:short) %></td></tr>
