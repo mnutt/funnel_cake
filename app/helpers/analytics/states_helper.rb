@@ -12,7 +12,7 @@ module Analytics::StatesHelper
 
 
   def conversion_data_hash(state, next_state, options)
-    Rails.cache.fetch("FunnelCake::StatesHelper.state_graph_data:#{state}-#{options.inspect.gsub(/[\s:]/,'_')}", :expires_in=>1.day) do
+    Rails.cache.fetch("FC.state_graph_data:#{state}-#{options.inspect.gsub(/[\s:=>\"\{\}\,]/,'')}", :expires_in=>1.day) do
       time_period = @options[:time_period]
 
       periods_per_year = (1.year / time_period).round
