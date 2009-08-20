@@ -151,7 +151,7 @@ module FunnelCake
     # Returns: number of users in the end state,
     # and number of users in the start state
     def self.conversion_stats(start_state, end_state, opts={})
-      Rails.cache.fetch("FunnelCake::Engine.conversion_stats:#{start_state}-#{end_state}-#{opts.inspect}", :expires_in=>1.day) do
+      Rails.cache.fetch("FunnelCake::Engine.conversion_stats:#{start_state}-#{end_state}-#{opts.inspect.gsub(/[\s:]/,'_')}", :expires_in=>1.day) do
         if start_state.nil? or end_state.nil?
           {:rate=>0.0, :end_count=>0, :start_count=>0}
         else
