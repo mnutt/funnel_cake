@@ -42,14 +42,12 @@
 
 		var params = $H({
 			authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
-			date_range_start: opts.period_start,
-			date_range_end: opts.period_end
+			time_period: opts.time_period
 		}).merge(opts);
 
 		$('state_info_container_spinner').show();
 		$('state_info_container').hide();
 
-		var label_state = label.id.sub(/funnel_rate_/,'');
 		new Ajax.Request('stages/'+state+'-'+next_state,
 			{
 				asynchronous:true,
@@ -57,7 +55,7 @@
 				method:'get',
 				parameters: params,
 				onComplete: function() {
-					updateStateGraphs(opts.time_period);
+					updateStateGraphs(opts);
 				}
 			}
 		);
