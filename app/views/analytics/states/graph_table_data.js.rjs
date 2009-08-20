@@ -1,0 +1,7 @@
+
+page.visual_effect :fade, "state_graph_table_#{@state}", :duration=>0.5
+page.delay 0.5 do
+  page.replace_html "state_graph_table_#{@state}", state_graph_table_data(@state, @options)
+  page.visual_effect :appear, "state_graph_table_#{@state}", :duration=>0.25
+  page.visual_effect :fade, "state_graph_table_#{@state}_spinner", :duration=>0.5
+end

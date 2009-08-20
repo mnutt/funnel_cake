@@ -17,9 +17,9 @@
 							:top_label=>(i==0) if next_state_from(state) %>
 			<%- end -%>
 		</div>
-		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px;">
+		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px; padding-top: 80px;">
 			<%- Analytics::Visitor.primary_states.each do |state| -%>
-				<%= render 'analytics/states/graph', :state=>state if next_state_from(state) %>
+				<%= render 'analytics/states/graph', :state=>next_state_from(state) if next_state_from(state) %>
 			<%- end -%>
 		</div>
 	</div>
@@ -31,13 +31,14 @@
 <script type="text/javascript">
 <%= render 'analytics/common/filter_fields_update.js' %>
 <%= render 'analytics/common/graph_update.js' %>
+<%= render 'analytics/common/diagram_update.js' %>
 
 	var updateAnalyticsStats = function() {
-		<%= render :partial => 'analytics/common/grab_filter_fields.js' %>
+		<%= render 'analytics/common/grab_filter_fields.js' %>
 
-		funnelChart.refreshData(periodStart(period), periodEnd(period), opts);
-		updateStateGraphs(periodDays(period), opts);
-		updateFunnelDiagram(periodDays(period), opts);
+		funnelChart.refreshData(opts);
+		updateStateGraphs(opts);
+		updateFunnelDiagram(opts);
 		setPeriodLabel(period)
 	}
 

@@ -1,4 +1,4 @@
-var updateVisitorInfo = function(period, opts) {
+var updateVisitorInfo = function(opts) {
 	if (!opts) opts = {};
 	$$('.visitors_notes_container').each(function(e){
 
@@ -6,8 +6,8 @@ var updateVisitorInfo = function(period, opts) {
 		var state = state_name.split(/-/)[0];
 		var next_state = state_name.split(/-/)[1];
 
-		var p_start = periodStart($('date_period').value);
-		var p_end = periodEnd($('date_period').value);
+		var p_start = opts.period_start;
+		var p_end = opts.period_end;
 
 		var params = $H({
 			authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',

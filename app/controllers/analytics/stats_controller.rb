@@ -1,5 +1,7 @@
 class Analytics::StatsController < Analytics::CommonController
 
+  helper 'analytics/common'
+
   # def index
   #   respond_to do |format|
   #     format.html # show.html.erb
@@ -8,22 +10,20 @@ class Analytics::StatsController < Analytics::CommonController
   #
 
   def show
-    unless params[:date_range_start].blank? or params[:date_range_end].blank?
-      @date_range = params[:date_range_start].to_date..params[:date_range_end].to_date
-    else
-      @date_range = 1.month.ago..0.days.ago
-    end
+    @date_range = grab_date_range
     @stat = params[:id]
 
     @options = add_filter_options({:date_range=>@date_range})
 
     if @stat == 'entered_state_count'
       state = params[:state].to_sym
-      @title = state.to_s.titleize
-      @value = FunnelCake::Engine.find_by_ending_state(state, @options).length
+      prev_state = previous_state_from(state)
+      @title = params[:title] or state.to_s.titleize
+      stats = FunnelCake::Engine.conversion_stats(prev_state, state, {:date_range=>@date_range, :attrition_period=>1.month}.merge(@options) )
+      @value = stats[:end_count].to_i
       @stat_name = "#{@stat}-#{state}"
     else
-      @title = 'Unknown'
+      @title = params[:title] or 'Unknown'
       @value = 0
       @stat_name = ''
     end

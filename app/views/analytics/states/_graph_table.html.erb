@@ -1,0 +1,8 @@
+<% style = '' if local_assigns[:style].nil? %>
+<% state = @state if local_assigns[:state].nil? %>
+<div class='state_graph_table_container' id='state_graph_table_<%= state %>_container' style='<%=style%>'>
+	<h3><%= link_to state.to_s.titleize, analytics_state_path(state) %> Data</h3>
+	<table class='state_graph_table' id='state_graph_table_<%= state %>'>
+	</table>
+	<img class='spinner state_graph_table_spinner' id='state_graph_table_<%= state %>_spinner' src='/images/ajax-loader.gif'>
+</div>

@@ -86,7 +86,7 @@ FunnelChart.prototype = {
 		});
 	},
 
-	refreshData: function(date_range_start, date_range_end, opts) {
+	refreshData: function(opts) {
 		if (!opts) opts = {};
 		var me = this;
 		$$(this.selector).each(function(e){
@@ -97,8 +97,7 @@ FunnelChart.prototype = {
 
 			var params = $H({
 				authenticity_token: me.settings.authenticity_token,
-				date_range_start: date_range_start,
-				date_range_end: date_range_end
+				time_period: opts.time_period
 			}).merge(opts);
 
 			new Ajax.Request('/analytics/stages/'+top_state+'-'+bottom_state+'/stats',

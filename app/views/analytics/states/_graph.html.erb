@@ -1,6 +1,6 @@
 <% style = '' if local_assigns[:style].nil? %>
 <div class='state_graph_container' id='state_graph_<%= state %>_container' style='<%=style%>'>
-	<h3><%# = link_to state.to_s.titleize, analytics_state_path(state) %><%= link_to state.to_s.titleize %> History</h3>
+	<h3><%= link_to state.to_s.titleize, analytics_state_path(state) %> History</h3>
 	<div class='state_graph' id='state_graph_<%= state %>'></div>
 	<img class='spinner state_graph_spinner' id='state_graph_<%= state %>_spinner' src='/images/ajax-loader.gif'>
 </div>

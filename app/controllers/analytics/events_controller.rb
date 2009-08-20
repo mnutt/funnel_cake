@@ -27,8 +27,8 @@ class Analytics::EventsController < Analytics::CommonController
   end
 
   def diagram
-    @daterange = params[:start_days_ago].to_i.days.ago .. 0.days.ago
-    @options = add_filter_options({:date_range=>@daterange, :attrition_period=>1.month})
+    @date_range = grab_date_range
+    @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
     respond_to do |format|
       format.js { render }
     end

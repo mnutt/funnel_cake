@@ -22,9 +22,9 @@
 <%= render 'analytics/common/filter_fields_update.js' %>
 
 	var updateAnalyticsStats = function() {
-		<%= render :partial => 'analytics/common/grab_filter_fields.js' %>
+		<%= render 'analytics/common/grab_filter_fields.js' %>
 
-		funnelChart.refreshData(periodStart(period), periodEnd(period), opts);
+		funnelChart.refreshData(opts);
 		setPeriodLabel(period);
 		if (currentState) {
 			funnelChartClickHandler($('funnel_stage_'+currentState).down('.funnel_rate_label'));
@@ -38,15 +38,12 @@
 		var state = currentState.split(/-/)[0];
 		var next_state = currentState.split(/-/)[1];
 
-		var p_start = periodStart($('date_period').value);
-		var p_end = periodEnd($('date_period').value);
-
-		<%= render :partial => 'analytics/common/grab_filter_fields.js' %>
+		<%= render 'analytics/common/grab_filter_fields.js' %>
 
 		var params = $H({
 			authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
-			date_range_start: p_start,
-			date_range_end: p_end
+			date_range_start: opts.period_start,
+			date_range_end: opts.period_end
 		}).merge(opts);
 
 		$('state_info_container_spinner').show();
@@ -60,7 +57,7 @@
 				method:'get',
 				parameters: params,
 				onComplete: function() {
-					updateStateGraphs(periodDays($('date_period').value));
+					updateStateGraphs(opts.time_period);
 				}
 			}
 		);

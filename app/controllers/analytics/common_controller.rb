@@ -12,6 +12,7 @@ class Analytics::CommonController < ApplicationController
   end
 
   helper 'analytics/common'
+  include Analytics::CommonHelper
 
   private
 
@@ -20,6 +21,15 @@ class Analytics::CommonController < ApplicationController
     data = ActiveSupport::JSON.decode(params[:filter_data])
     data = data.inject({}) { |h, (k, v)| h[k.to_sym] = v; h }
     options.merge(data)
+  end
+
+  def grab_date_range
+    if params[:time_period]
+      return current_period(params[:time_period].to_i.days)
+    elsif !params[:date_range_start].blank? and !params[:date_range_end].blank?
+      return params[:date_range_start].to_date..params[:date_range_end].to_date
+    end
+    return 1.month.ago..0.days.ago
   end
 
 end

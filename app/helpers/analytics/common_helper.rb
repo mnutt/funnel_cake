@@ -5,12 +5,18 @@ module Analytics::CommonHelper
     Analytics::Visitor.primary_states[i+1]
   end
 
+  def previous_state_from(state)
+    i = Analytics::Visitor.primary_states.index(state.to_sym)
+    Analytics::Visitor.primary_states[i-1]
+  end
+
   def day_within_current_period(time_period)
     ((DateTime.now.beginning_of_day - DateTime.now.beginning_of_year).days.to_i % time_period.to_i)/1.day
   end
 
   def current_period(time_period)
-    day_within_current_period(time_period).days.ago.beginning_of_day...0.days.ago.beginning_of_day
+    start = day_within_current_period(time_period).days.ago.beginning_of_day
+    start...(start+time_period)
   end
 
   def monthly_header

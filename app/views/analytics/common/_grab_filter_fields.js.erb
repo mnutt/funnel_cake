@@ -8,3 +8,6 @@
 				has_event_matching: { url: visited_page_match }
 			}).toJSON()
 		};
+		opts.time_period = periodDays(period);
+		opts.period_start = periodStart(period);
+		opts.period_end = periodEnd(period);

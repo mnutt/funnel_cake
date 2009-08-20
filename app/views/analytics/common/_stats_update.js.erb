@@ -1,16 +1,20 @@
-var updateStats = function(periodEnd, periodStart, opts) {
+var updateStats = function(opts) {
 	if (!opts) opts = {};
 	$$('.stat').each(function(e){
 		var stat_name_state = e.id.sub(/stat_/,'');
 		var stat_name = stat_name_state.split(/-/)[0];
 		var state = stat_name_state.split(/-/)[1];
 		$('stat_'+stat_name+'-'+state+'_spinner').appear({duration: 0.5});
+		var title = e.down('h3').innerHTML;
+		var time_period = opts.time_period;
 
 		var params = $H({
 			authenticity_token: '<%=escape_javascript(form_authenticity_token)%>',
-			date_range_start: periodEnd,
-			date_range_end: periodStart,
-			state: state
+			// date_range_start: periodEnd,
+			// date_range_end: periodStart,
+			time_period: time_period,
+			state: state,
+			title: title
 		}).merge(opts);
 
 		new Ajax.Request('/analytics/stats/'+stat_name,
