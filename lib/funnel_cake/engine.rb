@@ -155,16 +155,30 @@ module FunnelCake
         if start_state.nil? or end_state.nil?
           {:rate=>0.0, :end_count=>0, :start_count=>0}
         else
-          state_pair_visitors = self.find_by_state_pair(start_state, end_state, opts)
-          starting_state_visitors = self.find_by_starting_state(start_state, opts).to_a | state_pair_visitors
+          visitors = conversion_visitors(start_state, end_state, opts)
           stats = {}
-          stats[:end_count] = state_pair_visitors.length.to_f
-          stats[:start_count] = starting_state_visitors.length.to_f
+          stats[:end_count] = visitors[:end].length.to_f
+          stats[:start_count] = visitors[:start].length.to_f
 
           stats[:rate] = 0.0
           stats[:rate] = stats[:end_count] / stats[:start_count] if stats[:start_count] != 0.0
           stats
         end
+      end
+    end
+
+    # Helper method to return visitors who correspond to conversion rate stats between states
+    def self.conversion_visitors(start_state, end_state, opts={})
+      if start_state.nil? or end_state.nil?
+        {:end=>[], :start=>[]}
+      else
+        # converted_visitors = self.find_by_state_pair(start_state, end_state, opts)
+        converted_visitors = self.find_by_ending_state(end_state, opts)
+        starting_state_visitors = self.find_by_starting_state(start_state, opts).to_a | converted_visitors
+        visitors = {}
+        visitors[:end] = converted_visitors
+        visitors[:start] = starting_state_visitors
+        visitors
       end
     end
 

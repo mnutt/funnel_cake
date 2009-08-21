@@ -23,10 +23,10 @@
     <th>Email</th>
     <th>Visitor Key</th>
     <th>IP</th>
-	 <th>Date</th>
-	 <th></th>
+	 	<th>Created At</th>
+		<th></th>
   </tr>
-	<%= render :partial=>'analytics/events/event', :collection=>@visitor.events %>
+	<%= render :partial=>'analytics/events/event', :collection=>@visitor.events.sorted_by_date %>
 </table>
 
 <%= link_to 'Edit', edit_analytics_visitor_path(@visitor) %> |

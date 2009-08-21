@@ -7,7 +7,7 @@
     <td><%= event.visitor.user.email unless event.visitor.nil? or event.visitor.user.nil? %></td>
     <td><%= event.visitor.key[0..5]+'...' unless event.visitor.nil? %></td>
     <td><%= event.visitor.ip unless event.visitor.nil? %></td>
-    <td><%#= human_time(event.created_at) %><%=event.created_at.to_s(:short)%>
+    <td><%= event.created_at.to_s(:short)%>
 	 <span id='datetime_<%=event.id%>' style="display: none;"><%=event.created_at%></span></td>
 	 <td><%=link_to 'Show', analytics_event_path(event)%></td>
   </tr>
