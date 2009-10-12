@@ -28,6 +28,13 @@ class Analytics::StagesController < Analytics::CommonController
     @date_range = grab_date_range
     @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
     @stats = FunnelCake::Engine.conversion_stats(@state, @next_state, @options)
+
+    if params[:show_previous_period]=='true'
+      @previous_date_range = previous_date_range(@date_range)
+      @previous_options = add_filter_options({:date_range=>@previous_date_range, :attrition_period=>1.month})
+      @previous_stats = FunnelCake::Engine.conversion_stats(@state, @next_state, @previous_options)
+    end
+
     respond_to do |format|
       format.js { render }
     end

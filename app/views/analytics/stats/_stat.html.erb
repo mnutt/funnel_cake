@@ -1,6 +1,7 @@
 <%- title = @title if local_assigns[:title].nil? -%>
 <%- value = @value if local_assigns[:value].nil? -%>
+<%- custom = false if local_assigns[:custom].nil? -%>
 <%- id = "stat_#{@stat_name}" if local_assigns[:id].nil? -%>
-<div class='stat big_stat' id='<%=id%>'>
+<div class='stat big_stat <%="custom" if custom%>' id='<%=id%>'>
 	<%= render 'analytics/stats/stat_internals', :value=>value, :title=>title, :id=>id %>
 </div>

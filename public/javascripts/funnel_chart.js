@@ -75,7 +75,7 @@ FunnelChart.prototype = {
 			if (label) {
 	      var labelpos = {
 	          x: element.getWidth()/2 - 10,
-	          y: (element.getHeight() - padding)/3.5
+	          y: (element.getHeight() - padding)/5
 	      };
 			  label.setStyle({
 		  		top: labelpos.y + element.positionedOffset().top + 'px',
@@ -94,10 +94,12 @@ FunnelChart.prototype = {
 			var top_state = states.split(/-/)[0];
 			var bottom_state = states.split(/-/)[1];
 			e.down('.spinner').appear({duration: 0.25});
+			var show_previous_period = (e.down('.previous_rate_stats') != null);
 
 			var params = $H({
 				authenticity_token: me.settings.authenticity_token,
-				time_period: opts.time_period
+				time_period: opts.time_period,
+				show_previous_period: show_previous_period
 			}).merge(opts);
 
 			new Ajax.Request('/analytics/stages/'+top_state+'-'+bottom_state+'/stats',

@@ -36,4 +36,9 @@ module Analytics::CommonHelper
     generic_header_text(1.week)
   end
 
+  def previous_date_range(date_range)
+    period = date_range.end - date_range.begin
+    (date_range.begin - period)..date_range.begin
+  end
+
 end
