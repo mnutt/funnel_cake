@@ -15,7 +15,7 @@ var updateVisitorInfo = function(opts) {
 			date_range_end: p_end
 		}).merge(opts);
 
-		new Ajax.Updater(e.id, '/analytics/stages/'+state+'-'+next_state+'/visitors',
+		new Ajax.Updater(e.id, '/analytics/conversions/'+state+'-'+next_state+'/visitors',
 			{
 				asynchronous:true,
 				method:'get',

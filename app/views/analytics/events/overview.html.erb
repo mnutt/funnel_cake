@@ -11,15 +11,16 @@
 	<div class="column span-9 last">
 		<h2>Primary Conversion Rates</h2>
 		<div class="column span-3">
-			<%- Analytics::Visitor.primary_states.each_with_index do |state, i| -%>
-			 	<%= render 'analytics/stages/stage', :state=>state,
-							:date_range=>current_period(2.weeks),
-							:top_label=>(i==0) if next_state_from(state) %>
+			<%- Analytics::Visitor.primary_states[1..-1].each_with_index do |state, i| -%>
+				<%- prev_state = previous_state_from(state) -%>
+			 	<%= render 'analytics/conversions/conversion', :start_state=>prev_state, :end_state=>state,
+							:options=>{:topLabel=>(i==0)} %>
 			<%- end -%>
 		</div>
-		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px; padding-top: 80px;">
+		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px; padding-top: 30px">
 			<%- Analytics::Visitor.primary_states.each do |state| -%>
-				<%= render 'analytics/states/graph', :state=>next_state_from(state) if next_state_from(state) %>
+				<%- prev_state = previous_state_from(state) -%>
+			 	<%= render 'analytics/conversions/graph', :start_state=>prev_state, :end_state=>state, :stat=>:rate %>
 			<%- end -%>
 		</div>
 	</div>
@@ -30,23 +31,16 @@
 </div>
 <script type="text/javascript">
 <%= render 'analytics/common/filter_fields_update.js' %>
-<%= render 'analytics/common/graph_update.js' %>
 <%= render 'analytics/common/diagram_update.js' %>
 
 	var updateAnalyticsStats = function() {
 		<%= render 'analytics/common/grab_filter_fields.js' %>
 
-		funnelChart.refreshData(opts);
-		updateStateGraphs(opts);
+		FunnelCakeWidget.update(opts);
 		updateFunnelDiagram(opts);
 		setPeriodLabel(period)
 	}
 
-	var funnelChart = new FunnelChart('.funnel_stage', {
-		padding: 10,
-		authenticity_token: '<%=escape_javascript(form_authenticity_token)%>'
-	});
-	funnelChart.draw();
-
+	FunnelCakeWidget.draw();
 	updateAnalyticsStats();
 </script>

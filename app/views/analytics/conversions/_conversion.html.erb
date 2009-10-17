@@ -1,0 +1,11 @@
+<%- options = {} if local_assigns[:options].nil? -%>
+<div class='funnel_conversion' id='funnel_conversion_<%=start_state%>-<%=end_state%>'>
+</div>
+<script type='text/javascript'>
+	options = <%= options.to_json %>;
+	if (options.clickHandler) { eval('tempFunc = '+options.clickHandler); options.clickHandler = tempFunc; }
+	new ConversionFunnel($('funnel_conversion_<%=start_state%>-<%=end_state%>'), $H({
+		startState: '<%=start_state%>',
+		endState: '<%=end_state%>'
+	}).merge(options).toObject());
+</script>

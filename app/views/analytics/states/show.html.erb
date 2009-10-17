@@ -20,17 +20,17 @@
 	</div>
 </div>
 <script type="text/javascript">
-<%= render 'analytics/common/graph_update.js' %>
 <%= render 'analytics/common/stats_update.js' %>
 <%= render 'analytics/common/filter_fields_update.js' %>
 
 	var updateAnalyticsStats = function() {
 		<%= render 'analytics/common/grab_filter_fields.js' %>
 
-		updateStateGraphs(opts);
+		FunnelCakeWidget.update(opts);
 		updateStats(opts);
 		setPeriodLabel(period)
 	};
 
+	FunnelCakeWidget.draw();
 	updateAnalyticsStats();
 </script>

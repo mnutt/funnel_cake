@@ -1,0 +1,11 @@
+<%- options = {} if local_assigns[:options].nil? -%>
+<div class='data_table' id='data_table_<%=state%>-<%=category%>-<%=stats.inspect%>'>
+</div>
+<script type='text/javascript'>
+	options = <%= options.to_json %>;
+	new DataTable($('data_table_<%=state%>-<%=category%>-<%=stats.inspect%>'), $H({
+		state: '<%=state%>',
+		category: '<%=category%>',
+		stats: <%=stats.to_json%>
+	}).merge(options).toObject());
+</script>

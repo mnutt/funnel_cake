@@ -1,6 +1,6 @@
-<div id='stage_detail_<%=@state%>-<%=@next_state%>' class='stage_detail'>
+<div id='conversion_detail_<%=@state%>-<%=@next_state%>' class='conversion_detail'>
 	<h2><%= "#{@state.to_s.titleize} to #{@next_state.to_s.titleize}" %></h2>
-	<p><%= link_to "View this Stage in Detail", analytics_stage_path("#{@state}-#{@next_state}") %></p>
+	<p><%= link_to "View this Conversion in Detail", analytics_conversion_path("#{@state}-#{@next_state}") %></p>
 	<div class='visitors_notes_container' id='visitors_notes_container_<%=@state%>-<%=@next_state%>' style='clear: both;'>
 		<%= render 'visitors', :state=>@state, :options=>@options %>
 	</div><br />

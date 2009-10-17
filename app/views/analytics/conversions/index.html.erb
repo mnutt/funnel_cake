@@ -1,0 +1,41 @@
+<div class="section">
+	<h1>TransFS <span>Conversion Rates</span></h1>
+	<div class="section full_width">
+		<h2>Filter Controls</h2>
+		<%= render :partial => 'analytics/common/daterange_label' %>
+		<%= render :partial => 'analytics/common/filter_fields_input', :style=>'font-size: 14px' %>
+	</div>
+<%- Analytics::Visitor.primary_states[1..-1].each_with_index do |state, i| -%>
+	<%- prev_state = previous_state_from(state) -%>
+	<div class="section full_width">
+		<div class="column span-3">
+				<%= render 'analytics/conversions/conversion', :start_state=>prev_state, :end_state=>state, :options=>{:topLabel=>(i==0)} %>
+		</div>
+		<div class="column span-6">
+			<b><%=prev_state%> to <%=state%> Rate History</b>
+			<%= render 'analytics/conversions/graph', :start_state=>prev_state, :end_state=>state, :stat=>:rate %>
+		</div>
+		<div class="column span-6">
+			<b><%=prev_state%> to <%=state%> Absolute History</b>
+			<%= render 'analytics/conversions/graph', :start_state=>prev_state, :end_state=>state %>
+		</div>
+	</div>
+<%- end -%>
+</div>
+<script type='text/javascript'>
+<%= render 'analytics/common/filter_fields_update.js' %>
+<%= render 'analytics/common/stats_update.js' %>
+
+	var updateAnalyticsStats = function() {
+		<%= render 'analytics/common/grab_filter_fields.js' %>
+
+		setPeriodLabel(period)
+		Cufon.refresh('daterange_label');
+
+		FunnelCakeWidget.update(opts);
+	}
+
+	FunnelCakeWidget.draw();
+	updateAnalyticsStats();
+
+</script>

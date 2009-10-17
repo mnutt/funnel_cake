@@ -1,6 +1,6 @@
-<%- next_state = next_state_from(state) if local_assigns[:next_state].nil? -%>
-<%- visitors = state_graph_visitors(state, options) -%>
-<div class='visitors_notes' id='visitors_notes_<%=state%>-<%=next_state%>' style='clear: both;'>
+<%- end_state = next_state_from(start_state) if local_assigns[:end_state].nil? -%>
+<%- visitors = state_graph_visitors(start_state, end_state, options) -%>
+<div class='visitors_notes' id='visitors_notes_<%=start_state%>-<%=end_state%>' style='clear: both;'>
 	<h3>Eligible Visitors: <%= visitors[0].length %></h3>
 	<table class='visitors_before_notes admin_table'>
 		<tr class='admin_table_header'><th>Visitor ID</th><th>Name</th><th>Email</th><th>Last Updated</th></tr>

@@ -1,7 +1,0 @@
-
-page.visual_effect :fade, "state_graph_#{@state}", :duration=>0.5
-page.delay 0.5 do
-  page << "var f = Flotr.draw( $('state_graph_#{@state}'), #{state_graph_data(@state, @options)});"
-  page.visual_effect :appear, "state_graph_#{@state}", :duration=>0.25
-  page.visual_effect :fade, "state_graph_#{@state}_spinner", :duration=>0.5
-end

@@ -1,9 +1,9 @@
 <% default_period = 30 if local_assigns[:default_period].nil? %>
 <%- Analytics::Visitor.primary_states.each_with_index do |state, i| -%>
- 	<%= render 'funnel_stage', :state=>state, :date_range=>(default_period.days.ago..0.days.ago), :top_label=>(i==0) if next_state_from(state) %>
+ 	<%= render 'funnel_conversion', :state=>state, :date_range=>(default_period.days.ago..0.days.ago), :top_label=>(i==0) if next_state_from(state) %>
 <%- end -%>
 <img class='spinner funnel_chart_spinner' id='funnel_chart_spinner' src='/images/ajax-loader.gif' style='display: none;'/>
 <script type='text/javascript'>
-	var funnelChart = new FunnelChart('.funnel_stage');
+	var funnelChart = new FunnelChart('.funnel_conversion');
 	funnelChart.draw();
 </script>

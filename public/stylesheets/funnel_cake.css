@@ -15,18 +15,18 @@ div.graph_edge {
 	margin-left: 20px;
 }
 
-div.funnel_stage {
+div.funnel_conversion {
 	width: 100%;
 	margin: 0;
 	padding: 0;
 }
-div.funnel_stage_container {
+div.funnel_conversion_container {
 	width: 100%;
 	height: 100px;
 	margin: 0;
 	padding: 0;
 }
-div.funnel_stage_label {
+div.funnel_conversion_label {
 	width: 100%;
 	height: 17px;
 	margin: 0;
@@ -113,7 +113,7 @@ img.state_graph_spinner {
 	left: 0px;
 }
 
-div.stage_detail {
+div.conversion_detail {
 	float: left;
 	border: 1px solid #888;
 	border-radius: 10px;
@@ -121,7 +121,7 @@ div.stage_detail {
 	padding:15px;
 	background-color: #F0FAFF;
 }
-div.stage_detail h3 {
+div.conversion_detail h3 {
 	display: inline;
 }
 

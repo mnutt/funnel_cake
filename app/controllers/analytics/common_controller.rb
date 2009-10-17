@@ -3,7 +3,7 @@ class Analytics::CommonController < ApplicationController
   before_filter :setup_funnel_cake_includes
   def setup_funnel_cake_includes
     @javascripts.push 'excanvas'
-    @javascripts.push 'funnel_chart'
+    @javascripts.push 'funnelcake'
     @javascripts.push 'canviz'
     @javascripts.push 'path'
     @javascripts.push 'x11colors'
