@@ -21,6 +21,7 @@ module Analytics::CommonHelper
   end
 
   def current_period(time_period)
+    return 0.days.ago.beginning_of_month...0.days.ago.end_of_month if time_period==30.days
     start = day_within_current_period(time_period).days.ago.beginning_of_day
     start...(start+time_period)
   end
