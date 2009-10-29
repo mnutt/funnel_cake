@@ -17,7 +17,7 @@ var canviz;
 document.observe('dom:loaded', function() {
 	canviz = new Canviz('funnel_diagram_container');
 	canviz.setImagePath('/images/');
-	canviz.setScale(0.6);
+	canviz.setScale(0.45);
 	canviz.parse('<%= escape_javascript(render("diagram.xdot.erb")) %>');
 	$('funnel_diagram_spinner').style.position = 'absolute';
 	$('funnel_diagram_spinner').style.top = $('funnel_diagram_container').positionedOffset().top+'px';

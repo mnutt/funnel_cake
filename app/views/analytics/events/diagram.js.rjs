@@ -3,7 +3,12 @@
 Analytics::Visitor.states_table.each do |s, state|
   start_count = FunnelCake::Engine.find_by_starting_state(s, @options).length
   end_count = FunnelCake::Engine.find_by_ending_state(s, @options).length
-  page.replace_html "#{s}_node", "#{end_count.to_s} &rarr; <b>#{s.to_s.titleize}: #{start_count.to_s}</b>"
+
+  node_html = "<div class='entering'>#{end_count.to_s}&rarr;</div>"
+  node_html += "<div class='label'>#{s.to_s.titleize}</div>"
+  node_html += "<div class='exiting'>#{start_count.to_s}&rarr;</div>"
+  page.replace_html "#{s}_node", node_html
+
   page << "$('#{s}_node').addClassName('primary');" if state.primary?
 end
 Analytics::Visitor.event_table.each do |ev_name, ev|
