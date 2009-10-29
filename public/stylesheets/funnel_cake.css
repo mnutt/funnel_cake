@@ -112,6 +112,7 @@ div.conversion_detail {
 	float: left;
 	border: 1px solid #888;
 	border-radius: 10px;
+	-webkit-border-radius: 10px;
 	-moz-border-radius: 10px;
 	padding:15px;
 	background-color: #F0FAFF;
@@ -127,8 +128,9 @@ div.visitors_notes td {
 
 div.big_stat {
 	background-color: #E0EFFF;
-	-moz-border-radius: 10px;
 	border-radius: 10px;
+	-webkit-border-radius: 10px;
+	-moz-border-radius: 10px;
 	border: 1px solid #ACACAC;
 	float: left;
 	padding: 3px 8px;
