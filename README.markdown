@@ -33,6 +33,7 @@ FunnelCake comes with a variety of visualization widgets for viewing different a
 * Single-stat widgets for displaying a single-number analytics statistic in a dashboard-friendly large-type format (eg:  "555 New Customers This Month")
 * Table of visitors eligible-for/entered-into a given state
 
+
 #### REST-ful Views
 
 Most of FunnelCake is designed with a RESTful architecture.  Thus, it exposes useful views for many of the analytics components, such as:
