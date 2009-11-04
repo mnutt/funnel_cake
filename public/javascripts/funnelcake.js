@@ -213,6 +213,8 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 		if (!options.endState) { console.error("ConversionGraph missing required 'endState'"); }
 		if (!options.stat) { console.error("ConversionGraph missing required 'stat'"); }
 
+		options.dataUrl = options.dataUrl.replace('ID', options.startState+'-'+options.endState);
+
 		$super(elem, options);
 		this.build();
   },
@@ -221,10 +223,12 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 		// Create parts
 		this.graph = new Element('div', {'class': 'graph'});
 		this.spinner = new Element('img', {'class': 'spinner', 'style': 'display: none;', 'src': '/images/ajax-loader.gif'});
+		this.exports = new Element('p', {'class': 'export'});
 
 		// Add everything to the wrapper element
 		this.element.insert({bottom: this.graph});
 		this.element.insert({bottom: this.spinner});
+		this.element.insert({bottom: this.exports});
 	},
 
   draw: function() {
@@ -244,7 +248,7 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 					format: 'json'
 				}).merge(opts);
 
-				new Ajax.Request(thiz.options.dataUrl.replace('ID', thiz.options.startState+'-'+thiz.options.endState),
+				new Ajax.Request(thiz.options.dataUrl,
 				{
 					format: 'json',
 					asynchronous: true,
@@ -256,10 +260,17 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 						thiz.graph.appear({duration: 0.35, afterFinish: function() {
 							thiz.spinner.fade({duration: 0.5});
 						}});
+						thiz.updateExports(params);
 					}
 				});
 			}
 		});
+	},
+
+	// Update the export links
+	updateExports: function(params) {
+		params.set('format', 'csv');
+		this.exports.update(new Element('a', {'href': this.options.dataUrl+'.csv?'+params.toQueryString()}).update('csv'));
 	},
 
 	constructFlotrData: function(rawdata) {
@@ -314,6 +325,8 @@ var DataTable = Class.create(FunnelCakeWidget, {
 		if (!options.category) { console.error("ConversionGraph missing required 'category'"); }
 		if (!options.stats) { console.error("ConversionGraph missing required 'stats'"); }
 
+		options.dataUrl = options.dataUrl.replace('ID', options.state);
+
 		$super(elem, options);
 		this.build();
   },
@@ -324,6 +337,9 @@ var DataTable = Class.create(FunnelCakeWidget, {
 		// Create parts
 		this.table = new Element('table', {'class': ''});
 		this.spinner = new Element('img', {'class': 'spinner', 'style': 'display: none;', 'src': '/images/ajax-loader.gif'});
+
+		// create exports
+		this.exports = new Element('p', {'class': 'export'});
 
 		// Add the header row
 		this.header_row = new Element('tr', {'class': 'header'});
@@ -338,6 +354,7 @@ var DataTable = Class.create(FunnelCakeWidget, {
 		// Add everything to the wrapper element
 		this.element.insert({bottom: this.spinner});
 		this.element.insert({bottom: this.table});
+		this.element.insert({bottom: this.exports});
 	},
 
   draw: function() {
@@ -354,7 +371,7 @@ var DataTable = Class.create(FunnelCakeWidget, {
 			format: 'json'
 		}).merge(opts);
 
-		new Ajax.Request(thiz.options.dataUrl.replace('ID', thiz.options.state),
+		new Ajax.Request(thiz.options.dataUrl,
 		{
 			format: 'json',
 			asynchronous: true,
@@ -363,8 +380,15 @@ var DataTable = Class.create(FunnelCakeWidget, {
 			onSuccess: function(transport) {
 				thiz.insertTableData(transport.responseJSON);
 				thiz.spinner.fade({duration: 0.5});
+				thiz.updateExports(params);
 			}
 		});
+	},
+
+	// Update the export links
+	updateExports: function(params) {
+		params.set('format', 'csv');
+		this.exports.update(new Element('a', {'href': this.options.dataUrl+'.csv?'+params.toQueryString()}).update('csv'));
 	},
 
 	insertTableData: function(rawdata) {

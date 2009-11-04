@@ -158,7 +158,7 @@ module FunnelCake
           {:rate=>0.0, :end_count=>0, :start_count=>0}
         else
           visitors = conversion_visitors(start_state, end_state, opts)
-          stats = {}
+          stats = FunnelCake::DataHash.new
           stats[:end_count] = visitors[:end].length.to_f
           stats[:start_count] = visitors[:start].length.to_f
 
@@ -177,7 +177,7 @@ module FunnelCake
         # converted_visitors = self.find_by_state_pair(start_state, end_state, opts)
         converted_visitors = self.find_by_ending_state(end_state, opts)
         starting_state_visitors = self.find_by_starting_state(start_state, opts).to_a | converted_visitors
-        visitors = {}
+        visitors = FunnelCake::DataHash.new
         visitors[:end] = converted_visitors
         visitors[:start] = starting_state_visitors
         visitors
@@ -190,20 +190,21 @@ module FunnelCake
 
         periods_per_year = (1.year / time_period).round
 
-        num_periods = 6.months / time_period
+        num_periods = (options[:max_history] || 4).months / time_period
         current_period_num = ((DateTime.now.beginning_of_day - DateTime.now.beginning_of_year).days.to_f / time_period.to_f).floor
         current_period = current_period(time_period)
 
-        data_hash = {}
+        data_hash = FunnelCake::DataHash.new
         0.upto(num_periods-1) do |period_num|
           stats = FunnelCake::Engine.conversion_stats(start_state, end_state, {:date_range=>current_period, :attrition_period=>time_period}.merge(options) )
-          data_hash[current_period_num - period_num] = {
+          data_hash[current_period_num - period_num] = FunnelCake::DataHash[{
             :rate => stats[:rate]*100.0,
             :number => stats[:end_count],
             :date => current_period.end.to_formatted_s(:month_slash_day),
             :index => current_period_num - period_num
-          }
-          current_period = (current_period.begin - time_period)...current_period.begin
+          }]
+
+          current_period = previous_date_range(current_period, time_period==30.days)
         end
 
         data_hash
