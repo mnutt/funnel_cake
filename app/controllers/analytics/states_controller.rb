@@ -20,12 +20,9 @@ class Analytics::StatesController < Analytics::CommonController
         start_state = previous_state_from(end_state)
         stat = params[:stat].blank? ? :number : params[:stat].to_sym
         options = add_filter_options({:time_period=>time_period, :stat=>stat})
-        render :json=>conversion_data_hash(start_state, end_state, options).to_json and return
+        render :json=>FunnelCake::Engine.conversion_history(start_state, end_state, options).to_json and return
       end
     end
   end
-
-
-
 
 end

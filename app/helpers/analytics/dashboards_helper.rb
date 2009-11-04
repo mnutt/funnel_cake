@@ -1,0 +1,5 @@
+module Analytics::DashboardsHelper
+
+
+
+end

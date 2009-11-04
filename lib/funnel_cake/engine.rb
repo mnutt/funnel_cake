@@ -1,6 +1,8 @@
 module FunnelCake
   class Engine
 
+    extend FunnelCake::StatePeriodHelpers
+
     # Accessor and default for User class
     @@user_class_name = 'User'
     cattr_accessor :user_class_name
@@ -151,7 +153,7 @@ module FunnelCake
     # Returns: number of users in the end state,
     # and number of users in the start state
     def self.conversion_stats(start_state, end_state, opts={})
-      Rails.cache.fetch("FC.conversion_stats:#{start_state}-#{end_state}-#{opts.inspect.gsub(/[\s:=>\"\{\}\,]/,'')}", :expires_in=>1.day) do
+      cache_fetch("conversion_stats:#{start_state}-#{end_state}-#{opts.inspect.gsub(/[\s:=>\"\{\}\,]/,'')}", :expires_in=>1.day) do
         if start_state.nil? or end_state.nil?
           {:rate=>0.0, :end_count=>0, :start_count=>0}
         else
@@ -181,6 +183,43 @@ module FunnelCake
         visitors
       end
     end
+
+    def self.conversion_history(start_state, end_state, options={})
+      cache_fetch("conversion_history:#{start_state}-#{end_state}-#{options.inspect.gsub(/[\s:=>\"\{\}\,]/,'')}", :expires_in=>1.day) do
+        time_period = options[:time_period]
+
+        periods_per_year = (1.year / time_period).round
+
+        num_periods = 6.months / time_period
+        current_period_num = ((DateTime.now.beginning_of_day - DateTime.now.beginning_of_year).days.to_f / time_period.to_f).floor
+        current_period = current_period(time_period)
+
+        data_hash = {}
+        0.upto(num_periods-1) do |period_num|
+          stats = FunnelCake::Engine.conversion_stats(start_state, end_state, {:date_range=>current_period, :attrition_period=>time_period}.merge(options) )
+          data_hash[current_period_num - period_num] = {
+            :rate => stats[:rate]*100.0,
+            :number => stats[:end_count],
+            :date => current_period.end.to_formatted_s(:month_slash_day),
+            :index => current_period_num - period_num
+          }
+          current_period = (current_period.begin - time_period)...current_period.begin
+        end
+
+        data_hash
+      end
+    end
+
+
+    # Clears the cached data, by performing the memcached namespace hack
+    # We find the FunnelCake namespace key, and increment it
+    def self.clear_cached_data
+      namespace_key = Rails.cache.fetch("FC.namespace_key") do
+        rand(10000)
+      end
+      Rails.cache.write("FC.namespace_key", (namespace_key.to_i + 1).to_s)
+    end
+
 
     private
 
@@ -212,6 +251,20 @@ module FunnelCake
       end if opts[:first_event_matching]
 
       return visitors
+    end
+
+    # Return the namespaced key for funnelcake, so that we can easily clear the funnelcake cache
+    # without blowing away all other cached data
+    def self.cache_key_for(key_name)
+      namespace_key = Rails.cache.fetch("FC.namespace_key") do
+        rand(10000).to_s
+      end
+      "FC.#{namespace_key}.#{key_name}"
+    end
+
+    # Query the Rails cache, sheparded through our memcached namespace hack
+    def self.cache_fetch(key, options, &block)
+      Rails.cache.fetch(cache_key_for(key), options, &block)
     end
 
   end
