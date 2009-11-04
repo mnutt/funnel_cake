@@ -1,11 +1,19 @@
 <%- stat = 'number' if local_assigns[:stat].nil? -%>
 <%- options = {} if local_assigns[:options].nil? -%>
-<div class='funnel_conversion_graph' id='funnel_conversion_graph_<%=start_state%>-<%=end_state%>_<%=stat%>'>
+<%-
+	unless local_assigns[:width].nil? or local_assigns[:width].nil?
+		style = "width: #{width}px; height: #{height}px;"
+	else
+		style = ''
+	end
+-%>
+<div class='funnel_conversion_graph' id='funnel_conversion_graph_<%=start_state%>-<%=end_state%>_<%=stat%>' style="<%=style%>">
 </div>
 <script type='text/javascript'>
 	new ConversionGraph($('funnel_conversion_graph_<%=start_state%>-<%=end_state%>_<%=stat%>'), $H({
 		startState: '<%=start_state%>',
 		endState: '<%=end_state%>',
-		stat: '<%=stat%>'
+		stat: '<%=stat%>',
+		style: '<%=style%>'
 	}).merge(<%= options.to_json %>).toObject());
 </script>

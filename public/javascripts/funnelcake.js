@@ -214,6 +214,7 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 		if (!options.stat) { console.error("ConversionGraph missing required 'stat'"); }
 
 		options.dataUrl = options.dataUrl.replace('ID', options.startState+'-'+options.endState);
+		options.style = options.style ? options.style : '';
 
 		$super(elem, options);
 		this.build();
@@ -221,7 +222,7 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 
 	build: function() {
 		// Create parts
-		this.graph = new Element('div', {'class': 'graph'});
+		this.graph = new Element('div', {'class': 'graph', 'style': this.options.style});
 		this.spinner = new Element('img', {'class': 'spinner', 'style': 'display: none;', 'src': '/images/ajax-loader.gif'});
 		this.exports = new Element('p', {'class': 'export'});
 
@@ -396,10 +397,20 @@ var DataTable = Class.create(FunnelCakeWidget, {
 		var sortedData = $H(rawdata).values().sortBy(function(e){return e.index});
 		sortedData.each(function(elem) {
 			var row = new Element('tr', {'class': 'data'});
-			var category = new Element('td').update(elem[thiz.options.category]);
+
+			var content = elem[thiz.options.category];
+			if (thiz.options.statPreprocessor) {
+				content = thiz.options.statPreprocessor(elem, thiz.options.category);
+			}
+			var category = new Element('td').update(content);
+
 			row.insert({bottom: category});
 			thiz.options.stats.each(function(stat){
-				var stat_td = new Element('td').update(elem[stat]);
+				var content = elem[stat];
+				if (thiz.options.statPreprocessor) {
+					content = thiz.options.statPreprocessor(elem, stat);
+				}
+				var stat_td = new Element('td').update(content);
 				row.insert({bottom: stat_td});
 			});
 			thiz.table.insert({bottom: row});

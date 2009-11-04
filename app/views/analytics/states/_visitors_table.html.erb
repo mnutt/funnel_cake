@@ -1,0 +1,16 @@
+<%- options = {} if local_assigns[:options].nil? -%>
+<div class='data_table' id='visitor_table_<%=state%>-<%=category%>-<%=stats.inspect%>'>
+</div>
+<script type='text/javascript'>
+	options = <%= options.to_json %>;
+	new DataTable($('visitor_table_<%=state%>-<%=category%>-<%=stats.inspect%>'), $H({
+		state: '<%=state%>',
+		category: '<%=category%>',
+		stats: <%=stats.to_json%>,
+		dataUrl: '/analytics/states/ID/visitors',
+		statPreprocessor: function(elem, stat) {
+			if (stat!='id') return elem[stat];
+			return '<a href="/analytics/visitors/'+elem[stat]+'">'+elem[stat]+'</a>';
+		}
+	}).merge(options).toObject());
+</script>

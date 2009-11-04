@@ -24,7 +24,23 @@ module Analytics::CommonHelper
 
     starting_visitors = visitors[:start].sort {|a,b| (a.user ? a.user.name : '') <=> (a.user ? a.user.name : '') }
     ending_visitors = visitors[:end].sort {|a,b| (a.user ? a.user.name : '') <=> (a.user ? a.user.name : '') }
-    [starting_visitors, ending_visitors]
+
+    FunnelCake::DataHash[{
+      :start_state=>FunnelCake::DataHash[starting_visitors.collect { |visitor| [visitor.id, FunnelCake::DataHash[collapse_visitor_attributes(visitor)]] }],
+      :end_state=>FunnelCake::DataHash[ending_visitors.collect { |visitor| [visitor.id, FunnelCake::DataHash[collapse_visitor_attributes(visitor)]] }]
+    }]
+  end
+
+  def collapse_visitor_attributes(visitor)
+    attrs = visitor.attributes.merge({:email=>nil, :name=>nil, :recent_event_date=>nil})
+
+    if visitor.user
+      attrs[:email] = visitor.user.email
+      attrs[:name] = visitor.user.name
+    end
+    attrs[:recent_event_date] = visitor.events.last.created_at.to_s(:short)
+
+    FunnelCake::DataHash[attrs]
   end
 
 end
