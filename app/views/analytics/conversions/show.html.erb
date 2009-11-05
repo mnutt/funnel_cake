@@ -11,8 +11,8 @@
 	</div>
 	<div class='column span-8 last' id='state_chart_container'>
 		<%= render 'analytics/conversions/graph', :start_state=>@start_state, :end_state=>@end_state %>
-		<div class='visitors_notes_container' id='visitors_notes_container_<%=@start_state%>-<%=@end_state%>' style='clear: both;'>
-		</div>
+		<h3>Visitors in End State: <%=@end_state%></h3>
+		<%= render 'analytics/states/visitors_table', :state=>@end_state, :stats=>[:name, :email, :recent_event_date], :category=>'id' %>
 	</div>
 </div>
 <script type="text/javascript">
