@@ -26,8 +26,8 @@ module Analytics::CommonHelper
     ending_visitors = visitors[:end].sort {|a,b| (a.user ? a.user.name : '') <=> (a.user ? a.user.name : '') }
 
     FunnelCake::DataHash[{
-      :start_state=>FunnelCake::DataHash[starting_visitors.collect { |visitor| [visitor.id, FunnelCake::DataHash[collapse_visitor_attributes(visitor)]] }],
-      :end_state=>FunnelCake::DataHash[ending_visitors.collect { |visitor| [visitor.id, FunnelCake::DataHash[collapse_visitor_attributes(visitor)]] }]
+      :start_state=>FunnelCake::DataHash[starting_visitors.collect { |visitor| [visitor.id, collapse_visitor_attributes(visitor)] }],
+      :end_state=>FunnelCake::DataHash[ending_visitors.collect { |visitor| [visitor.id, collapse_visitor_attributes(visitor)] }]
     }]
   end
 
