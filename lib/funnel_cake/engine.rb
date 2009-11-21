@@ -200,7 +200,7 @@ module FunnelCake
           data_hash[current_period_num - period_num] = FunnelCake::DataHash[{
             :rate => stats[:rate]*100.0,
             :number => stats[:end_count],
-            :date => current_period.end.to_formatted_s(:month_slash_day),
+            :date => current_period.end.to_formatted_s(:long),
             :index => current_period_num - period_num
           }]
 

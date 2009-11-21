@@ -214,7 +214,7 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 		if (!options.stat) { console.error("ConversionGraph missing required 'stat'"); }
 
 		options.dataUrl = options.dataUrl.replace('ID', options.startState+'-'+options.endState);
-		options.style = options.style ? options.style : '';
+		options.style = options.style ? options.style : 'width: 325px; height: 100px;';
 
 		$super(elem, options);
 		this.build();
@@ -256,11 +256,24 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 					method: 'get',
 					parameters: params,
 					onSuccess: function(transport) {
-						var flotrData = thiz.constructFlotrData(transport.responseJSON);
-						Flotr.draw( thiz.graph, flotrData.data, flotrData.options);
+						// var flotrData = thiz.constructFlotrData(transport.responseJSON);
+						// Flotr.draw( thiz.graph, flotrData.data, flotrData.options);
+						// thiz.graph.appear({duration: 0.35, afterFinish: function() {
+						// 	thiz.spinner.fade({duration: 0.5});
+						// }});
+
+						var data = thiz.constructGoogleData(transport.responseJSON);
+						var chart = new google.visualization.AnnotatedTimeLine(thiz.graph);
+
 						thiz.graph.appear({duration: 0.35, afterFinish: function() {
 							thiz.spinner.fade({duration: 0.5});
+							chart.draw(data, {
+								displayAnnotations: true,
+								displayRangeSelector: false,
+								displayZoomButtons: false
+							});
 						}});
+
 						thiz.updateExports(params);
 					}
 				});
@@ -304,6 +317,21 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 			  }
 			}
 		};
+	},
+
+	constructGoogleData: function(rawdata) {
+		var thiz = this;
+		var sortedData = $H(rawdata).values().sortBy(function(e){return e.index});
+
+
+		var data = new google.visualization.DataTable();
+		data.addColumn('date', 'Date');
+		data.addColumn('number', thiz.options.stat);
+
+		var rows = sortedData.collect(function(e){ return [new Date(e.date), e[thiz.options.stat]] });
+		data.addRows(rows);
+
+		return data;
 	}
 
 });
