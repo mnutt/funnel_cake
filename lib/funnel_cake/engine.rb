@@ -1,3 +1,5 @@
+require 'digest/md5'
+
 module FunnelCake
   class Engine
 
@@ -153,7 +155,7 @@ module FunnelCake
     # Returns: number of users in the end state,
     # and number of users in the start state
     def self.conversion_stats(start_state, end_state, opts={})
-      cache_fetch("conversion_stats:#{start_state}-#{end_state}-#{opts.inspect.gsub(/[\s:=>\"\{\}\,]/,'')}", :expires_in=>1.day) do
+      cache_fetch("conversion_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
         if start_state.nil? or end_state.nil?
           {:rate=>0.0, :end_count=>0, :start_count=>0}
         else
@@ -185,7 +187,7 @@ module FunnelCake
     end
 
     def self.conversion_history(start_state, end_state, options={})
-      cache_fetch("conversion_history:#{start_state}-#{end_state}-#{options.inspect.gsub(/[\s:=>\"\{\}\,]/,'')}", :expires_in=>1.day) do
+      cache_fetch("conversion_history:#{start_state}-#{end_state}-#{self.hash_options(options)}", :expires_in=>1.day) do
         time_period = options[:time_period]
 
         periods_per_year = (1.year / time_period).round
@@ -267,6 +269,11 @@ module FunnelCake
     def self.cache_fetch(key, options, &block)
       Rails.cache.fetch(cache_key_for(key), options, &block)
     end
+
+		# Returns a MD5 hash code from the inspected options hash
+		def self.hash_options(options)
+			Digest::MD5.hexdigest(options.inspect)
+		end
 
   end
 end
