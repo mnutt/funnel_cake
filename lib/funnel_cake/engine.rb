@@ -161,11 +161,11 @@ module FunnelCake
         else
           visitors = conversion_visitors(start_state, end_state, opts)
           stats = FunnelCake::DataHash.new
-          stats[:end_count] = visitors[:end].length.to_f
-          stats[:start_count] = visitors[:start].length.to_f
+          stats[:end_count] = visitors[:end].length
+          stats[:start_count] = visitors[:start].length
 
           stats[:rate] = 0.0
-          stats[:rate] = stats[:end_count] / stats[:start_count] if stats[:start_count] != 0.0
+          stats[:rate] = stats[:end_count].to_f / stats[:start_count].to_f if stats[:start_count] > 0
           stats
         end
       end
