@@ -4,25 +4,9 @@
 </div>
 <div class='clear'><br /></div>
 <div class="section">
-	<div class="column span-8">
+	<div class="column span-12">
 		<h2>Funnel Diagram</h2>
-		<%= render 'funnel_diagram' %>
-	</div>
-	<div class="column span-9 last">
-		<h2>Primary Conversion Rates</h2>
-		<div class="column span-3">
-			<%- Analytics::Visitor.primary_states[1..-1].each_with_index do |state, i| -%>
-				<%- prev_state = previous_state_from(state) -%>
-			 	<%= render 'analytics/conversions/conversion', :start_state=>prev_state, :end_state=>state,
-							:options=>{:topLabel=>(i==0)} %>
-			<%- end -%>
-		</div>
-		<div class='state_chart_container' id='state_chart_container' style="float: left; width: 325px; height: 1000px; padding-top: 30px">
-			<%- Analytics::Visitor.primary_states.each do |state| -%>
-				<%- prev_state = previous_state_from(state) -%>
-			 	<%= render 'analytics/conversions/graph', :start_state=>prev_state, :end_state=>state, :stat=>:rate %>
-			<%- end -%>
-		</div>
+		<%= render 'diagram' %>
 	</div>
 </div>
 <div class="section span-12">
@@ -31,13 +15,11 @@
 </div>
 <script type="text/javascript">
 <%= render 'analytics/common/filter_fields_update.js' %>
-<%= render 'analytics/common/diagram_update.js' %>
 
 	var updateAnalyticsStats = function() {
 		<%= render 'analytics/common/grab_filter_fields.js' %>
 
 		FunnelCakeWidget.update(opts);
-		updateFunnelDiagram(opts);
 		setPeriodLabel(period)
 	}
 

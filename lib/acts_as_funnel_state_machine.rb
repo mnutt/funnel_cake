@@ -42,6 +42,9 @@ module ScottBarron                   #:nodoc:
           def primary?
             @opts[:primary] == true
           end
+          def hidden?
+            @opts[:hidden] == true
+          end
         end
 
         class StateTransition
@@ -140,6 +143,7 @@ module ScottBarron                   #:nodoc:
 
           write_inheritable_attribute :states, {}
           write_inheritable_attribute :primary_states, []
+          write_inheritable_attribute :hidden_states, []
           write_inheritable_attribute :state_events_table, {}
           write_inheritable_attribute :initial_state, opts[:initial]
           write_inheritable_attribute :transition_table, {}
@@ -235,6 +239,10 @@ module ScottBarron                   #:nodoc:
           read_inheritable_attribute(:primary_states)
         end
 
+        def hidden_states
+          read_inheritable_attribute(:hidden_states)
+        end
+
         def states_table
           read_inheritable_attribute(:states)
         end
@@ -301,6 +309,7 @@ module ScottBarron                   #:nodoc:
           define_method("#{funnel_state.name}?") { current_state == funnel_state.name }
 
           read_inheritable_attribute(:primary_states) << name.to_sym if opts[:primary]==true
+          read_inheritable_attribute(:hidden_states) << name.to_sym if opts[:hidden]==true
         end
 
         # Wraps ActiveRecord::Base.find to conveniently find all records in

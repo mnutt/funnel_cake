@@ -10,8 +10,9 @@ var FunnelCakeWidget = Class.create({
 		FunnelCakeWidget.addWidget(this);
   },
 
-  update: function(options) {
-	},
+  update: function(options) {},
+
+  draw: function() {},
 
 	classesWithHidden: function(classes, visible) {
 		return classes + (visible ? '' : ' hidden');
@@ -304,6 +305,105 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 			  }
 			}
 		};
+	}
+
+});
+
+
+
+//
+// Widget for drawing a data state diagram
+//
+var ConversionDiagram = Class.create(FunnelCakeWidget, {
+
+	// Supply the element div that will hold the funnel display
+  initialize: function($super, elem, options) {
+		options = $H({
+			dataUrl: '/analytics/dashboards/diagram',
+			scale: 0.45,
+			xdot: ''
+		}).merge(options).toObject();
+		if (!options.xdot) { console.error("ConversionDiagram missing required 'xdot'"); }
+
+		options.style = options.style ? options.style : '';
+
+		$super(elem, options);
+		this.build();
+  },
+
+	build: function() {
+		// Create parts
+		this.diagram = new Element('div', {'class': 'diagram', 'style': this.options.style});
+		this.spinner = new Element('img', {'class': 'spinner_bar', 'style': 'display: none; position: absolute;', 'src': '/images/ajax-loader-bar.gif'});
+		this.label = new Element('p', {'class': 'label'});
+
+		// Add everything to the wrapper element
+		this.element.insert({bottom: this.diagram});
+		this.element.insert({bottom: this.spinner});
+		this.element.insert({bottom: this.label});
+	},
+
+  draw: function() {
+		this.canviz = new Canviz(this.diagram);
+		this.canviz.setImagePath('/images/');
+		this.canviz.setScale(this.options.scale);
+		this.canviz.parse(this.options.xdot);
+  },
+
+	update: function(opts) {
+		var thiz = this;
+
+		thiz.spinner.setStyle({
+			left: thiz.diagram.positionedOffset().left + thiz.diagram.getWidth()/2.0 - thiz.spinner.getWidth()/2.0 + 'px',
+			top: thiz.diagram.positionedOffset().top + thiz.diagram.getHeight()/3.0 - thiz.spinner.getHeight()/2.0 + 'px'
+		});
+		thiz.diagram.fade({duration: 0.5, from: 1.0, to: 0.5});
+		thiz.spinner.appear({duration: 0.25});
+
+		var params = $H({
+			authenticity_token: FunnelCakeWidget.authenticity_token,
+			time_period: opts.time_period,
+			format: 'json'
+		}).merge(opts);
+
+		new Ajax.Request(thiz.options.dataUrl,
+		{
+			format: 'json',
+			asynchronous: true,
+			method: 'get',
+			parameters: params,
+			onSuccess: function(transport) {
+				thiz.updateDiagramLabels(transport.responseJSON);
+				thiz.spinner.fade({duration: 0.25});
+				thiz.diagram.appear({duration: 0.5, from: 0.5, to: 1.0});
+			}
+		});
+	},
+
+	updateDiagramLabels: function(rawdata) {
+		var thiz = this;
+		var nodes = {};
+
+		// First, iterate through the transitions, setting the edge labels and recording the node data
+		$A(rawdata).each(function(transition){
+			if (Object.isUndefined(nodes[transition.from])) { nodes[transition.from] = { in: 0, out: 0, primary: false }; }
+			if (Object.isUndefined(nodes[transition.to])) { nodes[transition.to] = { in: 0, out: 0, primary: false }; }
+
+			nodes[transition.from].out = [nodes[transition.from].out, transition.stats.start_count].max();
+			nodes[transition.to].in += transition.stats.end_count;
+			nodes[transition.to].primary = transition.to_primary;
+
+			$(transition.from+'_to_'+transition.to+'_edge').update(transition.stats.end_count);
+		});
+
+		// Then, iterate through the node data, setting the node labels
+		$H(nodes).each(function(pair){
+		  var node_html = "<div class='entering'>"+pair.value.in+"&rarr;</div>"
+		  node_html += "<div class='label'>"+pair.key+"</div>"
+		  node_html += "<div class='exiting'>"+pair.value.out+"&rarr;</div>"
+			$(pair.key+'_node').update(node_html)
+			if (pair.value.primary) { $(pair.key+'_node').addClassName('primary'); }
+		});
 	}
 
 });

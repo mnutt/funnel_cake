@@ -3,14 +3,16 @@ digraph finite_state_machine {
 <% Analytics::Visitor.states_table.each do |s, state| -%>
 	<% if state.primary? -%>
 	<%=s%> [label = "________ -> <%= s.to_s.titleize + ": ________" %>", style="setlinewidth(1.0)", color=white, fontname=Helvetica];
-	<% else -%>
+	<% elsif !state.hidden? -%>
 	<%=s%> [label = "________ -> <%= s.to_s.titleize + ": ________" %>", style="setlinewidth(0.75)", color=white, fontname=Helvetica];
 	<% end -%>
 <% end -%>
 
 <% Analytics::Visitor.event_table.each do |ev_name, ev| -%>
 	<% Analytics::Visitor.transition_table[ev_name].each do |trans| -%>
-		<%=trans.from%> -> <%=trans.to%> [ label = "  _____", style="setlinewidth(3.0)", color=saddlebrown, fontname=Helvetica, arrowsize=1.25 ];
+		<%- unless Analytics::Visitor.states_table[trans.from].hidden? or Analytics::Visitor.states_table[trans.to].hidden? -%>
+			<%=trans.from%> -> <%=trans.to%> [ label = "  _____", style="setlinewidth(3.0)", color=saddlebrown, fontname=Helvetica, arrowsize=1.25 ];
+		<%- end -%>
 	<% end -%>
 <% end -%>
 }

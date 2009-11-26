@@ -143,17 +143,30 @@ module FunnelCake
     end
 
 
+    # Calculate stats for transitions between two states
+    def self.transition_stats(start_state, end_state, opts={})
+      cache_fetch("transition_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
+        if start_state.nil? or end_state.nil?
+          {:end_count=>0, :start_count=>0}
+        else
+					starting_visitors = find_by_starting_state(start_state, opts)
+          visitors = find_by_transition(start_state, end_state, opts)
+          stats = FunnelCake::DataHash.new
+          stats[:start_count] = starting_visitors.length
+          stats[:end_count] = visitors.length
+          stats
+        end
+      end
+    end
+
+
     # Calculate conversion rate between two states
-    # By calculating the number of users in the end state,
-    # divided by the number of users in the start state
     def self.conversion_rate(start_state, end_state, opts={})
       stats = conversion_stats(start_state, end_state, opts)
       return stats[:rate]
     end
 
-    # Calculate conversion rate between two states
-    # Returns: number of users in the end state,
-    # and number of users in the start state
+    # Calculate conversion stats between two states
     def self.conversion_stats(start_state, end_state, opts={})
       cache_fetch("conversion_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
         if start_state.nil? or end_state.nil?

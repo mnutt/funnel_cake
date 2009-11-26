@@ -1,0 +1,9 @@
+<%- options = {} if local_assigns[:options].nil? -%>
+<%- style = '' if local_assigns[:style].nil? -%>
+<div class='funnel_diagram' id='funnel_diagram' style="<%=style%>"></div>
+<script type='text/javascript'>
+	new ConversionDiagram($('funnel_diagram'), $H({
+		style: '<%=style%>',
+		xdot: '<%= escape_javascript(render("diagram.xdot.erb")) %>'
+	}).merge(<%= options.to_json %>).toObject());
+</script>

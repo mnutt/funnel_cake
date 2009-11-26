@@ -123,7 +123,11 @@ img.spinner {
 	height: 15px;
 	z-index: 10;
 }
-
+img.spinner {
+	width: 220px;
+	height: 19px;
+	z-index: 10;
+}
 div.conversion_detail {
 	float: left;
 	border: 1px solid #888;
