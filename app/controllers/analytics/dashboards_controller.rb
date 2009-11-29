@@ -1,5 +1,8 @@
 class Analytics::DashboardsController < Analytics::CommonController
 
+  helper 'analytics/stats'
+  helper 'analytics/events'
+
   def diagram
     @date_range = grab_date_range
     @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
