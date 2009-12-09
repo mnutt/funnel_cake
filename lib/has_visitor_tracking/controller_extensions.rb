@@ -135,7 +135,7 @@ module FunnelCake
             ua = request.env['HTTP_USER_AGENT'] || ''
             ua.downcase!
 
-            if ua.index('msie') && !ua.index('opera') && !ua.index('webtv')
+            if ua.index('msie') && ua.length>4 && !ua.index('opera') && !ua.index('webtv')
               'ie'+ua[ua.index('msie')+5].chr
             elsif ua.index('gecko/')
               'gecko'
