@@ -28,10 +28,7 @@
 
 	var updateAnalyticsStats = function() {
 		<%= render 'analytics/common/grab_filter_fields.js' %>
-
 		setPeriodLabel(period)
-		Cufon.refresh('daterange_label');
-
 		FunnelCakeWidget.update(opts);
 	}
 
