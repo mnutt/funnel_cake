@@ -4,7 +4,7 @@ module FunnelCake
 
     module UserExtensions
       def self.included( recipient )
-        recipient.extend( ClassMethods )
+        recipient.extend( FunnelCake::HasFunnel::UserExtensions::ClassMethods )
       end
 
       module ClassMethods

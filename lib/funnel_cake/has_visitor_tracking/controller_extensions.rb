@@ -2,8 +2,9 @@ module FunnelCake
   module HasVisitorTracking
 
     module ControllerExtensions
+
       def self.included( recipient )
-        recipient.extend( ClassMethods )
+        recipient.extend( FunnelCake::HasVisitorTracking::ControllerExtensions::ClassMethods )
       end
 
       module ClassMethods
