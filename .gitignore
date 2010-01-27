@@ -1,3 +1,4 @@
 debug.log
 .DS_Store
 .tmp*
+spec/database.yml
