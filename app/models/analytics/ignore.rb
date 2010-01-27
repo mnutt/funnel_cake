@@ -1,3 +1,6 @@
-class Analytics::Ignore < ActiveRecord::Base
-  set_table_name :funnelcake_ignores
+class Analytics::Ignore
+  include MongoMapper::Document
+  key :ip, String
+  key :name, String
+  timestamps!
 end

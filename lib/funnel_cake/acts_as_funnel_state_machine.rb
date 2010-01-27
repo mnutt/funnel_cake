@@ -68,7 +68,7 @@ module FunnelCake                   #:nodoc:
           next_state = states[to]
           old_state = states[record.current_state]
           
-          record.class.transaction do
+          #record.class.transaction do
             next_state.entering(record) unless loopback
             
             record.update_attribute(record.class.state_column, to.to_s)
@@ -79,7 +79,7 @@ module FunnelCake                   #:nodoc:
             next_state.entered(record) unless loopback
             old_state.exited(record) unless loopback
             true
-          end
+          #end
         end
         
         

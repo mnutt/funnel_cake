@@ -1,8 +1,17 @@
-class Analytics::Visitor < ActiveRecord::Base
-  set_table_name :funnelcake_visitors
+class Analytics::Visitor
+  include MongoMapper::Document
+  include FunnelCake::ActsAsFunnelStateMachine
+  include FunnelCake::HasFunnel::UserExtensions
+
+  timestamps!
+  key :key, String
+  key :user_id, Integer
+  key :state, String
+  key :ip, String
 
   # Set up the Analytics::Event model association
-  has_many :events, :class_name=>'Analytics::Event', :dependent=>:destroy
+  many :events, :class_name=>'Analytics::Event', :dependent=>:destroy, :foreign_key=>:visitor_id
+
 
   # Set up state machine
   acts_as_funnel_state_machine :initial=>:unknown, :validate_on_transitions=>false,
@@ -15,11 +24,11 @@ class Analytics::Visitor < ActiveRecord::Base
   # Add association for User model
   belongs_to :user, :class_name=>'User', :foreign_key=>:user_id
 
-  named_scope :recent, :conditions=>["created_at > ?", 1.months.ago]
-  named_scope :with_user, :conditions=>"user_id IS NOT NULL"
-  named_scope :without_user, :conditions=>"user_id IS NULL"
-  named_scope :including_events, :include=>:events
-  named_scope :ordered, :order=>'created_at DESC'
+# named_scope :recent, :conditions=>["created_at > ?", 1.months.ago]
+# named_scope :with_user, :conditions=>"user_id IS NOT NULL"
+# named_scope :without_user, :conditions=>"user_id IS NULL"
+# named_scope :including_events, :include=>:events
+# named_scope :ordered, :order=>'created_at DESC'
 
   # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)

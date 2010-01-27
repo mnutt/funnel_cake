@@ -19,40 +19,47 @@ describe "for a controller that uses has_visitor_tracking" do
   describe "in the track_visitor_as_user before_filter" do
     before(:each) do
       @controller.stub!(:ignore_visitor?).and_return(false)
-      @controller.stub!(:internal_visitor?).and_return(false)
+      @request = mock('request', :env=>{'HTTP_USER_AGENT'=>'msie', :request_uri=>'http://something', :referer=>'http://whereiwasbefore.com'})
+      @controller.stub!(:request).and_return(@request)
     end
 
     describe "and this is not an internal user" do
+      before(:each) do
+        @controller.stub!(:internal_visitor?).and_return(false)
+      end
       it "should check if this is an admin/internal user" do
         @controller.should_receive(:internal_visitor?).and_return(false)
         @controller.should_receive(:ignore_visitor?).and_return(false)
-        @controller.track_visitor_as_user
+        @controller.send :track_visitor_as_user
       end
       it "should set the cookie to a new random hash" do
         randomval = '5'
         FunnelCake::RandomId.should_receive(:generate).and_return(randomval)
-        @controller.track_visitor_as_user
+        @controller.send :track_visitor_as_user
         @controller.cookies.should == {:transfs_ut=>{:value=>randomval}}
       end
       it "should create a new Analytics::Visitor" do
         randomval = '5'
         FunnelCake::RandomId.should_receive(:generate).and_return(randomval)
         Analytics::Visitor.should_receive(:create).with(:key=>randomval).and_return(OpenStruct.new(:key=>randomval))
-        @controller.track_visitor_as_user
+        @controller.send :track_visitor_as_user
       end
     end
     describe "and this is an internal user" do
+      before(:each) do
+        @controller.stub!(:internal_visitor?).and_return(true)
+      end
       it "should do nothing if :internal_visitor? is true" do
         @controller.should_receive(:internal_visitor?).and_return(true)
         FunnelCake::RandomId.should_not_receive(:generate)
         Analytics::Visitor.should_not_receive(:create)
-        @controller.track_visitor_as_user
+        @controller.send :track_visitor_as_user
       end
       it "should do nothing if :ignore_visitor? is true" do
         @controller.should_receive(:ignore_visitor?).and_return(true)
         FunnelCake::RandomId.should_not_receive(:generate)
         Analytics::Visitor.should_not_receive(:create)
-        @controller.track_visitor_as_user
+        @controller.send :track_visitor_as_user
       end
     end
   end

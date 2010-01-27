@@ -40,7 +40,7 @@ class Analytics::IgnoresController < ApplicationController
   # POST /ignores
   # POST /ignores.xml
   def create
-    @ignore = Analytics::Ignore.new(params[:ignore])
+    @ignore = Analytics::Ignore.new(params[:analytics_ignore])
 
     respond_to do |format|
       if @ignore.save
@@ -58,7 +58,7 @@ class Analytics::IgnoresController < ApplicationController
     @ignore = Analytics::Ignore.find(params[:id])
 
     respond_to do |format|
-      if @ignore.update_attributes(params[:ignore])
+      if @ignore.update_attributes(params[:analytics_ignore])
         flash[:notice] = 'Analytics::Ignore was successfully updated.'
         format.html { redirect_to(@ignore) }
       else
