@@ -1,3 +1,4 @@
+
 ActiveRecord::Base.class_eval do
   include FunnelCake::ActsAsFunnelStateMachine
   include FunnelCake::HasFunnel::UserExtensions

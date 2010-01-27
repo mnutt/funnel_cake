@@ -7,7 +7,7 @@ require 'active_support'
 require 'active_record'
 require 'active_record/fixtures'
 require 'action_controller'
-require "#{File.dirname(__FILE__)}/../init"
+# require "#{File.dirname(__FILE__)}/../rails/init"
 
 
 config = YAML::load(IO.read(File.dirname(__FILE__) + '/database.yml'))
