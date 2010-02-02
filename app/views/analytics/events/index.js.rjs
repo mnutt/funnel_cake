@@ -1,6 +1,6 @@
 
 remove_old_rows = <<HERE
-  var lastRow = $$('tr.funnel_event').last();
+  var lastRow = $$('tr.event').last();
   for(i=0; i<#{@events.count}; i++) {
     var oldLastRow = lastRow;
     lastRow = oldLastRow.previousSiblings().first();
