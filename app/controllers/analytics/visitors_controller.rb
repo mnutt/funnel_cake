@@ -1,4 +1,5 @@
 class Analytics::VisitorsController < Analytics::CommonController
+  unloadable if RAILS_ENV=='development'
 
   # GET /visitors
   # GET /visitors.xml

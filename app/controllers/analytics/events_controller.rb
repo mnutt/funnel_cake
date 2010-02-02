@@ -1,4 +1,5 @@
 class Analytics::EventsController < Analytics::CommonController
+  unloadable if RAILS_ENV=='development'
 
   helper 'analytics/stats'
 

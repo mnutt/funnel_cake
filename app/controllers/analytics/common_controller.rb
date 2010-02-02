@@ -1,4 +1,5 @@
 class Analytics::CommonController < ApplicationController
+  unloadable if RAILS_ENV=='development'
 
   before_filter :setup_funnel_cake_includes
   def setup_funnel_cake_includes
