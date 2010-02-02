@@ -1,3 +1,3 @@
 module FunnelCake
-
 end
+

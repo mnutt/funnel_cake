@@ -1,4 +1,5 @@
 require 'digest/md5'
+require 'funnel_cake/state_period_helpers'
 
 module FunnelCake
   class Engine
@@ -46,15 +47,15 @@ module FunnelCake
       end
 
       condition_frags = []
-      condition_frags << "#{event_class.table_name}.to = '#{state}'"
-      condition_frags << "#{event_class.table_name}.created_at < '#{date_range.end.to_s(:db)}'" unless date_range.nil?
-      condition_frags << "#{event_class.table_name}.created_at > '#{(date_range.end - attrition_period).to_s(:db)}'" unless (date_range.nil? or attrition_period.nil?)
+      condition_frags << "#{event_class.collection_name}.to = '#{state}'"
+      condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.end.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.created_at > '#{(date_range.end - attrition_period).to_s(:db)}'" unless (date_range.nil? or attrition_period.nil?)
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       entering_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 
       condition_frags = []
-      condition_frags << "#{event_class.table_name}.from = '#{state}'"
-      condition_frags << "#{event_class.table_name}.created_at < '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.from = '#{state}'"
+      condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 
@@ -76,9 +77,9 @@ module FunnelCake
       date_range = opts[:date_range]
 
       condition_frags = []
-      condition_frags << "#{event_class.table_name}.to = '#{state}'"
-      condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
-      condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.to = '#{state}'"
+      condition_frags << "#{event_class.collection_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 
@@ -102,9 +103,9 @@ module FunnelCake
       date_range = opts[:date_range]
 
       condition_frags = []
-      condition_frags << "#{event_class.table_name}.from = '#{start_state}'"
-      condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
-      condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.from = '#{start_state}'"
+      condition_frags << "#{event_class.collection_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 
@@ -132,10 +133,10 @@ module FunnelCake
       date_range = opts[:date_range]
 
       condition_frags = []
-      condition_frags << "#{event_class.table_name}.from = '#{start_state}'"
-      condition_frags << "#{event_class.table_name}.to = '#{end_state}'"
-      condition_frags << "#{event_class.table_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
-      condition_frags << "#{event_class.table_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.from = '#{start_state}'"
+      condition_frags << "#{event_class.collection_name}.to = '#{end_state}'"
+      condition_frags << "#{event_class.collection_name}.created_at >= '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
+      condition_frags << "#{event_class.collection_name}.created_at <= '#{date_range.end.to_s(:db)}'" unless date_range.nil?
       condition_frags << opts[:conditions] unless opts[:conditions].nil?
       user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
 

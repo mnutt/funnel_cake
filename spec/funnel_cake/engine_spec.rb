@@ -1,41 +1,7 @@
-require File.dirname(__FILE__) + '/spec_helper'
-
-module UserTestStates
-  def initialize_states
-    state :page_visited, :primary=>true
-    funnel_event :view_page do
-      transitions :unknown,       :page_visited
-      transitions :page_visited,  :page_visited
-    end
-    funnel_event :start_a do
-      transitions :page_visited,  :a_started
-    end
-    funnel_event :start_b do
-      transitions :a_started,     :b_started
-    end
-  end
-end
-
-class Analytics::Visitor < ActiveRecord::Base
-  set_table_name :funnelcake_visitors
-end
-class Analytics::EventDummy < ActiveRecord::Base
-  set_table_name :funnelcake_events
-end
-class UserDummy < ActiveRecord::Base
-  set_table_name :users
-  has_funnel :class_name=>'Analytics::EventDummy', :foreign_key=>'user_id',
-              :state_module=>'UserTestStates'
-end
+require 'spec_helper'
+# require 'spec_models'
 
 describe "when querying funnel events", :type=>:model do
-  set_fixture_class :users => UserDummy
-  set_fixture_class :funnelcake_events => Analytics::EventDummy
-  set_fixture_class :funnelcake_visitors => Analytics::Visitor
-  fixtures :users
-  fixtures :funnelcake_events
-  fixtures :funnelcake_visitors
-
   describe "for a given date range" do
     before(:each) do
       start_date = DateTime.civil(1978, 5, 12, 12, 0, 0, Rational(-5, 24))
@@ -43,7 +9,7 @@ describe "when querying funnel events", :type=>:model do
       @date_range = start_date..end_date
       FunnelCake::Engine.user_class_name = 'UserDummy'
       FunnelCake::Engine.visitor_class_name = 'Analytics::Visitor'
-      FunnelCake::Engine.event_class_name = 'Analytics::EventDummy'
+      FunnelCake::Engine.event_class_name = 'Analytics::Event'
     end
 
     describe "when calculating conversion rates" do
@@ -54,19 +20,10 @@ describe "when querying funnel events", :type=>:model do
         end
       end
     end
-
   end # for a given date range
-
 end
 
 describe "when finding users by funnel events", :type=>:model do
-  set_fixture_class :users => UserDummy
-  set_fixture_class :funnelcake_events => Analytics::EventDummy
-  set_fixture_class :funnelcake_visitors => Analytics::Visitor
-  fixtures :users
-  fixtures :funnelcake_events
-  fixtures :funnelcake_visitors
-
   it "should have 18 users" do
     UserDummy.count.should == 18
   end
@@ -82,7 +39,7 @@ describe "when finding users by funnel events", :type=>:model do
       @date_range = start_date..end_date
       FunnelCake::Engine.user_class_name = 'UserDummy'
       FunnelCake::Engine.visitor_class_name = 'Analytics::Visitor'
-      FunnelCake::Engine.event_class_name = 'Analytics::EventDummy'
+      FunnelCake::Engine.event_class_name = 'Analytics::Event'
     end
     describe "by starting state A" do
       before(:each) do
