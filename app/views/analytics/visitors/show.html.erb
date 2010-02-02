@@ -26,8 +26,8 @@
 	 	<th>Created At</th>
 		<th></th>
   </tr>
-	<%= render :partial=>'analytics/events/event', :collection=>@visitor.events.sorted %>
+	<%= render :partial=>'analytics/events/event', :collection=>@visitor.events.find(:all, :order=>'created_at DESC') %>
 </table>
 
 <%= link_to 'Edit', edit_analytics_visitor_path(@visitor) %> |
-<%= link_to 'Back', analytics_visitors_path %>
+<%= link_to 'Back to the Visitor List', analytics_visitors_path %>

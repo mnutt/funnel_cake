@@ -4,8 +4,18 @@ class Analytics::VisitorsController < Analytics::CommonController
   # GET /visitors
   # GET /visitors.xml
   def index
-    @visitors_with_users = Analytics::Visitor.recent.with_user.including_events.ordered
-    @visitors_without_users = Analytics::Visitor.recent.without_user.ordered
+
+    # Analytics::Visitor.recent.with_user.including_events.ordered
+    @visitors_with_users = Analytics::Visitor.find(:all, :conditions=>{
+      :created_at.gt=>1.month.ago.utc,
+      :user_id.ne=>nil,
+    }, :order=>'created_at DESC')
+
+    # @visitors_without_users = Analytics::Visitor.recent.without_user.ordered
+    @visitors_without_users = Analytics::Visitor.find(:all, :conditions=>{
+      :created_at.gt=>1.month.ago.utc,
+      :user_id=>nil,
+    }, :order=>'created_at DESC')
 
     respond_to do |format|
       format.html # index.html.erb

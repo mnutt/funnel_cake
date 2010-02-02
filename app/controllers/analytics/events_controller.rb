@@ -8,12 +8,14 @@ class Analytics::EventsController < Analytics::CommonController
 
     respond_to do |format|
       format.html do
-        @events = Analytics::Event.find(:all, :limit=>limit, :include=>[:visitor], :order=>'created_at DESC')
+        @events = Analytics::Event.find(:all, :limit=>limit, :order=>'created_at DESC')
       end
       format.js do
-        timestamp = params[:timestamp].to_datetime
-        @events = Analytics::Event.find(:all, :limit=>limit, :include=>[:visitor],
-                                                :order=>'created_at DESC', :conditions=>['created_at > ?',timestamp])
+        timestamp = params[:timestamp].to_time
+        @events = Analytics::Event.find(:all, :limit=>limit,
+          :order=>'created_at DESC',
+          :conditions=>{:created_at.gt=>timestamp}
+        )
       end
     end
   end
