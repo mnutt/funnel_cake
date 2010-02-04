@@ -7,67 +7,69 @@ module FunnelCake
     extend FunnelCake::StatePeriodHelpers
 
     # Accessor and default for User class
-    @@user_class_name = 'User'
-    cattr_accessor :user_class_name
-    def self.user_class
-      @@user_class_name.constantize
-    end
+    @@user_class = User if Object.const_defined?('User')
+    cattr_accessor :user_class
 
     # Accessor and default for Analytics::Visitor class
-    @@visitor_class_name = 'Analytics::Visitor'
-    cattr_accessor :visitor_class_name
-    def self.visitor_class
-      @@visitor_class_name.constantize
-    end
+    @@visitor_class = Analytics::Visitor
+    cattr_accessor :visitor_class
 
     # Accessor and default for Analytics::Event class
-    @@event_class_name = 'Analytics::Event'
-    cattr_accessor :event_class_name
-    def self.event_class
-      @@event_class_name.constantize
-    end
+    @@event_class = Analytics::Event
+    cattr_accessor :event_class
 
-    # Method for finding users/visitors who are "eligible" for
+
+
+    # Method for finding visitors who are "eligible" for
     # transitioning from a given state, for a given time period
     # (Used in calculating conversion rates)
-    # We qualify users who:
+    # We qualify visitors who:
     # - entered the given state before the end of the date range (but within the attrition timeframe)
     # MINUS
     # - exited the given state before the beginning of the date range
     def self.find_by_starting_state(state, opts={})
       return [] if state.nil?
       state = state.to_sym
-      return [] unless Analytics::Visitor.states.include?(state)
+      return [] unless visitor_class.states.include?(state)
 
       date_range = opts[:date_range]
       attrition_period = opts[:attrition_period]
-      attrition_period = Analytics::Visitor.state_options(state)[:attrition_period] unless Analytics::Visitor.state_options(state)[:attrition_period].nil?
-      unless attrition_period.nil?
-        attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period > ((date_range.end - date_range.begin)*2.0)
-      end
+      attrition_period = visitor_class.state_options(state)[:attrition_period] unless visitor_class.state_options(state)[:attrition_period].nil?
+      attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0)
 
-      condition_frags = []
-      condition_frags << "#{event_class.collection_name}.to = '#{state}'"
-      condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.end.to_s(:db)}'" unless date_range.nil?
-      condition_frags << "#{event_class.collection_name}.created_at > '#{(date_range.end - attrition_period).to_s(:db)}'" unless (date_range.nil? or attrition_period.nil?)
-      condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      entering_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
+      find_opts = { :'events.to'=>"#{state}" }
+      find_opts[:'events.created_at'.lt] = date_range.end.utc.to_time if date_range
+      find_opts[:'events.created_at'.gt] = (date_range.end - attrition_period).utc.to_time if date_range and attrition_period
+      entering_a_user_visitors = visitor_class.all(find_opts).to_a
 
-      condition_frags = []
-      condition_frags << "#{event_class.collection_name}.from = '#{state}'"
-      condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
-      condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
+      find_opts = { :'events.from'=>"#{state}" }
+      find_opts[:'events.created_at'.lt] = date_range.begin.utc.to_time if date_range
+      leaving_a_user_visitors = visitor_class.all(find_opts).to_a
 
-      all = (entering_a_user_visitors - leaving_a_user_visitors).uniq
-      filter_visitors(all, opts)
+      all = entering_a_user_visitors.delete_if {|v| leaving_a_user_visitors.include?(v) }
+
+      # condition_frags = []
+      # condition_frags << "#{event_class.collection_name}.to = '#{state}'"
+      # condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.end.to_s(:db)}'" unless date_range.nil?
+      # condition_frags << "#{event_class.collection_name}.created_at > '#{(date_range.end - attrition_period).to_s(:db)}'" unless (date_range.nil? or attrition_period.nil?)
+      # condition_frags << opts[:conditions] unless opts[:conditions].nil?
+      # entering_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
+      #
+      # condition_frags = []
+      # condition_frags << "#{event_class.collection_name}.from = '#{state}'"
+      # condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
+      # condition_frags << opts[:conditions] unless opts[:conditions].nil?
+      # leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
+      #
+      # all = (entering_a_user_visitors - leaving_a_user_visitors).uniq
+      # filter_visitors(all, opts)
     end
 
 
-    # Method for finding users/visitors who transitioned
+    # Method for finding visitors who transitioned
     # into a given state, for a given time period
     # (Used in calculating conversion rates)
-    # We qualify users who:
+    # We qualify visitors who:
     # - entered the given state during the date range
     def self.find_by_ending_state(state, opts={})
       return [] if state.nil?
@@ -86,10 +88,10 @@ module FunnelCake
       filter_visitors(leaving_a_user_visitors.uniq, opts)
     end
 
-    # Method for finding users/visitors who transitioned
+    # Method for finding visitors who transitioned
     # into a given state, from a given state, for a given time period
     # (Used in calculating conversion rates)
-    # We qualify users who:
+    # We qualify visitors who:
     # - exited the start state during the date range
     # AND
     # - entered the end state during the date range
@@ -116,10 +118,10 @@ module FunnelCake
     end
 
 
-    # Method for finding users who transitioned
+    # Method for finding visitors who transitioned
     # into a given state, from a given state, WITH NO STATES INBETWEEN,
     # for a given time period
-    # We qualify users who:
+    # We qualify visitors who:
     # - exited the start state during the date range
     # AND
     # - entered the end state during the date range
@@ -160,13 +162,6 @@ module FunnelCake
       end
     end
 
-
-    # Calculate conversion rate between two states
-    def self.conversion_rate(start_state, end_state, opts={})
-      stats = conversion_stats(start_state, end_state, opts)
-      return stats[:rate]
-    end
-
     # Calculate conversion stats between two states
     def self.conversion_stats(start_state, end_state, opts={})
       cache_fetch("conversion_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
@@ -183,6 +178,11 @@ module FunnelCake
           stats
         end
       end
+    end
+
+    # Calculate conversion rate between two states
+    def self.conversion_rate(start_state, end_state, opts={})
+      conversion_stats(start_state, end_state, opts)[:rate]
     end
 
     # Helper method to return visitors who correspond to conversion rate stats between states

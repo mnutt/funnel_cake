@@ -1,6 +1,6 @@
 Factory.define :visitor, :class=>Analytics::Visitor do |model|
-  model.key '1010'
+  model.sequence(:key) {|n| "key#{n}" }
+  model.sequence(:ip) {|n| "#{(n % 9).to_s*3}.#{(n % 9).to_s*3}.#{(n % 9).to_s*3}.#{(n % 9).to_s*3}" }
   model.state 'unknown'
-  model.ip '555.555.555.555'
   model.user_id 1
 end

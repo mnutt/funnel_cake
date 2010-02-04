@@ -4,12 +4,30 @@ require 'active_support'
 gem 'mongo_mapper'
 require 'mongo_mapper'
 
+module EngineMacros
+  def build_date(offset={})
+    DateTime.civil(1978, 5, 12, 12, 0, 0, Rational(-5, 24)).advance(offset)
+  end
+
+  def create_visitor_with(args={}, &block)
+    v = Factory.create :visitor, args
+    yield v
+    v.save
+    v
+  end
+
+  def create_event_for(v, args={})
+    v.events << Factory.create(:event, args)
+  end
+end
+
 Spec::Runner.configure do |config|
   config.before(:each) do
     MongoMapper.database.collections.each do |coll|
       coll.remove
     end
   end
+  config.include(EngineMacros)
 end
 
 ActiveSupport::Dependencies.load_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
@@ -32,6 +50,9 @@ module FunnelCake::UserStates
   end
 end
 
+gem 'factory_girl'
+require 'factory_girl'
+
 class Rails
   def self.cache
     self
@@ -41,6 +62,6 @@ class Rails
   end
 end
 
-MongoMapper.connection = Mongo::Connection.new('127.0.0.1', 27017, :logger => Logger.new(STDOUT))
+MongoMapper.connection = Mongo::Connection.new '127.0.0.1', 27017, :logger => Logger.new(STDOUT)
 MongoMapper.database = 'funnelcake_test'
 
