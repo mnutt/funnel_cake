@@ -71,75 +71,75 @@ describe 'when finding visitors by starting state' do
         @visitors[1], @visitors[2],
       ])
     end
-    # describe 'with a has_event filter' do
-    #   it 'should return the visitors with an exact match' do
-    #     opts = {
-    #       :date_range=>@date_range, 
-    #       :has_event=>{
-    #         :referer=>'c'
-    #       }
-    #     }
-    #     FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[2] ]
-    #   end  
-    #   it 'should return the visitors with a regex match' do
-    #     opts = {
-    #       :date_range=>@date_range, 
-    #       :has_event=>{
-    #         :referer=>/c+/
-    #       }
-    #     }
-    #     FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[2] ]
-    #   end
-    # end
-    # describe 'with a first_event filter' do
-    #   it 'should return the visitors with an exact match' do
-    #     opts = {
-    #       :date_range=>@date_range, 
-    #       :first_event=>{
-    #         :referer=>'aaa'
-    #       }
-    #     }
-    #     FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
-    #   end
-    #   it 'should return the visitors with a regex match' do
-    #     opts = {
-    #       :date_range=>@date_range, 
-    #       :first_event=>{
-    #         :referer=>/a+/
-    #       }
-    #     }
-    #     FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
-    #   end      
-    # end
-    # describe 'with a query filter' do
-    #   it 'should return the visitors with an exact match' do
-    #     opts = {
-    #       :date_range=>@date_range, 
-    #       :query=>{
-    #         :key=>'AAA'
-    #       }
-    #     }
-    #     FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
-    #   end
-    #   it 'should return the visitors with a regex match' do
-    #     opts = {
-    #       :date_range=>@date_range, 
-    #       :query=>{
-    #         :key=>/A+/
-    #       }
-    #     }
-    #     FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
-    #   end
-    # end
-    # describe 'with an attrition period' do
-    #   it 'should return the visitors' do
-    #     opts = {
-    #       :date_range=>@date_range, 
-    #       :attrition_period=>14.days,
-    #     }
-    #     FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ ]
-    #   end
-    # end
+    describe 'with a has_event filter' do
+      it 'should return the visitors with an exact match' do
+        opts = {
+          :date_range=>@date_range, 
+          :has_event=>{
+            :referer=>'ccc'
+          }
+        }
+        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[2] ]
+      end  
+      it 'should return the visitors with a regex match' do
+        opts = {
+          :date_range=>@date_range, 
+          :has_event=>{
+            :referer=>/c+/
+          }
+        }
+        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[2] ]
+      end
+    end
+    describe 'with a first_event filter' do
+      it 'should return the visitors with an exact match' do
+        opts = {
+          :date_range=>@date_range, 
+          :first_event=>{
+            :referer=>'aaa'
+          }
+        }
+        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+      end
+      it 'should return the visitors with a regex match' do
+        opts = {
+          :date_range=>@date_range, 
+          :first_event=>{
+            :referer=>/a+/
+          }
+        }
+        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+      end      
+    end
+    describe 'with a query filter' do
+      it 'should return the visitors with an exact match' do
+        opts = {
+          :date_range=>@date_range, 
+          :query=>{
+            :key=>'AAA'
+          }
+        }
+        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+      end
+      it 'should return the visitors with a regex match' do
+        opts = {
+          :date_range=>@date_range, 
+          :query=>{
+            :key=>/A+/
+          }
+        }
+        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+      end
+    end
+    describe 'with an attrition period' do
+      it 'should return the visitors' do
+        opts = {
+          :date_range=>@date_range, 
+          :attrition_period=>14.days,
+        }
+        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ ]
+      end
+    end
   end
 end
 

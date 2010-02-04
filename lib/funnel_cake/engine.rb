@@ -32,37 +32,39 @@ module FunnelCake
       state = state.to_sym
       return [] unless visitor_class.states.include?(state)
 
-      date_range = opts[:date_range]
-      attrition_period = opts[:attrition_period]
+      date_range = opts.delete(:date_range)
+      attrition_period = opts.delete(:attrition_period)
       attrition_period = visitor_class.state_options(state)[:attrition_period] unless visitor_class.state_options(state)[:attrition_period].nil?
       attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0)
 
       find_opts = { :events=>{'$elemMatch'=>{:to=>"#{state}"}} }
-      find_opts[:events]['$elemMatch'][:created_at.lt] = date_range.end.utc.to_time if date_range
-      find_opts[:events]['$elemMatch'][:created_at.gt] = (date_range.end - attrition_period).utc.to_time if date_range and attrition_period
+      find_opts[:events]['$elemMatch'][:created_at] = { '$lt'=>date_range.end.utc.to_time } if date_range
+      find_opts[:events]['$elemMatch'][:created_at]['$gt'] = (date_range.end - attrition_period).utc.to_time if date_range and attrition_period
+      opts[:has_event].each do |k,v|
+        find_opts[:events]['$elemMatch'][k] = v
+      end if opts[:has_event]
+      opts[:first_event].each do |k,v|
+        find_opts["events.0.#{k}"] = v
+      end if opts[:first_event]
+      opts[:query].each do |k,v|
+        find_opts[k] = v
+      end if opts[:query]
       entering_a_user_visitors = visitor_class.all(find_opts).to_a
 
       find_opts = { :events=>{'$elemMatch'=>{:from=>"#{state}"}} }
       find_opts[:events]['$elemMatch'][:created_at.lt] = date_range.begin.utc.to_time if date_range
+      opts[:has_event].each do |k,v|
+        find_opts[:events]['$elemMatch'][k] = v
+      end if opts[:has_event]
+      opts[:first_event].each do |k,v|
+        find_opts["events.0.#{k}"] = v
+      end if opts[:first_event]
+      opts[:query].each do |k,v|
+        find_opts[k] = v
+      end if opts[:query]
       leaving_a_user_visitors = visitor_class.all(find_opts).to_a
 
-      all = entering_a_user_visitors.delete_if {|v| leaving_a_user_visitors.include?(v) }
-
-      # condition_frags = []
-      # condition_frags << "#{event_class.collection_name}.to = '#{state}'"
-      # condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.end.to_s(:db)}'" unless date_range.nil?
-      # condition_frags << "#{event_class.collection_name}.created_at > '#{(date_range.end - attrition_period).to_s(:db)}'" unless (date_range.nil? or attrition_period.nil?)
-      # condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      # entering_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
-      #
-      # condition_frags = []
-      # condition_frags << "#{event_class.collection_name}.from = '#{state}'"
-      # condition_frags << "#{event_class.collection_name}.created_at < '#{date_range.begin.to_s(:db)}'" unless date_range.nil?
-      # condition_frags << opts[:conditions] unless opts[:conditions].nil?
-      # leaving_a_user_visitors = Analytics::Visitor.find(:all, :joins=>[:events], :conditions=>condition_frags.join(" AND "))
-      #
-      # all = (entering_a_user_visitors - leaving_a_user_visitors).uniq
-      # filter_visitors(all, opts)
+      entering_a_user_visitors.delete_if {|v| leaving_a_user_visitors.include?(v) }
     end
 
 
