@@ -34,7 +34,7 @@ describe 'when finding visitors by starting state' do
       end
     end
     it 'should return visitors who entered the state MINUS those who exited the state' do
-      FunnelCake::Engine.find_by_starting_state(:a_started).should == [ @b ]
+      FunnelCake::Engine.find_by_starting_state(:a_started).should only_have_objects([ @b ])
     end
   end
   describe 'for a given date range' do
@@ -67,9 +67,9 @@ describe 'when finding visitors by starting state' do
       @date_range = build_date(:days=>-14)..build_date(:days=>0)
     end
     it 'should return the visitors who entered the state before the end MINUS those who exited before the start' do
-      FunnelCake::Engine.find_by_starting_state(:a_started, :date_range=>@date_range).should == [ 
+      FunnelCake::Engine.find_by_starting_state(:a_started, :date_range=>@date_range).should only_have_objects([ 
         @visitors[1], @visitors[2],
-      ]
+      ])
     end
     # describe 'with a has_event filter' do
     #   it 'should return the visitors with an exact match' do

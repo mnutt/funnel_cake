@@ -65,3 +65,10 @@ end
 MongoMapper.connection = Mongo::Connection.new '127.0.0.1', 27017, :logger => Logger.new(STDOUT)
 MongoMapper.database = 'funnelcake_test'
 
+
+
+Spec::Matchers.define :only_have_objects do |expected|
+  match do |actual|
+    actual.sort{|a,b| a._id.to_s<=>b._id.to_s} == expected.sort{|a,b| a._id.to_s<=>b._id.to_s}
+  end
+end
