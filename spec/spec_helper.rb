@@ -12,11 +12,12 @@ module EngineMacros
   def create_visitor_with(args={}, &block)
     v = Factory.create :visitor, args
     yield v
+    v.save
     v
   end
 
   def create_event_for(v, args={})
-    Factory.create :event, args.merge(:visitor_id=>v.id)
+    v.events << Factory.create(:event, args)
   end
 end
 

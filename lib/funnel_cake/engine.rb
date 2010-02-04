@@ -37,13 +37,13 @@ module FunnelCake
       attrition_period = visitor_class.state_options(state)[:attrition_period] unless visitor_class.state_options(state)[:attrition_period].nil?
       attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0)
 
-      find_opts = { :'events.to'=>"#{state}" }
-      find_opts[:'events.created_at'.lt] = date_range.end.utc.to_time if date_range
-      find_opts[:'events.created_at'.gt] = (date_range.end - attrition_period).utc.to_time if date_range and attrition_period
+      find_opts = { :events=>{'$elemMatch'=>{:to=>"#{state}"}} }
+      find_opts[:events]['$elemMatch'][:created_at.lt] = date_range.end.utc.to_time if date_range
+      find_opts[:events]['$elemMatch'][:created_at.gt] = (date_range.end - attrition_period).utc.to_time if date_range and attrition_period
       entering_a_user_visitors = visitor_class.all(find_opts).to_a
 
-      find_opts = { :'events.from'=>"#{state}" }
-      find_opts[:'events.created_at'.lt] = date_range.begin.utc.to_time if date_range
+      find_opts = { :events=>{'$elemMatch'=>{:from=>"#{state}"}} }
+      find_opts[:events]['$elemMatch'][:created_at.lt] = date_range.begin.utc.to_time if date_range
       leaving_a_user_visitors = visitor_class.all(find_opts).to_a
 
       all = entering_a_user_visitors.delete_if {|v| leaving_a_user_visitors.include?(v) }
