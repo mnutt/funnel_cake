@@ -62,7 +62,7 @@ class Rails
   end
 end
 
-MongoMapper.connection = Mongo::Connection.new '127.0.0.1', 27017, :logger => Logger.new(STDOUT)
+MongoMapper.connection = Mongo::Connection.new '127.0.0.1', 27017 #, :logger => Logger.new(STDOUT)
 MongoMapper.database = 'funnelcake_test'
 
 
@@ -70,5 +70,12 @@ MongoMapper.database = 'funnelcake_test'
 Spec::Matchers.define :only_have_objects do |expected|
   match do |actual|
     actual.sort{|a,b| a._id.to_s<=>b._id.to_s} == expected.sort{|a,b| a._id.to_s<=>b._id.to_s}
+  end
+  failure_message_for_should do |actual|
+    _expected = expected.collect(&:inspect).collect{|s| "   #{s}"}.join("\n")
+    _actual = actual.collect(&:inspect).collect{|s| "   #{s}"}.join("\n")
+    _expected = '   []' if expected.empty?
+    _actual = '   []' if actual.empty?
+    "expected to only have objects:\n#{_expected}\nbut got objects:\n#{_actual}"
   end
 end

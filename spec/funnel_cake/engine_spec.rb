@@ -16,7 +16,7 @@ describe 'when setting the engine classes' do
 end
 
 
-describe 'when finding visitors by starting state' do
+describe 'when finding visitors by eligibility to transition from state' do
   describe 'without a date range' do  
     before(:each) do
       @a = create_visitor_with do |v|
@@ -34,7 +34,7 @@ describe 'when finding visitors by starting state' do
       end
     end
     it 'should return visitors who entered the state MINUS those who exited the state' do
-      FunnelCake::Engine.find_by_starting_state(:a_started).should only_have_objects([ @b ])
+      FunnelCake::Engine.eligible_to_transition_from_state(:a_started).should only_have_objects([ @b ])
     end
   end
   describe 'for a given date range' do
@@ -65,83 +65,483 @@ describe 'when finding visitors by starting state' do
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-7), :referer=>'ddd'
       end
       @date_range = build_date(:days=>-14)..build_date(:days=>0)
+      @opts = { :date_range=>@date_range }
     end
     it 'should return the visitors who entered the state before the end MINUS those who exited before the start' do
-      FunnelCake::Engine.find_by_starting_state(:a_started, :date_range=>@date_range).should only_have_objects([ 
+      FunnelCake::Engine.eligible_to_transition_from_state(:a_started, @opts).should only_have_objects([ 
         @visitors[1], @visitors[2],
       ])
     end
     describe 'with a has_event filter' do
       it 'should return the visitors with an exact match' do
-        opts = {
-          :date_range=>@date_range, 
-          :has_event=>{
-            :referer=>'ccc'
-          }
-        }
-        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[2] ]
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
+          @opts.merge( :has_event=>{:referer=>'aaa'} )
+        ).should only_have_objects([ @visitors[1] ])
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
+          @opts.merge( :has_event=>{:referer=>'bbb'} )
+        ).should only_have_objects([ @visitors[1] ])
       end  
       it 'should return the visitors with a regex match' do
-        opts = {
-          :date_range=>@date_range, 
-          :has_event=>{
-            :referer=>/c+/
-          }
-        }
-        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[2] ]
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
+          @opts.merge( :has_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
+          @opts.merge( :has_event=>{:referer=>/b+/} )
+        ).should only_have_objects([ @visitors[1] ])
       end
     end
     describe 'with a first_event filter' do
       it 'should return the visitors with an exact match' do
-        opts = {
-          :date_range=>@date_range, 
-          :first_event=>{
-            :referer=>'aaa'
-          }
-        }
-        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
+          @opts.merge( :first_event=>{:referer=>'aaa'} )
+        ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
-        opts = {
-          :date_range=>@date_range, 
-          :first_event=>{
-            :referer=>/a+/
-          }
-        }
-        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
+          @opts.merge( :first_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
       end      
     end
     describe 'with a query filter' do
       it 'should return the visitors with an exact match' do
-        opts = {
-          :date_range=>@date_range, 
-          :query=>{
-            :key=>'AAA'
-          }
-        }
-        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started,
+          @opts.merge( :query=>{:key=>'AAA'} )
+        ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
-        opts = {
-          :date_range=>@date_range, 
-          :query=>{
-            :key=>/A+/
-          }
-        }
-        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ @visitors[1] ]
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started,
+          @opts.merge( :query=>{:key=>/A+/} )
+        ).should only_have_objects([ @visitors[1] ])
       end
     end
     describe 'with an attrition period' do
       it 'should return the visitors' do
-        opts = {
-          :date_range=>@date_range, 
-          :attrition_period=>14.days,
-        }
-        FunnelCake::Engine.find_by_starting_state(:a_started, opts).should == [ ]
+        FunnelCake::Engine.eligible_to_transition_from_state(:a_started,
+          @opts.merge( :attrition_period=>14.days )        
+        ).should only_have_objects([])
       end
     end
   end
 end
+
+describe 'when finding visitors by transition to state' do
+  describe 'without a date range' do  
+    before(:each) do
+      @a = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @b = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+      end
+      @c = create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @d = create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted
+      end
+    end
+    it 'should return visitors who entered the state' do
+      FunnelCake::Engine.transitioned_to_state(:a_started).should only_have_objects([ @a, @b ])
+    end
+  end
+  describe 'for a given date range' do
+    before(:each) do
+      @visitors = []
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'AAA') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'BBB') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'aaa'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'ccc'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>7), :referer=>'ddd'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted, :created_at=>build_date(:days=>-7), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-7), :referer=>'ddd'
+      end
+      @date_range = build_date(:days=>-14)..build_date(:days=>0)
+      @opts = { :date_range=>@date_range }
+    end
+    it 'should return the visitors who entered the state during the date range' do
+      FunnelCake::Engine.transitioned_to_state(:b_started, @opts).should only_have_objects([ 
+        @visitors[1], @visitors[6],
+      ])
+    end
+    describe 'with a has_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_to_state(:b_started, 
+          @opts.merge( :has_event=>{:referer=>'aaa'} )
+        ).should == [ @visitors[1] ]
+        FunnelCake::Engine.transitioned_to_state(:b_started, 
+          @opts.merge( :has_event=>{:referer=>'bbb'} )
+        ).should == [ @visitors[1] ]
+      end  
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_to_state(:b_started, 
+          @opts.merge( :has_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+        FunnelCake::Engine.transitioned_to_state(:b_started, 
+          @opts.merge( :has_event=>{:referer=>/b+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+    describe 'with a first_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_to_state(:b_started, 
+          @opts.merge( :first_event=>{:referer=>'aaa'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_to_state(:b_started, 
+          @opts.merge( :first_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end      
+    end
+    describe 'with a query filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_to_state(:b_started,
+          @opts.merge( :query=>{:key=>'AAA'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_to_state(:b_started,
+          @opts.merge( :query=>{:key=>/A+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+  end
+end
+
+describe 'when finding visitors by transition from state' do
+  describe 'without a date range' do  
+    before(:each) do
+      @a = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @b = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+      end
+      @c = create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @d = create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted
+      end
+    end
+    it 'should return visitors who entered the state' do
+      FunnelCake::Engine.transitioned_from_state(:a_started).should only_have_objects([ @a, @c ])
+    end
+  end
+  describe 'for a given date range' do
+    before(:each) do
+      @visitors = []
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'AAA') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'BBB') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'aaa'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'ccc'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>7), :referer=>'ddd'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted, :created_at=>build_date(:days=>-7), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-7), :referer=>'ddd'
+      end
+      @date_range = build_date(:days=>-14)..build_date(:days=>0)
+      @opts = { :date_range=>@date_range }
+    end
+    it 'should return the visitors who exited the state during the date range' do
+      FunnelCake::Engine.transitioned_from_state(:a_started, @opts).should only_have_objects([ 
+        @visitors[1], @visitors[6],
+      ])
+    end
+    describe 'with a has_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :has_event=>{:referer=>'bbb'} )
+        ).should == [ @visitors[1] ]
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :has_event=>{:referer=>'aaa'} )
+        ).should == [ @visitors[1] ]
+      end  
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :has_event=>{:referer=>/b+/} )
+        ).should only_have_objects([ @visitors[1] ])
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :has_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+    describe 'with a first_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :first_event=>{:referer=>'aaa'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :first_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end      
+    end
+    describe 'with a query filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :query=>{:key=>'AAA'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_from_state(:a_started,
+          @opts.merge( :query=>{:key=>/A+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+  end
+end
+
+describe 'when finding visitors by transition from state to state' do
+  describe 'without a date range' do  
+    before(:each) do
+      @a = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @b = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+      end
+      @c = create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @d = create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted
+      end
+    end
+    it 'should return visitors who transitioned between states' do
+      FunnelCake::Engine.transitioned_between_states(:a_started, :b_started).should only_have_objects([ @a, @c ])
+    end
+  end
+  describe 'for a given date range' do
+    before(:each) do
+      @visitors = []
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'AAA') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'BBB') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'aaa'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'ccc'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>7), :referer=>'ddd'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted, :created_at=>build_date(:days=>-7), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-7), :referer=>'ddd'
+      end
+      @date_range = build_date(:days=>-14)..build_date(:days=>0)
+      @opts = { :date_range=>@date_range }
+    end
+    it 'should return the visitors who exited the start state and entered the end state during the date range' do
+      FunnelCake::Engine.transitioned_between_states(:a_started, :b_started, @opts).should only_have_objects([ 
+        @visitors[1], @visitors[6],
+      ])
+    end
+    describe 'with states in between' do
+      it 'should return the visitors who exited the start state and entered the end state during the date range' do
+        @opts = { :date_range=>build_date(:days=>-31)..build_date(:days=>0) }
+        FunnelCake::Engine.transitioned_between_states(:page_visited, :b_started, @opts).should only_have_objects([ 
+          @visitors[0], @visitors[1],
+        ])
+      end
+    end
+    describe 'with a has_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>'bbb'} )
+        ).should == [ @visitors[1] ]
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>'aaa'} )
+        ).should == [ @visitors[1] ]
+      end  
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>/b+/} )
+        ).should only_have_objects([ @visitors[1] ])
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+    describe 'with a first_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :first_event=>{:referer=>'aaa'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :first_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end      
+    end
+    describe 'with a query filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :query=>{:key=>'AAA'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
+          @opts.merge( :query=>{:key=>/A+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+  end
+end
+
+describe 'when finding visitors by transition directly from state to state' do
+  describe 'without a date range' do  
+    before(:each) do
+      @a = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @b = create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started
+      end
+      @c = create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started
+      end
+      @d = create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted
+      end
+    end
+    it 'should return visitors who transitioned between states' do
+      FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started).should only_have_objects([ @a, @c ])
+    end
+  end
+  describe 'for a given date range' do
+    before(:each) do
+      @visitors = []
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'AAA') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
+      end
+      @visitors << create_visitor_with(:key=>'BBB') do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'aaa'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>1), :referer=>'ccc'
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>7), :referer=>'ddd'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:unknown, :to=>:page_visted, :created_at=>build_date(:days=>-7), :referer=>'ccc'
+      end
+      @visitors << create_visitor_with do |v|
+        create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-7), :referer=>'ddd'
+      end
+      @date_range = build_date(:days=>-14)..build_date(:days=>0)
+      @opts = { :date_range=>@date_range }
+    end
+    it 'should return the visitors who exited the start state and entered the end state during the date range' do
+      FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started, @opts).should only_have_objects([ 
+        @visitors[1], @visitors[6],
+      ])
+    end
+    describe 'with states in between' do
+      it 'should return no visitors' do
+        @opts = { :date_range=>build_date(:days=>-31)..build_date(:days=>0) }
+        FunnelCake::Engine.transitioned_directly_between_states(:page_visited, :b_started, @opts).should only_have_objects([])
+      end
+    end
+    describe 'with a has_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>'bbb'} )
+        ).should == [ @visitors[1] ]
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>'aaa'} )
+        ).should == [ @visitors[1] ]
+      end  
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>/b+/} )
+        ).should only_have_objects([ @visitors[1] ])
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :has_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+    describe 'with a first_event filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :first_event=>{:referer=>'aaa'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :first_event=>{:referer=>/a+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end      
+    end
+    describe 'with a query filter' do
+      it 'should return the visitors with an exact match' do
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :query=>{:key=>'AAA'} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+      it 'should return the visitors with a regex match' do
+        FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
+          @opts.merge( :query=>{:key=>/A+/} )
+        ).should only_have_objects([ @visitors[1] ])
+      end
+    end
+  end
+end
+
 
 
 # describe "when querying funnel events", :type=>:model do
@@ -186,7 +586,7 @@ end
 #     end
 #     describe "by starting state A" do
 #       before(:each) do
-#         @found = FunnelCake::Engine.find_by_starting_state(:a_started, {:date_range=>@date_range})
+#         @found = FunnelCake::Engine.eligible_to_transition_from_state(:a_started, {:date_range=>@date_range})
 #       end
 #       it "should find the right number of users" do
 #         @found.count.should == 18
