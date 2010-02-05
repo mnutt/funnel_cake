@@ -79,13 +79,29 @@ module FunnelCake
       find_opts = { :events=>{'$elemMatch'=>{:to=>"#{state}"}} }
       find_opts[:events]['$elemMatch'][:created_at] = { '$lt'=>date_range.end.utc.to_time } if date_range
       find_opts[:events]['$elemMatch'][:created_at]['$gt'] = (date_range.end - attrition_period).utc.to_time if date_range and attrition_period
-      entering_a_user_visitors = Finder.new(visitor_class, :find, find_opts, opts).find.to_a
+      js_condition = "x.from == '#{state}'"
+      js_condition += " && x.created_at < new Date('#{date_range.begin.utc.to_time}')" if date_range
+      find_opts['$where'] = <<-eos
+        function() {
+          qual=true;
+          this.events.forEach(
+            function(x) {
+              if( #{js_condition} ) {
+                qual=false;
+              }
+            }
+          )
+          return qual;
+        }
+      eos
 
-      find_opts = { :events=>{'$elemMatch'=>{:from=>"#{state}"}} }
-      find_opts[:events]['$elemMatch'][:created_at.lt] = date_range.begin.utc.to_time if date_range
-      leaving_a_user_visitors = Finder.new(visitor_class, :find, find_opts, opts).find.to_a
+      Finder.new(visitor_class, :find, find_opts, opts).find.to_a
 
-      entering_a_user_visitors.delete_if {|v| leaving_a_user_visitors.include?(v) }
+      #find_opts = { :events=>{'$elemMatch'=>{:from=>"#{state}"}} }
+      #find_opts[:events]['$elemMatch'][:created_at.lt] = date_range.begin.utc.to_time if date_range
+      #leaving_a_user_visitors = Finder.new(visitor_class, :find, find_opts, opts).find.to_a
+#
+      #entering_a_user_visitors.delete_if {|v| leaving_a_user_visitors.include?(v) }
     end
 
 
