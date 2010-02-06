@@ -27,24 +27,16 @@ module FunnelCake
     #   where 'something'
     # end
     class Finder
-      attr_accessor :options, :type, :klass
+      attr_accessor :options, :klass
 
-      class << self
-        def results(_klass, _options={}, _type=:find, &block)
-          finder = self.new(_klass, _options, _type)
-          finder.instance_eval(&block)
-          finder.execute
-        end
-      end
-
-      def initialize(_klass, _options={}, _type=:find)
+      def initialize(_klass, _options={}, &block)
         @options = _options
         @klass = _klass
-        @type = _type
         @finder_options = {}
+        self.instance_eval(&block)
       end
 
-      def execute
+      def execute(type=:find)
         process_options!
         case type
         when :count
@@ -53,6 +45,8 @@ module FunnelCake
           klass.all(@finder_options)
         end
       end
+      def find; execute; end
+      def count; execute(:count); end
 
       #
       # DSL methods
@@ -114,13 +108,13 @@ module FunnelCake
     end
 
     # Method for finding visitors who are "eligible" for
-    # transitioning from a given state, for a given time period
+    # moveing from a given state, for a given time period
     # (Used in calculating conversion rates)
     # We qualify visitors who:
     # - entered the given state before the end of the date range (but within the attrition timeframe)
     # MINUS
     # - exited the given state before the beginning of the date range
-    def self.eligible_to_transition_from_state(state, opts={})
+    def self.eligible_to_move_from_state(state, opts={})
       return [] if state.nil?
       state = state.to_sym
       return [] unless visitor_class.states.include?(state)
@@ -146,80 +140,59 @@ module FunnelCake
         }
       eos
 
-      Finder.results(visitor_class, opts) do
+      Finder.new(visitor_class, opts) do
         to state
         created_at :lt=>date_range.end.utc.to_time if date_range
         created_at :gt=>(date_range.end - attrition_period).utc.to_time if date_range and attrition_period
         where where_javascript
-      end.to_a
+      end
     end
 
 
-    # Method for finding visitors who transitioned
+    # Method for finding visitors who moved
     # from a given state, for a given time period
     # (Used in calculating conversion rates)
     # We qualify visitors who:
     # - exited the given state during the date range
-    def self.transitioned_from_state(state, opts={})
+    def self.moved_from_state(state, opts={})
       return [] if state.nil?
       state = state.to_sym
       return [] unless Analytics::Visitor.states.include?(state)
 
       date_range = opts.delete(:date_range)
 
-      Finder.results(visitor_class, opts) do
+      Finder.new(visitor_class, opts) do
         from state
         created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
-      end.to_a
+      end
     end
 
-    # Method for finding visitors who transitioned
+    # Method for finding visitors who moved
     # into a given state, for a given time period
     # (Used in calculating conversion rates)
     # We qualify visitors who:
     # - entered the given state during the date range
-    def self.transitioned_to_state(state, opts={})
+    def self.moved_to_state(state, opts={})
       return [] if state.nil?
       state = state.to_sym
       return [] unless Analytics::Visitor.states.include?(state)
 
       date_range = opts.delete(:date_range)
 
-      Finder.results(visitor_class, opts) do
+      Finder.new(visitor_class, opts) do
         to state
         created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
-      end.to_a
+      end
     end
 
-    # Method for finding visitors who transitioned
+    # Method for finding visitors who moved
     # into a given state, from a given state, for a given time period
     # (Used in calculating conversion rates)
     # We qualify visitors who:
     # - exited the start state during the date range
     # AND
     # - entered the end state during the date range
-    def self.transitioned_between_states(start_state, end_state, opts={})
-      return [] if start_state.nil? or end_state.nil?
-      start_state = start_state.to_sym
-      end_state = end_state.to_sym
-      return [] unless Analytics::Visitor.states.include?(start_state)
-      return [] unless Analytics::Visitor.states.include?(end_state)
-
-      leaving_a_user_visitors = transitioned_from_state(start_state, opts)
-      entering_b_user_visitors = transitioned_to_state(end_state, opts)
-
-      leaving_a_user_visitors.delete_if {|v| not entering_b_user_visitors.include?(v) }
-    end
-
-
-    # Method for finding visitors who transitioned
-    # into a given state, from a given state, WITH NO STATES INBETWEEN,
-    # for a given time period
-    # We qualify visitors who:
-    # - exited the start state during the date range
-    # AND
-    # - entered the end state during the date range
-    def self.transitioned_directly_between_states(start_state, end_state, opts={})
+    def self.moved_between_states(start_state, end_state, opts={})
       return [] if start_state.nil? or end_state.nil?
       start_state = start_state.to_sym
       end_state = end_state.to_sym
@@ -228,22 +201,63 @@ module FunnelCake
 
       date_range = opts.delete(:date_range)
 
-      Finder.results(visitor_class, opts) do
+      js_condition = "x.to == '#{end_state}'"
+      js_condition += " && x.created_at >= new Date('#{date_range.begin.utc.to_time}')" if date_range
+      js_condition += " && x.created_at <= new Date('#{date_range.end.utc.to_time}')" if date_range
+      where_javascript = <<-eos
+        function() {
+          qual=false;
+          this.events.forEach(
+            function(x) {
+              if( #{js_condition} ) {
+                qual=true;
+              }
+            }
+          )
+          return qual;
+        }
+      eos
+
+      Finder.new(visitor_class, opts) do
         from start_state
-        to end_state
         created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
-      end.to_a
+        where where_javascript
+      end
     end
 
 
-    # Calculate stats for transitions between two states
-    def self.transition_stats(start_state, end_state, opts={})
-      cache_fetch("transition_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
+    # Method for finding visitors who moved
+    # into a given state, from a given state, WITH NO STATES INBETWEEN,
+    # for a given time period
+    # We qualify visitors who:
+    # - exited the start state during the date range
+    # AND
+    # - entered the end state during the date range
+    def self.moved_directly_between_states(start_state, end_state, opts={})
+      return [] if start_state.nil? or end_state.nil?
+      start_state = start_state.to_sym
+      end_state = end_state.to_sym
+      return [] unless Analytics::Visitor.states.include?(start_state)
+      return [] unless Analytics::Visitor.states.include?(end_state)
+
+      date_range = opts.delete(:date_range)
+
+      Finder.new(visitor_class, opts) do
+        from start_state
+        to end_state
+        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+      end
+    end
+
+
+    # Calculate stats for moves between two states
+    def self.move_stats(start_state, end_state, opts={})
+      cache_fetch("move_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
         if start_state.nil? or end_state.nil?
           {:end_count=>0, :start_count=>0}
         else
-					starting_visitors = eligible_to_transition_from_state(start_state, opts)
-          visitors = transitioned_directly_between_states(start_state, end_state, opts)
+					starting_visitors = eligible_to_move_from_state(start_state, opts)
+          visitors = moved_directly_between_states(start_state, end_state, opts)
           stats = FunnelCake::DataHash.new
           stats[:start_count] = starting_visitors.length
           stats[:end_count] = visitors.length
@@ -280,8 +294,8 @@ module FunnelCake
       if start_state.nil? or end_state.nil?
         {:end=>[], :start=>[]}
       else
-        converted_visitors = self.transitioned_to_state(end_state, opts)
-        starting_state_visitors = self.eligible_to_transition_from_state(start_state, opts).to_a | converted_visitors
+        converted_visitors = self.moved_to_state(end_state, opts)
+        starting_state_visitors = self.eligible_to_move_from_state(start_state, opts).to_a | converted_visitors
         visitors = FunnelCake::DataHash.new
         visitors[:end] = converted_visitors
         visitors[:start] = starting_state_visitors
