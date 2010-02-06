@@ -13,7 +13,7 @@ class Analytics::DashboardsController < Analytics::CommonController
 				json << {
 					:from => trans.from,
 					:to => trans.to,
-					:stats => FunnelCake::Engine.transition_stats(trans.from, trans.to, @options),
+					:stats => FunnelCake::Engine.move_stats(trans.from, trans.to, @options),
 					:to_primary => Analytics::Visitor.states_table[trans.to].primary?
 				}	unless Analytics::Visitor.states_table[trans.from].hidden? or Analytics::Visitor.states_table[trans.to].hidden?
 		  end

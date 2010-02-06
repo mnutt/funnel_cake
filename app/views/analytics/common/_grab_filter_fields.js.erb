@@ -4,8 +4,8 @@
 		var visited_page_match = $('visited_page_match').value;
 		var opts = {
 			filter_data: $H({
-				first_event_matching: { url: landing_page_match, referer: referer_match },
-				has_event_matching: { url: visited_page_match }
+				first_event_with: { url: landing_page_match, referer: referer_match },
+				has_event_with: { url: visited_page_match }
 			}).toJSON()
 		};
 		opts.time_period = periodDays(period);

@@ -79,10 +79,10 @@ module FunnelCake
         @finder_options[:events] ||= {}
         @finder_options[:events]['$elemMatch'] ||= {}
         @finder_options[:events]['$elemMatch'][:created_at] ||= {}
-        @finder_options[:events]['$elemMatch'][:created_at]['$lt'] = _options[:lt] if _options[:lt]
-        @finder_options[:events]['$elemMatch'][:created_at]['$lte'] = _options[:lte] if _options[:lte]
-        @finder_options[:events]['$elemMatch'][:created_at]['$gt'] = _options[:gt] if _options[:gt]
-        @finder_options[:events]['$elemMatch'][:created_at]['$gte'] = _options[:gte] if _options[:gte]
+        @finder_options[:events]['$elemMatch'][:created_at]['$lt'] = _options[:lt].to_time.utc if _options[:lt]
+        @finder_options[:events]['$elemMatch'][:created_at]['$lte'] = _options[:lte].to_time.utc if _options[:lte]
+        @finder_options[:events]['$elemMatch'][:created_at]['$gt'] = _options[:gt].to_time.utc if _options[:gt]
+        @finder_options[:events]['$elemMatch'][:created_at]['$gte'] = _options[:gte].to_time.utc if _options[:gte]
       end
 
       def where(_where)
@@ -94,15 +94,15 @@ module FunnelCake
 
       def process_options!
         @options[:has_event_with].each do |k,v|
-          has_event_with k, v
+          has_event_with k, v unless v.blank?
         end if @options[:has_event_with]
 
         @options[:first_event_with].each do |k,v|
-          first_event_with k, v
+          first_event_with k, v unless v.blank?
         end if @options[:first_event_with]
 
         @options[:visitor_with].each do |k,v|
-          visitor_with k, v
+          visitor_with k, v unless v.blank?
         end if @options[:visitor_with]
       end
     end
@@ -125,7 +125,7 @@ module FunnelCake
       attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0)
 
       js_condition = "x.from == '#{state}'"
-      js_condition += " && x.created_at < new Date('#{date_range.begin.utc.to_time}')" if date_range
+      js_condition += " && x.created_at < new Date('#{date_range.begin}')" if date_range
       where_javascript = <<-eos
         function() {
           qual=true;
@@ -142,8 +142,8 @@ module FunnelCake
 
       Finder.new(visitor_class, opts) do
         to state
-        created_at :lt=>date_range.end.utc.to_time if date_range
-        created_at :gt=>(date_range.end - attrition_period).utc.to_time if date_range and attrition_period
+        created_at :lt=>date_range.end if date_range
+        created_at :gt=>(date_range.end - attrition_period) if date_range and attrition_period
         where where_javascript
       end
     end
@@ -163,7 +163,7 @@ module FunnelCake
 
       Finder.new(visitor_class, opts) do
         from state
-        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+        created_at :gte=>date_range.begin, :lte=>date_range.end if date_range
       end
     end
 
@@ -181,7 +181,7 @@ module FunnelCake
 
       Finder.new(visitor_class, opts) do
         to state
-        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+        created_at :gte=>date_range.begin, :lte=>date_range.end if date_range
       end
     end
 
@@ -202,8 +202,8 @@ module FunnelCake
       date_range = opts.delete(:date_range)
 
       js_condition = "x.to == '#{end_state}'"
-      js_condition += " && x.created_at >= new Date('#{date_range.begin.utc.to_time}')" if date_range
-      js_condition += " && x.created_at <= new Date('#{date_range.end.utc.to_time}')" if date_range
+      js_condition += " && x.created_at >= new Date('#{date_range.begin.to_time.utc}')" if date_range
+      js_condition += " && x.created_at <= new Date('#{date_range.end.to_time.utc}')" if date_range
       where_javascript = <<-eos
         function() {
           qual=false;
@@ -220,7 +220,7 @@ module FunnelCake
 
       Finder.new(visitor_class, opts) do
         from start_state
-        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+        created_at :gte=>date_range.begin, :lte=>date_range.end if date_range
         where where_javascript
       end
     end
@@ -245,7 +245,7 @@ module FunnelCake
       Finder.new(visitor_class, opts) do
         from start_state
         to end_state
-        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+        created_at :gte=>date_range.begin, :lte=>date_range.end if date_range
       end
     end
 

@@ -32,11 +32,14 @@ class Analytics::Visitor
 
   # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)
-    self.events.create( :from=>from.to_s, :to=>to.to_s,
-                              :url=>data[:url],
-                              :referer=>data[:referer],
-                              :user_agent=>data[:user_agent],
-                              :name=>event.to_s)
+    self.events << Analytics::Event.new({
+      :from=>from.to_s, :to=>to.to_s,
+      :url=>data[:url],
+      :referer=>data[:referer],
+      :user_agent=>data[:user_agent],
+      :name=>event.to_s
+    })
+    self.save
   end
 
   # Utility method for logging funnel events from within application code
