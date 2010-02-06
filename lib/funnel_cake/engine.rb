@@ -21,11 +21,11 @@ module FunnelCake
 
     # Helper class that DRY's up building mongo queries with a simple DSL
     # Example:
-    # Finder.results(visitor_class, opts) do
+    # Finder.new(visitor_class, opts) do
     #   to state
     #   created_at :lt=>some_time
     #   where 'something'
-    # end
+    # end.find
     class Finder
       attr_accessor :options, :klass
 
