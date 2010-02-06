@@ -182,8 +182,8 @@ var ConversionFunnel = Class.create(FunnelCakeWidget, {
 				parameters: params,
 				onSuccess: function(transport) {
 					var data = transport.responseJSON;
-					thiz.startCount.update(data.stats.start_count);
-					thiz.endCount.update(data.stats.end_count);
+					thiz.startCount.update(data.stats.start);
+					thiz.endCount.update(data.stats.end);
 					thiz.rate.update(Math.round(data.stats.rate*100)+'%');
 					thiz.previousRate.update('(' + Math.round(data.previous_stats.rate*100) + '%)');
 					thiz.spinner.fade({duration: 0.5});
@@ -389,11 +389,11 @@ var ConversionDiagram = Class.create(FunnelCakeWidget, {
 			if (Object.isUndefined(nodes[transition.from])) { nodes[transition.from] = { in: 0, out: 0, primary: false }; }
 			if (Object.isUndefined(nodes[transition.to])) { nodes[transition.to] = { in: 0, out: 0, primary: false }; }
 
-			nodes[transition.from].out = [nodes[transition.from].out, transition.stats.start_count].max();
-			nodes[transition.to].in += transition.stats.end_count;
+			nodes[transition.from].out = [nodes[transition.from].out, transition.stats.start].max();
+			nodes[transition.to].in += transition.stats.end;
 			nodes[transition.to].primary = transition.to_primary;
 
-			$(transition.from+'_to_'+transition.to+'_edge').update(transition.stats.end_count);
+			$(transition.from+'_to_'+transition.to+'_edge').update(transition.stats.end);
 		});
 
 		// Then, iterate through the node data, setting the node labels

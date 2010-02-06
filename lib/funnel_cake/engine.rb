@@ -254,14 +254,12 @@ module FunnelCake
     def self.move_stats(start_state, end_state, opts={})
       cache_fetch("move_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
         if start_state.nil? or end_state.nil?
-          {:end_count=>0, :start_count=>0}
+          {:end=>0, :start=>0}
         else
-					starting_visitors = eligible_to_move_from_state(start_state, opts)
-          visitors = moved_directly_between_states(start_state, end_state, opts)
           stats = FunnelCake::DataHash.new
-          stats[:start_count] = starting_visitors.length
-          stats[:end_count] = visitors.length
-          stats
+          stats[:start] = eligible_to_move_from_state(start_state, opts).count
+          stats[:end] = moved_directly_between_states(start_state, end_state, opts).count
+          stats_with_rate(stats)
         end
       end
     end
@@ -270,16 +268,12 @@ module FunnelCake
     def self.conversion_stats(start_state, end_state, opts={})
       cache_fetch("conversion_stats:#{start_state}-#{end_state}-#{self.hash_options(opts)}", :expires_in=>1.day) do
         if start_state.nil? or end_state.nil?
-          {:rate=>0.0, :end_count=>0, :start_count=>0}
+          {:rate=>0.0, :end=>0, :start=>0}
         else
-          visitors = conversion_visitors(start_state, end_state, opts)
           stats = FunnelCake::DataHash.new
-          stats[:end_count] = visitors[:end].length
-          stats[:start_count] = visitors[:start].length
-
-          stats[:rate] = 0.0
-          stats[:rate] = stats[:end_count].to_f / stats[:start_count].to_f if stats[:start_count] > 0
-          stats
+          stats[:start] = eligible_to_move_from_state(start_state, opts).count
+          stats[:end] = moved_to_state(end_state, opts).count
+          stats_with_rate(stats)
         end
       end
     end
@@ -294,11 +288,11 @@ module FunnelCake
       if start_state.nil? or end_state.nil?
         {:end=>[], :start=>[]}
       else
-        converted_visitors = self.moved_to_state(end_state, opts)
-        starting_state_visitors = self.eligible_to_move_from_state(start_state, opts).to_a | converted_visitors
+        converted_visitors = moved_to_state(end_state, opts).find.to_a
+        starting_state_visitors = eligible_to_move_from_state(start_state, opts).find.to_a | converted_visitors
         visitors = FunnelCake::DataHash.new
-        visitors[:end] = converted_visitors
         visitors[:start] = starting_state_visitors
+        visitors[:end] = converted_visitors
         visitors
       end
     end
@@ -318,7 +312,7 @@ module FunnelCake
           stats = FunnelCake::Engine.conversion_stats(start_state, end_state, {:date_range=>current_period, :attrition_period=>time_period}.merge(options) )
           data_hash[current_period_num - period_num] = FunnelCake::DataHash[{
             :rate => stats[:rate]*100.0,
-            :number => stats[:end_count],
+            :number => stats[:end],
             :date => current_period.end.to_formatted_s(:month_slash_day),
             :index => current_period_num - period_num
           }]
@@ -342,6 +336,12 @@ module FunnelCake
 
 
     private
+
+    def self.stats_with_rate(stats)
+      stats[:rate] = 0.0
+      stats[:rate] = stats[:end].to_f / stats[:start].to_f if stats[:start] > 0
+      stats
+    end
 
     # Filters Visitors from a list per an options hash
     # For example:

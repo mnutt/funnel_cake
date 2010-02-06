@@ -28,4 +28,10 @@ class FunnelCake::DataHash < ::Hash
     headers.collect { |k| self[k] }
   end
 
+  def self.build(hash)
+    me = self.new
+    me.merge!(hash)
+    me
+  end
+
 end

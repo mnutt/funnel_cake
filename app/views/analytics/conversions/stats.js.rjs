@@ -1,8 +1,8 @@
 id = "#{@state}-#{@next_state}"
 
-page << "$('funnel_conversion_#{id}').down('.start_count').update('#{@stats[:start_count]}');"
+page << "$('funnel_conversion_#{id}').down('.start').update('#{@stats[:start]}');"
 page << "$('funnel_conversion_#{id}').down('.rate_stats').update('#{number_to_percentage(@stats[:rate]*100.0, :precision=>1)}');"
-page << "$('funnel_conversion_#{id}').down('.end_count').update('#{@stats[:end_count]}');"
+page << "$('funnel_conversion_#{id}').down('.end').update('#{@stats[:end]}');"
 if @previous_stats
   page << "$('funnel_conversion_#{id}').down('.previous_rate_stats').update('#{number_to_percentage(@previous_stats[:rate]*100.0, :precision=>1)}');"
 end

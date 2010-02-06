@@ -846,6 +846,68 @@ describe 'when finding visitors by move directly from state to state' do
   end
 end
 
+describe 'querying a conversion' do
+  describe 'for visitors' do
+    before(:each) do
+      @start = mock(:start, :find=>[1, 2, 3, 4, 5, 6], :count=>6)
+      @end = mock(:end, :find=>[1, 2, 3], :count=>3)
+      FunnelCake::Engine.stub!(:eligible_to_move_from_state).and_return(@start)
+      FunnelCake::Engine.stub!(:moved_to_state).and_return(@end)
+      @date_range = build_date(:days=>-14)..build_date(:days=>0)
+      @opts = { :date_range=>@date_range }
+    end
+    it 'should query the visitors eligible to move' do
+      FunnelCake::Engine.should_receive(:eligible_to_move_from_state).with(:a_started, @opts).once.and_return(@start)
+      FunnelCake::Engine.conversion_visitors(:a_started, :b_started, @opts)
+    end
+    it 'should query the visitors who moved' do
+      FunnelCake::Engine.should_receive(:moved_to_state).with(:b_started, @opts).once.and_return(@end)
+      FunnelCake::Engine.conversion_visitors(:a_started, :b_started, @opts)
+    end
+    it 'should return the list of converted visitors' do
+      FunnelCake::Engine.conversion_visitors(:a_started, :b_started, @opts).should == {
+        :start=>[1, 2, 3, 4, 5, 6],
+        :end=>[1, 2, 3],
+      }
+    end
+  end
+  describe 'for stats' do
+    before(:each) do
+      @start = mock(:start, :find=>[1, 2, 3, 4, 5, 6], :count=>6)
+      @end = mock(:end, :find=>[1, 2, 3], :count=>3)
+      FunnelCake::Engine.stub!(:eligible_to_move_from_state).and_return(@start)
+      FunnelCake::Engine.stub!(:moved_to_state).and_return(@end)
+      @date_range = build_date(:days=>-14)..build_date(:days=>0)
+      @opts = { :date_range=>@date_range }
+    end
+    it 'should query the visitors eligible to move' do
+      FunnelCake::Engine.should_receive(:eligible_to_move_from_state).with(:a_started, @opts).once.and_return(@start)
+      FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts)
+    end
+    it 'should query the visitors who moved' do
+      FunnelCake::Engine.should_receive(:moved_to_state).with(:b_started, @opts).once.and_return(@end)
+      FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts)
+    end
+    it 'should return the stats' do
+      FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts).should == FunnelCake::DataHash.build({
+        :start=>6,
+        :end=>3,
+        :rate=>0.5,        
+      })
+    end
+  end  
+  describe 'rate only' do  
+    it 'should return the rate' do
+      FunnelCake::Engine.should_receive(:conversion_stats).with(:a_started, :b_started, @opts).once.and_return({
+        :start=>6,
+        :end=>3,
+        :rate=>0.5,        
+      })      
+      FunnelCake::Engine.conversion_rate(:a_started, :b_started, @opts).should == 0.5
+    end
+  end
+end
+
 
 
 # describe "when visitor_withing funnel events", :type=>:model do

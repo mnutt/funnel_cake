@@ -20,7 +20,7 @@ class Analytics::StatsController < Analytics::CommonController
       prev_state = previous_state_from(state)
       @title = params[:title] or state.to_s.titleize
       stats = FunnelCake::Engine.conversion_stats(prev_state, state, {:date_range=>@date_range, :attrition_period=>1.month}.merge(@options) )
-      @value = stats[:end_count].to_i
+      @value = stats[:end].to_i
       @stat_name = "#{@stat}-#{state}"
     else
       @title = params[:title] or 'Unknown'
