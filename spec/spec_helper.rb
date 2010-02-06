@@ -1,6 +1,9 @@
 require 'spec'
 require 'active_support'
 
+gem 'timecop'
+require 'timecop'
+
 gem 'mongo_mapper'
 require 'mongo_mapper'
 

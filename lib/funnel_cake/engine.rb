@@ -343,36 +343,6 @@ module FunnelCake
       stats
     end
 
-    # Filters Visitors from a list per an options hash
-    # For example:
-    # :has_event_with=>{ :url=>'/some_url' }
-    # :has_event_matching=>{ :url=>'url_match' }
-    # or...
-    # :first_event_with=>{ :referer=>'/referer_url' }
-    # :first_event_matching=>{ :referer=>'referer_match' }
-    def self.filter_visitors(visitors, opts={})
-
-      opts[:has_event_with].each do |filter, value|
-        visitors.delete_if { |v| v.events.find(:first, :conditions=>["#{filter} = ?", value]).nil? } unless value.blank?
-      end if opts[:has_event_with]
-
-      opts[:has_event_matching].each do |filter, value|
-        visitors.delete_if { |v| v.events.find(:first, :conditions=>"#{filter} LIKE '%#{value}%'").nil? } unless value.blank?
-      end if opts[:has_event_matching]
-
-      opts[:first_event_with].each do |filter, value|
-        visitors.delete_if { |v| v.events.first.attributes[filter.to_s] != value } unless value.blank?
-      end if opts[:first_event_with]
-
-      opts[:first_event_matching].each do |filter, value|
-        visitors.delete_if do |v|
-          (v.events.first.attributes[filter.to_s] ? v.events.first.attributes[filter.to_s].match(value) : nil).nil? unless value.blank?
-        end
-      end if opts[:first_event_matching]
-
-      return visitors
-    end
-
     # Return the namespaced key for funnelcake, so that we can easily clear the funnelcake cache
     # without blowing away all other cached data
     def self.cache_key_for(key_name)

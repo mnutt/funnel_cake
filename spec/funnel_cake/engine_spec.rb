@@ -889,11 +889,11 @@ describe 'querying a conversion' do
       FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts)
     end
     it 'should return the stats' do
-      FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts).should == FunnelCake::DataHash.build({
+      FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts).should == FunnelCake::DataHash[{
         :start=>6,
         :end=>3,
         :rate=>0.5,        
-      })
+      }]
     end
   end  
   describe 'rate only' do  
@@ -906,169 +906,41 @@ describe 'querying a conversion' do
       FunnelCake::Engine.conversion_rate(:a_started, :b_started, @opts).should == 0.5
     end
   end
+  describe 'for history over a period of time' do
+    describe 'for a 2 week window' do
+      describe 'with the default history length' do
+        before(:each) do
+          @current_date = DateTime.civil(1978, 1, 15, 12, 0, 0, Rational(-5, 24))
+          Timecop.freeze(@current_date)                    
+          @opts = {
+            :time_period=>2.weeks,
+          }
+          @data = FunnelCake::DataHash[{:start=>6, :end=>3, :rate=>0.5}]
+          FunnelCake::Engine.stub!(:conversion_stats).and_return(@data)
+        end
+        it 'should return the right number of stats' do
+          FunnelCake::Engine.conversion_history(:a_started, :b_started, @opts).values.length.should == 8
+        end
+        it 'should query the right dates' do
+          period_end = DateTime.civil(1978, 1, 29, 12, 0, 0, Rational(-5, 24)).to_date
+          0.upto(7) do |i|
+            topts = @opts.merge(:date_range=>period_end.advance(:weeks=>(-1-i)*2)...period_end.advance(:weeks=>-i*2), :attrition_period=>2.weeks)
+            FunnelCake::Engine.should_receive(:conversion_stats).with(:a_started, :b_started, topts).and_return(@data)
+          end
+          FunnelCake::Engine.conversion_history(:a_started, :b_started, @opts)
+        end
+      end
+      describe 'with a custom history length' do
+        before(:each) do
+          DateTime.stub!(:now).and_return(build_date(:days=>0))
+          @opts = { :time_period=>2.weeks, :max_history=>3 }
+          FunnelCake::Engine.stub!(:conversion_stats).and_return(FunnelCake::DataHash[{:start=>6, :end=>3, :rate=>0.5}])
+        end
+        it 'should return the right number of stats' do
+          FunnelCake::Engine.conversion_history(:a_started, :b_started, @opts).values.length.should == 6
+        end
+      end
+    end
+  end
 end
 
-
-
-# describe "when visitor_withing funnel events", :type=>:model do
-#   describe "for a given date range" do
-#     before(:each) do
-#       start_date = DateTime.civil(1978, 5, 12, 12, 0, 0, Rational(-5, 24))
-#       end_date = DateTime.civil(1978, 5, 12, 17, 0, 0, Rational(-5, 24))
-#       @date_range = start_date..end_date
-#       FunnelCake::Engine.user_class = UserDummy
-#       FunnelCake::Engine.visitor_class = Analytics::Visitor
-#       FunnelCake::Engine.event_class = Analytics::Event
-#     end
-# 
-#     describe "when calculating conversion rates" do
-#       describe "from state A to state B" do
-#         it "should be the correct rate" do
-#           @rate = FunnelCake::Engine.conversion_rate(:a_started, :b_started, {:date_range=>@date_range})
-#           @rate.should == (1.0/3.0)
-#         end
-#       end
-#     end
-#   end # for a given date range
-# end
-# 
-# describe "when finding users by funnel events", :type=>:model do
-#   it "should have 18 users" do
-#     UserDummy.count.should == 18
-#   end
-# 
-#   it "should have the correct number of funnel events for :before_before" do
-#     users(:before_before).funnelcake_events.count.should == 3
-#   end
-# 
-#   describe "for a given date range" do
-#     before(:each) do
-#       start_date = DateTime.civil(1978, 5, 12, 12, 0, 0, Rational(-5, 24))
-#       end_date = DateTime.civil(1978, 5, 12, 17, 0, 0, Rational(-5, 24))
-#       @date_range = start_date..end_date
-#       FunnelCake::Engine.user_class = UserDummy
-#       FunnelCake::Engine.visitor_class = Analytics::Visitor
-#       FunnelCake::Engine.event_class = Analytics::Event
-#     end
-#     describe "by starting state A" do
-#       before(:each) do
-#         @found = FunnelCake::Engine.eligible_to_move_from_state(:a_started, {:date_range=>@date_range})
-#       end
-#       it "should find the right number of users" do
-#         @found.count.should == 18
-#       end
-#       it "should find the :before_during user" do
-#         @found.include?(users(:before_during)).find.should be_true
-#         @found.include?(users(:visitor_before_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_before_during)).find.should be_true
-#       end
-#       it "should find the :before_after user" do
-#         @found.include?(users(:before_after)).find.should be_true
-#         @found.include?(users(:visitor_before_after)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_before_after)).find.should be_true
-#       end
-#       it "should find the :during_during user" do
-#         @found.include?(users(:during_during)).find.should be_true
-#         @found.include?(users(:visitor_during_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_during_during)).find.should be_true
-#       end
-#       it "should find the :during_after user" do
-#         @found.include?(users(:during_after)).find.should be_true
-#         @found.include?(users(:visitor_during_after)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_during_after)).find.should be_true
-#       end
-#       it "should find the :before user" do
-#         @found.include?(users(:before)).find.should be_true
-#         @found.include?(users(:visitor_before)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_before)).find.should be_true
-#       end
-#       it "should find the :during user" do
-#         @found.include?(users(:during)).find.should be_true
-#         @found.include?(users(:visitor_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_during)).find.should be_true
-#       end
-#     end
-# 
-#     describe "by starting state A and ending state B" do
-#       before(:each) do
-#         @found = FunnelCake::Engine.find_by_state_pair(:a_started, :b_started, {:date_range=>@date_range})
-#       end
-#       it "should find the right number users" do
-#         @found.count.should == 6
-#       end
-#       it "should find the :before_during user" do
-#         @found.include?(users(:before_during)).find.should be_true
-#         @found.include?(users(:visitor_before_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_before_during)).find.should be_true
-#       end
-#       it "should find the :during_during user" do
-#         @found.include?(users(:during_during)).find.should be_true
-#         @found.include?(users(:visitor_during_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_during_during)).find.should be_true
-#       end
-#     end
-# 
-#     describe "by starting state unknown and ending state B" do
-#       before(:each) do
-#         @found = FunnelCake::Engine.find_by_state_pair(:unknown, :b_started, {:date_range=>@date_range})
-#       end
-#       it "should find the right number users" do
-#         @found.count.should == 3
-#       end
-#       it "should find the :during_during user" do
-#         @found.include?(users(:during_during)).find.should be_true
-#         @found.include?(users(:visitor_during_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_during_during)).find.should be_true
-#       end
-#     end
-# 
-#     describe "by move from state A to ending state B" do
-#       before(:each) do
-#         @found = FunnelCake::Engine.find_by_move(:a_started, :b_started, {:date_range=>@date_range})
-#       end
-#       it "should find the right number users" do
-#         @found.count.should == 6
-#       end
-#       it "should find the :before_during user" do
-#         @found.include?(users(:before_during)).find.should be_true
-#         @found.include?(users(:visitor_before_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_before_during)).find.should be_true
-#       end
-#       it "should find the :during_during user" do
-#         @found.include?(users(:during_during)).find.should be_true
-#         @found.include?(users(:visitor_during_during)).find.should be_true
-#         @found.include?(funnelcake_visitors(:visitor_only_during_during)).find.should be_true
-#       end
-#     end
-# 
-#     describe "by move unknown to ending state B" do
-#       before(:each) do
-#         @found = FunnelCake::Engine.find_by_move(:unknown, :b_started, {:date_range=>@date_range})
-#       end
-#       it "should find the right number users" do
-#         @found.count.should == 0
-#       end
-#     end
-# 
-#   end # for a given date range
-# 
-#   describe "by move from unknown to ending state B" do
-#     before(:each) do
-#       @found = FunnelCake::Engine.find_by_move(:unknown, :b_started)
-#     end
-#     it "should find the right number users" do
-#       @found.count.should == 0
-#     end
-#   end
-# 
-#   describe "by starting state unknown and ending state B" do
-#     before(:each) do
-#       @found = FunnelCake::Engine.find_by_state_pair(:unknown, :b_started)
-#     end
-#     it "should find the right number of users" do
-#       @found.count.should == 18
-#     end
-#   end
-# 
-# end
-# 
