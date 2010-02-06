@@ -72,45 +72,45 @@ describe 'when finding visitors by eligibility to transition from state' do
         @visitors[1], @visitors[2],
       ])
     end
-    describe 'with a has_event filter' do
+    describe 'with a has_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
-          @opts.merge( :has_event=>{:referer=>'aaa'} )
+          @opts.merge( :has_event_with=>{:referer=>'aaa'} )
         ).should only_have_objects([ @visitors[1] ])
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
-          @opts.merge( :has_event=>{:referer=>'bbb'} )
+          @opts.merge( :has_event_with=>{:referer=>'bbb'} )
         ).should only_have_objects([ @visitors[1] ])
       end  
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
-          @opts.merge( :has_event=>{:referer=>/a+/} )
+          @opts.merge( :has_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
-          @opts.merge( :has_event=>{:referer=>/b+/} )
+          @opts.merge( :has_event_with=>{:referer=>/b+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
-    describe 'with a first_event filter' do
+    describe 'with a first_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
-          @opts.merge( :first_event=>{:referer=>'aaa'} )
+          @opts.merge( :first_event_with=>{:referer=>'aaa'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started, 
-          @opts.merge( :first_event=>{:referer=>/a+/} )
+          @opts.merge( :first_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end      
     end
-    describe 'with a query filter' do
+    describe 'with a visitor_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started,
-          @opts.merge( :query=>{:key=>'AAA'} )
+          @opts.merge( :visitor_with=>{:key=>'AAA'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.eligible_to_transition_from_state(:a_started,
-          @opts.merge( :query=>{:key=>/A+/} )
+          @opts.merge( :visitor_with=>{:key=>/A+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
@@ -180,45 +180,45 @@ describe 'when finding visitors by transition to state' do
         @visitors[1], @visitors[6],
       ])
     end
-    describe 'with a has_event filter' do
+    describe 'with a has_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_to_state(:b_started, 
-          @opts.merge( :has_event=>{:referer=>'aaa'} )
+          @opts.merge( :has_event_with=>{:referer=>'aaa'} )
         ).should == [ @visitors[1] ]
         FunnelCake::Engine.transitioned_to_state(:b_started, 
-          @opts.merge( :has_event=>{:referer=>'bbb'} )
+          @opts.merge( :has_event_with=>{:referer=>'bbb'} )
         ).should == [ @visitors[1] ]
       end  
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_to_state(:b_started, 
-          @opts.merge( :has_event=>{:referer=>/a+/} )
+          @opts.merge( :has_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
         FunnelCake::Engine.transitioned_to_state(:b_started, 
-          @opts.merge( :has_event=>{:referer=>/b+/} )
+          @opts.merge( :has_event_with=>{:referer=>/b+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
-    describe 'with a first_event filter' do
+    describe 'with a first_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_to_state(:b_started, 
-          @opts.merge( :first_event=>{:referer=>'aaa'} )
+          @opts.merge( :first_event_with=>{:referer=>'aaa'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_to_state(:b_started, 
-          @opts.merge( :first_event=>{:referer=>/a+/} )
+          @opts.merge( :first_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end      
     end
-    describe 'with a query filter' do
+    describe 'with a visitor_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_to_state(:b_started,
-          @opts.merge( :query=>{:key=>'AAA'} )
+          @opts.merge( :visitor_with=>{:key=>'AAA'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_to_state(:b_started,
-          @opts.merge( :query=>{:key=>/A+/} )
+          @opts.merge( :visitor_with=>{:key=>/A+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
@@ -281,45 +281,45 @@ describe 'when finding visitors by transition from state' do
         @visitors[1], @visitors[6],
       ])
     end
-    describe 'with a has_event filter' do
+    describe 'with a has_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :has_event=>{:referer=>'bbb'} )
+          @opts.merge( :has_event_with=>{:referer=>'bbb'} )
         ).should == [ @visitors[1] ]
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :has_event=>{:referer=>'aaa'} )
+          @opts.merge( :has_event_with=>{:referer=>'aaa'} )
         ).should == [ @visitors[1] ]
       end  
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :has_event=>{:referer=>/b+/} )
+          @opts.merge( :has_event_with=>{:referer=>/b+/} )
         ).should only_have_objects([ @visitors[1] ])
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :has_event=>{:referer=>/a+/} )
+          @opts.merge( :has_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
-    describe 'with a first_event filter' do
+    describe 'with a first_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :first_event=>{:referer=>'aaa'} )
+          @opts.merge( :first_event_with=>{:referer=>'aaa'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :first_event=>{:referer=>/a+/} )
+          @opts.merge( :first_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end      
     end
-    describe 'with a query filter' do
+    describe 'with a visitor_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :query=>{:key=>'AAA'} )
+          @opts.merge( :visitor_with=>{:key=>'AAA'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_from_state(:a_started,
-          @opts.merge( :query=>{:key=>/A+/} )
+          @opts.merge( :visitor_with=>{:key=>/A+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
@@ -390,45 +390,45 @@ describe 'when finding visitors by transition from state to state' do
         ])
       end
     end
-    describe 'with a has_event filter' do
+    describe 'with a has_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>'bbb'} )
+          @opts.merge( :has_event_with=>{:referer=>'bbb'} )
         ).should == [ @visitors[1] ]
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>'aaa'} )
+          @opts.merge( :has_event_with=>{:referer=>'aaa'} )
         ).should == [ @visitors[1] ]
       end  
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>/b+/} )
+          @opts.merge( :has_event_with=>{:referer=>/b+/} )
         ).should only_have_objects([ @visitors[1] ])
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>/a+/} )
+          @opts.merge( :has_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
-    describe 'with a first_event filter' do
+    describe 'with a first_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :first_event=>{:referer=>'aaa'} )
+          @opts.merge( :first_event_with=>{:referer=>'aaa'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :first_event=>{:referer=>/a+/} )
+          @opts.merge( :first_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end      
     end
-    describe 'with a query filter' do
+    describe 'with a visitor_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :query=>{:key=>'AAA'} )
+          @opts.merge( :visitor_with=>{:key=>'AAA'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_between_states(:a_started, :b_started,
-          @opts.merge( :query=>{:key=>/A+/} )
+          @opts.merge( :visitor_with=>{:key=>/A+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
@@ -497,45 +497,45 @@ describe 'when finding visitors by transition directly from state to state' do
         FunnelCake::Engine.transitioned_directly_between_states(:page_visited, :b_started, @opts).should only_have_objects([])
       end
     end
-    describe 'with a has_event filter' do
+    describe 'with a has_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>'bbb'} )
+          @opts.merge( :has_event_with=>{:referer=>'bbb'} )
         ).should == [ @visitors[1] ]
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>'aaa'} )
+          @opts.merge( :has_event_with=>{:referer=>'aaa'} )
         ).should == [ @visitors[1] ]
       end  
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>/b+/} )
+          @opts.merge( :has_event_with=>{:referer=>/b+/} )
         ).should only_have_objects([ @visitors[1] ])
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :has_event=>{:referer=>/a+/} )
+          @opts.merge( :has_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
-    describe 'with a first_event filter' do
+    describe 'with a first_event_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :first_event=>{:referer=>'aaa'} )
+          @opts.merge( :first_event_with=>{:referer=>'aaa'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :first_event=>{:referer=>/a+/} )
+          @opts.merge( :first_event_with=>{:referer=>/a+/} )
         ).should only_have_objects([ @visitors[1] ])
       end      
     end
-    describe 'with a query filter' do
+    describe 'with a visitor_with filter' do
       it 'should return the visitors with an exact match' do
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :query=>{:key=>'AAA'} )
+          @opts.merge( :visitor_with=>{:key=>'AAA'} )
         ).should only_have_objects([ @visitors[1] ])
       end
       it 'should return the visitors with a regex match' do
         FunnelCake::Engine.transitioned_directly_between_states(:a_started, :b_started,
-          @opts.merge( :query=>{:key=>/A+/} )
+          @opts.merge( :visitor_with=>{:key=>/A+/} )
         ).should only_have_objects([ @visitors[1] ])
       end
     end
@@ -544,7 +544,7 @@ end
 
 
 
-# describe "when querying funnel events", :type=>:model do
+# describe "when visitor_withing funnel events", :type=>:model do
 #   describe "for a given date range" do
 #     before(:each) do
 #       start_date = DateTime.civil(1978, 5, 12, 12, 0, 0, Rational(-5, 24))

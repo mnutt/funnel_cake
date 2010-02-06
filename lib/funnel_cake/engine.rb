@@ -19,45 +19,99 @@ module FunnelCake
     cattr_accessor :event_class
 
 
+    # Helper class that DRY's up building mongo queries with a simple DSL
+    # Example:
+    # Finder.results(visitor_class, opts) do
+    #   to state
+    #   created_at :lt=>some_time
+    #   where 'something'
+    # end
     class Finder
-      attr_accessor :options, :type, :klass, :finder_options
+      attr_accessor :options, :type, :klass
 
-      def initialize(_klass, _type=:find, _finder_options={}, _options={})
-        @options = _options
-        @finder_options = _finder_options
-        @klass = _klass
-        @type = _type
-      end
-
-      def find
-        case type
-        when :count
-          klass.count(find_conditions)
-        else
-          klass.all(find_conditions)
+      class << self
+        def results(_klass, _options={}, _type=:find, &block)
+          finder = self.new(_klass, _options, _type)
+          finder.instance_eval(&block)
+          finder.execute
         end
       end
 
-      def find_conditions
-
-        options[:has_event].each do |k,v|
-          finder_options["events.#{k}"] = v
-        end if options[:has_event]
-
-        options[:first_event].each do |k,v|
-          finder_options["events.0.#{k}"] = v
-        end if options[:first_event]
-
-        options[:query].each do |k,v|
-          finder_options[k] = v
-        end if options[:query]
-
-        finder_options
+      def initialize(_klass, _options={}, _type=:find)
+        @options = _options
+        @klass = _klass
+        @type = _type
+        @finder_options = {}
       end
 
+      def execute
+        process_options!
+        case type
+        when :count
+          klass.count(@finder_options)
+        else
+          klass.all(@finder_options)
+        end
+      end
+
+      #
+      # DSL methods
+      #
+      def from(state)
+        @finder_options[:events] ||= {}
+        @finder_options[:events]['$elemMatch'] ||= {}
+        @finder_options[:events]['$elemMatch'][:from] = state.to_s
+      end
+      def to(state)
+        @finder_options[:events] ||= {}
+        @finder_options[:events]['$elemMatch'] ||= {}
+        @finder_options[:events]['$elemMatch'][:to] = state.to_s
+      end
+
+      def has_event_with(attrib, value)
+        @finder_options ||= {}
+        @finder_options["events.#{attrib}"] = value
+      end
+      def first_event_with(attrib, value)
+        @finder_options ||= {}
+        @finder_options["events.0.#{attrib}"] = value
+      end
+      def visitor_with(attrib, value)
+        @finder_options ||= {}
+        @finder_options[attrib] = value
+      end
+
+      def created_at(_options={})
+        @finder_options[:events] ||= {}
+        @finder_options[:events]['$elemMatch'] ||= {}
+        @finder_options[:events]['$elemMatch'][:created_at] ||= {}
+        @finder_options[:events]['$elemMatch'][:created_at]['$lt'] = _options[:lt] if _options[:lt]
+        @finder_options[:events]['$elemMatch'][:created_at]['$lte'] = _options[:lte] if _options[:lte]
+        @finder_options[:events]['$elemMatch'][:created_at]['$gt'] = _options[:gt] if _options[:gt]
+        @finder_options[:events]['$elemMatch'][:created_at]['$gte'] = _options[:gte] if _options[:gte]
+      end
+
+      def where(_where)
+        @finder_options ||= {}
+        @finder_options['$where'] = _where unless _where.blank?
+      end
+
+      private
+
+      def process_options!
+        @options[:has_event_with].each do |k,v|
+          has_event_with k, v
+        end if @options[:has_event_with]
+
+        @options[:first_event_with].each do |k,v|
+          first_event_with k, v
+        end if @options[:first_event_with]
+
+        @options[:visitor_with].each do |k,v|
+          visitor_with k, v
+        end if @options[:visitor_with]
+      end
     end
-
-
 
     # Method for finding visitors who are "eligible" for
     # transitioning from a given state, for a given time period
@@ -76,12 +130,9 @@ module FunnelCake
       attrition_period = visitor_class.state_options(state)[:attrition_period] unless visitor_class.state_options(state)[:attrition_period].nil?
       attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0)
 
-      find_opts = { :events=>{'$elemMatch'=>{:to=>"#{state}"}} }
-      find_opts[:events]['$elemMatch'][:created_at] = { '$lt'=>date_range.end.utc.to_time } if date_range
-      find_opts[:events]['$elemMatch'][:created_at]['$gt'] = (date_range.end - attrition_period).utc.to_time if date_range and attrition_period
       js_condition = "x.from == '#{state}'"
       js_condition += " && x.created_at < new Date('#{date_range.begin.utc.to_time}')" if date_range
-      find_opts['$where'] = <<-eos
+      where_javascript = <<-eos
         function() {
           qual=true;
           this.events.forEach(
@@ -95,13 +146,12 @@ module FunnelCake
         }
       eos
 
-      Finder.new(visitor_class, :find, find_opts, opts).find.to_a
-
-      #find_opts = { :events=>{'$elemMatch'=>{:from=>"#{state}"}} }
-      #find_opts[:events]['$elemMatch'][:created_at.lt] = date_range.begin.utc.to_time if date_range
-      #leaving_a_user_visitors = Finder.new(visitor_class, :find, find_opts, opts).find.to_a
-#
-      #entering_a_user_visitors.delete_if {|v| leaving_a_user_visitors.include?(v) }
+      Finder.results(visitor_class, opts) do
+        to state
+        created_at :lt=>date_range.end.utc.to_time if date_range
+        created_at :gt=>(date_range.end - attrition_period).utc.to_time if date_range and attrition_period
+        where where_javascript
+      end.to_a
     end
 
 
@@ -117,13 +167,10 @@ module FunnelCake
 
       date_range = opts.delete(:date_range)
 
-      find_opts = { :events=>{'$elemMatch'=>{:from=>"#{state}"}} }
-      find_opts[:events]['$elemMatch'][:created_at] = {
-        '$gte'=>date_range.begin.utc.to_time,
-        '$lte'=>date_range.end.utc.to_time,
-      } if date_range
-
-      Finder.new(visitor_class, :find, find_opts, opts).find.to_a
+      Finder.results(visitor_class, opts) do
+        from state
+        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+      end.to_a
     end
 
     # Method for finding visitors who transitioned
@@ -138,13 +185,10 @@ module FunnelCake
 
       date_range = opts.delete(:date_range)
 
-      find_opts = { :events=>{'$elemMatch'=>{:to=>"#{state}"}} }
-      find_opts[:events]['$elemMatch'][:created_at] = {
-        '$gte'=>date_range.begin.utc.to_time,
-        '$lte'=>date_range.end.utc.to_time,
-      } if date_range
-
-      Finder.new(visitor_class, :find, find_opts, opts).find.to_a
+      Finder.results(visitor_class, opts) do
+        to state
+        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+      end.to_a
     end
 
     # Method for finding visitors who transitioned
@@ -184,13 +228,11 @@ module FunnelCake
 
       date_range = opts.delete(:date_range)
 
-      find_opts = { :events=>{'$elemMatch'=>{:from=>"#{start_state}", :to=>"#{end_state}"}} }
-      find_opts[:events]['$elemMatch'][:created_at] = {
-        '$gte'=>date_range.begin.utc.to_time,
-        '$lte'=>date_range.end.utc.to_time,
-      } if date_range
-
-      Finder.new(visitor_class, :find, find_opts, opts).find.to_a
+      Finder.results(visitor_class, opts) do
+        from start_state
+        to end_state
+        created_at :gte=>date_range.begin.utc.to_time, :lte=>date_range.end.utc.to_time if date_range
+      end.to_a
     end
 
 
@@ -201,7 +243,7 @@ module FunnelCake
           {:end_count=>0, :start_count=>0}
         else
 					starting_visitors = eligible_to_transition_from_state(start_state, opts)
-          visitors = find_by_transition(start_state, end_state, opts)
+          visitors = transitioned_directly_between_states(start_state, end_state, opts)
           stats = FunnelCake::DataHash.new
           stats[:start_count] = starting_visitors.length
           stats[:end_count] = visitors.length
