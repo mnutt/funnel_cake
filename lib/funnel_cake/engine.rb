@@ -79,10 +79,10 @@ module FunnelCake
         @finder_options[:events] ||= {}
         @finder_options[:events]['$elemMatch'] ||= {}
         @finder_options[:events]['$elemMatch'][:created_at] ||= {}
-        @finder_options[:events]['$elemMatch'][:created_at]['$lt'] = _options[:lt].to_time.utc if _options[:lt]
-        @finder_options[:events]['$elemMatch'][:created_at]['$lte'] = _options[:lte].to_time.utc if _options[:lte]
-        @finder_options[:events]['$elemMatch'][:created_at]['$gt'] = _options[:gt].to_time.utc if _options[:gt]
-        @finder_options[:events]['$elemMatch'][:created_at]['$gte'] = _options[:gte].to_time.utc if _options[:gte]
+        @finder_options[:events]['$elemMatch'][:created_at]['$lt'] = _options[:lt].to_time.utc.to_time unless _options[:lt].blank?
+        @finder_options[:events]['$elemMatch'][:created_at]['$lte'] = _options[:lte].to_time.utc.to_time unless _options[:lte].blank?
+        @finder_options[:events]['$elemMatch'][:created_at]['$gt'] = _options[:gt].to_time.utc.to_time unless _options[:gt].blank?
+        @finder_options[:events]['$elemMatch'][:created_at]['$gte'] = _options[:gte].to_time.utc.to_time unless _options[:gte].blank?
       end
 
       def where(_where)
@@ -119,13 +119,13 @@ module FunnelCake
       state = state.to_sym
       return [] unless visitor_class.states.include?(state)
 
-      date_range = opts.delete(:date_range)
+      date_range = opts[:date_range]
       attrition_period = opts.delete(:attrition_period)
       attrition_period = visitor_class.state_options(state)[:attrition_period] unless visitor_class.state_options(state)[:attrition_period].nil?
       attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0)
 
       js_condition = "x.from == '#{state}'"
-      js_condition += " && x.created_at < new Date('#{date_range.begin}')" if date_range
+      js_condition += " && x.created_at < new Date('#{mongo_date(date_range.begin)}')" if date_range
       where_javascript = <<-eos
         function() {
           qual=true;
@@ -159,7 +159,7 @@ module FunnelCake
       state = state.to_sym
       return [] unless Analytics::Visitor.states.include?(state)
 
-      date_range = opts.delete(:date_range)
+      date_range = opts[:date_range]
 
       Finder.new(visitor_class, opts) do
         from state
@@ -177,7 +177,7 @@ module FunnelCake
       state = state.to_sym
       return [] unless Analytics::Visitor.states.include?(state)
 
-      date_range = opts.delete(:date_range)
+      date_range = opts[:date_range]
 
       Finder.new(visitor_class, opts) do
         to state
@@ -199,11 +199,11 @@ module FunnelCake
       return [] unless Analytics::Visitor.states.include?(start_state)
       return [] unless Analytics::Visitor.states.include?(end_state)
 
-      date_range = opts.delete(:date_range)
+      date_range = opts[:date_range]
 
       js_condition = "x.to == '#{end_state}'"
-      js_condition += " && x.created_at >= new Date('#{date_range.begin.to_time.utc}')" if date_range
-      js_condition += " && x.created_at <= new Date('#{date_range.end.to_time.utc}')" if date_range
+      js_condition += " && x.created_at >= new Date('#{mongo_date(date_range.begin)}')" if date_range
+      js_condition += " && x.created_at <= new Date('#{mongo_date(date_range.end)}')" if date_range
       where_javascript = <<-eos
         function() {
           qual=false;
@@ -240,7 +240,7 @@ module FunnelCake
       return [] unless Analytics::Visitor.states.include?(start_state)
       return [] unless Analytics::Visitor.states.include?(end_state)
 
-      date_range = opts.delete(:date_range)
+      date_range = opts[:date_range]
 
       Finder.new(visitor_class, opts) do
         from start_state
@@ -336,6 +336,10 @@ module FunnelCake
 
 
     private
+
+    def self.mongo_date(datetime)
+      datetime.to_time.utc.to_time
+    end
 
     def self.stats_with_rate(stats)
       stats[:rate] = 0.0
