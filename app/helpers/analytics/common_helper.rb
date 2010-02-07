@@ -1,4 +1,5 @@
 module Analytics::CommonHelper
+  unloadable if RAILS_ENV=='development'
 
   include FunnelCake::StatePeriodHelpers
 
