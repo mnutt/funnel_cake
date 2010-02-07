@@ -1,5 +1,7 @@
 require 'digest/md5'
 require 'funnel_cake/state_period_helpers'
+# gem 'rainbow'
+# require 'rainbow'
 
 module FunnelCake
   class Engine
@@ -38,6 +40,7 @@ module FunnelCake
 
       def execute(type=:find)
         process_options!
+        # puts "FunnelCake Query: #{type} - #{@finder_options.inspect}".color(:green)
         case type
         when :count
           klass.count(@finder_options)

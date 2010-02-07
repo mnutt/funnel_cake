@@ -24,15 +24,9 @@ class Analytics::Visitor
   # Add association for User model
   belongs_to :user, :class_name=>'User', :foreign_key=>:user_id
 
-# named_scope :recent, :conditions=>["created_at > ?", 1.months.ago]
-# named_scope :with_user, :conditions=>"user_id IS NOT NULL"
-# named_scope :without_user, :conditions=>"user_id IS NULL"
-# named_scope :including_events, :include=>:events
-# named_scope :ordered, :order=>'created_at DESC'
-
   # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)
-    self.events << Analytics::Event.new({
+    self.events << Analytics::Event.create({
       :from=>from.to_s, :to=>to.to_s,
       :url=>data[:url],
       :referer=>data[:referer],
@@ -52,6 +46,12 @@ class Analytics::Visitor
       return
     end
     self.send(event.to_s+"!", data)
+  end
+
+  def to_funnelcake
+    attrs = attributes.clone
+    attrs.merge(user.to_funnelcake) if user and user.responds_to?(:to_funnelcake)
+    attrs[:recent_event_date] = visitor.events.last.created_at.to_s(:short)
   end
 
 end

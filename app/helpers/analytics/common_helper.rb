@@ -21,27 +21,8 @@ module Analytics::CommonHelper
   end
 
   def state_graph_visitors(start_state, end_state, opts)
-    visitors = FunnelCake::Engine.conversion_visitors(start_state, end_state, opts)
-
-    starting_visitors = visitors[:start].sort {|a,b| (a.user ? a.user.name : '') <=> (a.user ? a.user.name : '') }
-    ending_visitors = visitors[:end].sort {|a,b| (a.user ? a.user.name : '') <=> (a.user ? a.user.name : '') }
-
-    FunnelCake::DataHash[{
-      :start_state=>FunnelCake::DataHash[*starting_visitors.collect { |visitor| [visitor.id, collapse_visitor_attributes(visitor)] }.flatten],
-      :end_state=>FunnelCake::DataHash[*ending_visitors.collect { |visitor| [visitor.id, collapse_visitor_attributes(visitor)] }.flatten]
-    }]
-  end
-
-  def collapse_visitor_attributes(visitor)
-    attrs = visitor.attributes.merge({:email=>nil, :name=>nil, :recent_event_date=>nil})
-
-    if visitor.user
-      attrs[:email] = visitor.user.email
-      attrs[:name] = visitor.user.name
-    end
-    attrs[:recent_event_date] = visitor.events.last.created_at.to_s(:short)
-
-    FunnelCake::DataHash[attrs]
+    visitors = FunnelCake::Engine.moved_to_state(end_state, opts).find.to_a
+    FunnelCake::DataHash[*visitors.collect { |visitor| [visitor.id, FunnelCake::DataHash[visitor.to_funnelcake]] }.flatten]
   end
 
 end

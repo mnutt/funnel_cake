@@ -15,13 +15,13 @@
   </tr>
 	<%= render :partial => 'event', :collection=>@events %>
 </table>
-<script type="text/javascript">
+<!-- script type="text/javascript">
 function timestampParam(){
 	 var timestamp_id = $$('tr.event').first().childElements().first().innerHTML;
 	 var timestamp = $('datetime_'+timestamp_id).innerHTML;
 	 return encodeURI(timestamp);
 }
-</script>
-<%= periodically_call_remote(:url=>{:controller=>'analytics/events', :action => 'index', :format=>:js},
+</script -->
+<%# = periodically_call_remote(:url=>{:controller=>'analytics/events', :action => 'index', :format=>:js},
 										:frequency=>10, :method=>:get,
 										:with => "'timestamp=' + timestampParam()") %>

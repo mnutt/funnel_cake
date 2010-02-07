@@ -8,14 +8,8 @@ class Analytics::EventsController < Analytics::CommonController
 
     respond_to do |format|
       format.html do
-        @events = Analytics::Event.find(:all, :limit=>limit, :order=>'created_at DESC')
-      end
-      format.js do
-        timestamp = params[:timestamp].to_time
-        @events = Analytics::Event.find(:all, :limit=>limit,
-          :order=>'created_at DESC',
-          :conditions=>{:created_at.gt=>timestamp}
-        )
+        @events = Analytics::Visitor.all(:limit=>limit, :order=>'updated_at DESC')
+        @events = @events.collect {|v| v.events}.flatten.delete_if {|e| e.nil? or e.created_at.nil?}.sort {|a,b| b.created_at <=> a.created_at }
       end
     end
   end

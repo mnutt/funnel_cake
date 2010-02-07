@@ -42,10 +42,10 @@ class Analytics::StatesController < Analytics::CommonController
 
     respond_to do |format|
       format.json do
-        render :json=>visitors[:end_state].to_json and return
+        render :json=>visitors.to_json and return
       end
       format.csv do
-        render :inline=>visitors[:end_state].to_csv and return
+        render :inline=>visitors.to_csv and return
       end
     end
   end

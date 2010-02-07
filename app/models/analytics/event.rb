@@ -11,14 +11,24 @@ class Analytics::Event
 
   #timestamps!
   key :created_at, Time
-  def save
-    self.created_at = Time.now if created_at.nil?
-    super
+  def update_timestamp!
+    self.created_at = Time.now
   end
 
-  belongs_to :visitor, :class_name=>'Analytics::Visitor', :foreign_key=>'visitor_id'
+  def self.create(attrs={})
+    _new = new(attrs)
+    _new.update_timestamp!
+    _new
+  end
 
-  # named_scope :sorted_by_date, :order=>'created_at DESC'
-  # named_scope :sorted, :order=>'id DESC'
+  def visitor
+    _root_document
+  end
+
+  include Comparable
+  def <=>(other)
+    return 0 if created_at.nil? or other.created_at.nil?
+    created_at <=> other.created_at
+  end
 
 end
