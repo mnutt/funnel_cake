@@ -4,10 +4,21 @@ class Analytics::Visitor
   include FunnelCake::HasFunnel::UserExtensions
 
   timestamps!
-  key :key, String
   key :user_id, Integer
+  key :key, String
   key :state, String
   key :ip, String
+
+  ensure_index :user_id
+  ensure_index :key
+  ensure_index :state
+  ensure_index :ip
+  ensure_index 'events.to'
+  ensure_index 'events.from'
+  ensure_index 'events.name'
+  ensure_index 'events.referer'
+  ensure_index 'events.user_agent'
+  ensure_index 'events.url'
 
   # Set up the Analytics::Event model association
   many :events, :class_name=>'Analytics::Event', :dependent=>:destroy, :foreign_key=>:visitor_id

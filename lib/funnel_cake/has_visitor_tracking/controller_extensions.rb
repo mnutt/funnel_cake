@@ -100,13 +100,12 @@ module FunnelCake
         # - Set the cookie value for this visitor
         def register_funnel_visitor
           @current_visitor = FunnelCake::Engine.visitor_class.create(
-                              :key=>FunnelCake::RandomId.generate(50),
                               :ip=>request.remote_ip.to_s
                               )
           @current_visitor.user = current_user if logged_in?
           @current_visitor.save
           cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
-            :value => @current_visitor.key,
+            :value => @current_visitor.id,
             :expires => 1.year.from_now
           }
         end
@@ -123,8 +122,18 @@ module FunnelCake
           # If we are not logged in, or if the current_user has no visitor,
           # then try to find the visitor by the cookie key
           if @current_visitor.nil?
-            cookie = cookies[self.class.read_inheritable_attribute(:cookie_name)]
-            @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookie) unless cookie.nil?
+            cookie = cookies[self.class.read_inheritable_attribute(:cookie_name)].gsub(/[^0-9a-f]/,'')
+            if cookie
+              if cookie.length > '000000000000000000000000'.length
+                @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookie)
+                cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
+                  :value => @current_visitor.id,
+                  :expires => 1.year.from_now
+                }
+              else
+                @current_visitor = FunnelCake::Engine.visitor_class.find(cookie)
+              end
+            end
           end
 
           return @current_visitor

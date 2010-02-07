@@ -47,11 +47,11 @@ describe 'when finding visitors by eligibility to move from state' do
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'AAA') do |v|
+      @visitors << create_visitor_with(:ip=>'AAA') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'BBB') do |v|
+      @visitors << create_visitor_with(:ip=>'BBB') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
       end
       @visitors << create_visitor_with do |v|
@@ -148,7 +148,7 @@ describe 'when finding visitors by eligibility to move from state' do
       describe 'for an exact match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
-            @opts.merge( :visitor_with=>{:key=>'AAA'} )
+            @opts.merge( :visitor_with=>{:ip=>'AAA'} )
           )
         end        
         it 'should return the visitors' do
@@ -161,7 +161,7 @@ describe 'when finding visitors by eligibility to move from state' do
       describe 'for a regex match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
-            @opts.merge( :visitor_with=>{:key=>/A+/} )
+            @opts.merge( :visitor_with=>{:ip=>/A+/} )
           )
         end        
         it 'should return the visitors' do
@@ -219,11 +219,11 @@ describe 'when finding visitors by move to state' do
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'AAA') do |v|
+      @visitors << create_visitor_with(:ip=>'AAA') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'BBB') do |v|
+      @visitors << create_visitor_with(:ip=>'BBB') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
       end
       @visitors << create_visitor_with do |v|
@@ -320,7 +320,7 @@ describe 'when finding visitors by move to state' do
       describe 'for an exact match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_to_state(:b_started,
-            @opts.merge( :visitor_with=>{:key=>'AAA'} )
+            @opts.merge( :visitor_with=>{:ip=>'AAA'} )
           )
         end        
         it 'should return the visitors' do
@@ -333,7 +333,7 @@ describe 'when finding visitors by move to state' do
       describe 'for a regex match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_to_state(:b_started,
-            @opts.merge( :visitor_with=>{:key=>/A+/} )
+            @opts.merge( :visitor_with=>{:ip=>/A+/} )
           )
         end        
         it 'should return the visitors' do
@@ -378,11 +378,11 @@ describe 'when finding visitors by move from state' do
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'AAA') do |v|
+      @visitors << create_visitor_with(:ip=>'AAA') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'BBB') do |v|
+      @visitors << create_visitor_with(:ip=>'BBB') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
       end
       @visitors << create_visitor_with do |v|
@@ -479,7 +479,7 @@ describe 'when finding visitors by move from state' do
       describe 'for an exact match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
-            @opts.merge( :visitor_with=>{:key=>'AAA'} )
+            @opts.merge( :visitor_with=>{:ip=>'AAA'} )
           )
         end        
         it 'should return the visitors' do
@@ -492,7 +492,7 @@ describe 'when finding visitors by move from state' do
       describe 'for a regex match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
-            @opts.merge( :visitor_with=>{:key=>/A+/} )
+            @opts.merge( :visitor_with=>{:ip=>/A+/} )
           )
         end        
         it 'should return the visitors' do
@@ -537,11 +537,11 @@ describe 'when finding visitors by move from state to state' do
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'AAA') do |v|
+      @visitors << create_visitor_with(:ip=>'AAA') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'BBB') do |v|
+      @visitors << create_visitor_with(:ip=>'BBB') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
       end
       @visitors << create_visitor_with do |v|
@@ -650,7 +650,7 @@ describe 'when finding visitors by move from state to state' do
       describe 'for an exact match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
-            @opts.merge( :visitor_with=>{:key=>'AAA'} )
+            @opts.merge( :visitor_with=>{:ip=>'AAA'} )
           )
         end        
         it 'should return the visitors' do
@@ -663,7 +663,7 @@ describe 'when finding visitors by move from state to state' do
       describe 'for a regex match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
-            @opts.merge( :visitor_with=>{:key=>/A+/} )
+            @opts.merge( :visitor_with=>{:ip=>/A+/} )
           )
         end        
         it 'should return the visitors' do
@@ -708,11 +708,11 @@ describe 'when finding visitors by move directly from state to state' do
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-15), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'AAA') do |v|
+      @visitors << create_visitor_with(:ip=>'AAA') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'aaa'
         create_event_for v, :from=>:a_started, :to=>:b_started, :created_at=>build_date(:days=>-13), :referer=>'bbb'
       end
-      @visitors << create_visitor_with(:key=>'BBB') do |v|
+      @visitors << create_visitor_with(:ip=>'BBB') do |v|
         create_event_for v, :from=>:page_visited, :to=>:a_started, :created_at=>build_date(:days=>-30), :referer=>'ccc'
       end
       @visitors << create_visitor_with do |v|
@@ -819,7 +819,7 @@ describe 'when finding visitors by move directly from state to state' do
       describe 'for an exact match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
-            @opts.merge( :visitor_with=>{:key=>'AAA'} )
+            @opts.merge( :visitor_with=>{:ip=>'AAA'} )
           )
         end        
         it 'should return the visitors' do
@@ -832,7 +832,7 @@ describe 'when finding visitors by move directly from state to state' do
       describe 'for a regex match' do
         before(:each) do
           @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
-            @opts.merge( :visitor_with=>{:key=>/A+/} )
+            @opts.merge( :visitor_with=>{:ip=>/A+/} )
           )
         end        
         it 'should return the visitors' do

@@ -5,7 +5,6 @@ class Analytics::Event
   key :from, String
   key :url, String
   key :name, String
-  # key :visitor_id, ObjectId
   key :referer, String
   key :user_agent, String
 

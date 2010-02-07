@@ -17,8 +17,7 @@
 		</tr>
 		<% @visitors_with_users.each do |visitor| %>
 		  <tr>
-				<td><%= link_to visitor.id, analytics_visitor_path(visitor) %></td>
-				<td><%= visitor.key[0,8] %>...</td>
+				<td><%= link_to visitor.id[0,8], analytics_visitor_path(visitor) %></td>
 				<td><%= visitor.ip %></td>
 				<td><%= link_to visitor.user_id, user_path(visitor.user_id), :popup=>true if visitor.user_id %></td>
 				<td><%= visitor.state %></td>
@@ -50,8 +49,7 @@
 		  </tr>
 		<% @visitors_without_users.each do |visitor| %>
 		  <tr>
-				<td><%= link_to visitor.id, analytics_visitor_path(visitor) %></td>
-				<td><%= visitor.key[0,8] %>...</td>
+				<td><%= link_to visitor.id[0,8], analytics_visitor_path(visitor) %></td>
 				<td><%= visitor.ip %></td>
 				<td><%= visitor.state %></td>
 				<td>

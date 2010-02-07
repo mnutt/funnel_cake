@@ -2,7 +2,6 @@
 
 <h2>Details</h2>
 <p>
-	<%= @visitor.key %><br />
 	<%= @visitor.ip %><br />
 	<%= @visitor.state %><br />
 	<%= @visitor.user.try(:name) %> <%= @visitor.user.try(:email) %> <%= @visitor.user.try(:created_at) %><br />

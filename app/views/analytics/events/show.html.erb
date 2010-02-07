@@ -7,7 +7,7 @@
 	<tr><th>Email:</th><td><%= @event.user.email unless @event.user.nil? %>
 	<%= @event.visitor.user.email unless @event.visitor.nil? or @event.visitor.user.nil? %>
 	</td></tr>
-	<tr><th>Visitor Key:</th><td><%= @event.visitor.key[0..5]+'...' unless @event.visitor.nil? %></td></tr>
+	<tr><th>Visitor Key:</th><td><%= @event.visitor.id.to_s[0..5]+'...' unless @event.visitor.nil? %></td></tr>
 	<tr><th>IP:</th><td><%= @event.visitor.ip unless @event.visitor.nil? %></td></tr>
 	<tr><th>Referer:</th><td><%= @event.referer %></td></tr>
 	<tr><th>User-Agent:</th><td><%= @event.user_agent %></td></tr>

@@ -5,7 +5,7 @@
     <td><%= event.to %></td>
     <td><%= event.url.sub(/https?:\/\/[^\/]+/,'') unless event.url.nil? %></td>
     <td><%= event.visitor.user.email unless event.visitor.nil? or event.visitor.user.nil? %></td>
-    <td><%= link_to event.visitor.key[0..5]+'...', analytics_visitor_path(event.visitor) unless event.visitor.nil? %></td>
+    <td><%= link_to event.visitor.id.to_s[0..5]+'...', analytics_visitor_path(event.visitor) unless event.visitor.nil? %></td>
     <td><%= event.visitor.ip unless event.visitor.nil? %></td>
     <td><%= event.created_at.to_s(:short) if event.created_at %>
 	 <span id='datetime_<%=event.id%>' style="display: none;"><%=event.created_at%></span></td>
