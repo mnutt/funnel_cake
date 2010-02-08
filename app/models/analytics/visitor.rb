@@ -53,7 +53,7 @@ class Analytics::Visitor
   # - Second, send() the event method with the accompanying data
   def log_funnel_event(event, data={})
     unless self.valid_events.include?(event.to_sym)
-      logger.info "#{self.class.to_s} couldn't log FunnelCake event: #{event} This event is not valid for state: #{self.current_state}, ip: #{self.ip}"
+      Rails.logger.info "#{self.class.to_s} couldn't log FunnelCake event: #{event} This event is not valid for state: #{self.current_state}, ip: #{self.ip}"
       return
     end
     self.send(event.to_s+"!", data)
