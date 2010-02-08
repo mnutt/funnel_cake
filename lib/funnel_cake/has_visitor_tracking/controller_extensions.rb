@@ -69,7 +69,7 @@ module FunnelCake
             logger.info "Couldn't sync nil Analytics::Visitor to current User: #{current_user.inspect}"
             return
           end
-          current_visitor.user = current_user
+          current_visitor.user_id = current_user.id
           current_visitor.save
         end
 
@@ -102,7 +102,7 @@ module FunnelCake
           @current_visitor = FunnelCake::Engine.visitor_class.create(
                               :ip=>request.remote_ip.to_s
                               )
-          @current_visitor.user = current_user if logged_in?
+          @current_visitor.user_id = current_user.id if logged_in?
           @current_visitor.save
           cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
             :value => @current_visitor.id,
