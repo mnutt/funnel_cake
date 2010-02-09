@@ -61,6 +61,8 @@ module FunnelCake
         # - Bails out if not logged in
         # - otherwise, sets the .user of the current_visitor
         def sync_funnel_visitor
+          return unless FunnelCake::Config.enabled
+
           if not logged_in?
             logger.info "Couldn't sync Analytics::Visitor to nil User"
             return
