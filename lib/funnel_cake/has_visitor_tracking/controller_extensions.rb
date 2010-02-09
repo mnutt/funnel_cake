@@ -77,6 +77,8 @@ module FunnelCake
 
         # should we ignore this visitor?
         def ignore_funnel_tracking?
+          return true unless FunnelCake::Config.enabled
+
           # check user-overrideable methods
           return true if respond_to?(:ignore_funnel_visitor?) and ignore_funnel_visitor?
 
