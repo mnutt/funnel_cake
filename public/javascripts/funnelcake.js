@@ -386,21 +386,21 @@ var ConversionDiagram = Class.create(FunnelCakeWidget, {
 
 		// First, iterate through the transitions, setting the edge labels and recording the node data
 		$A(rawdata).each(function(transition){
-			if (Object.isUndefined(nodes[transition.from])) { nodes[transition.from] = { 'in': 0, out: 0, primary: false }; }
-			if (Object.isUndefined(nodes[transition.to])) { nodes[transition.to] = { 'in': 0, out: 0, primary: false }; }
+			if (Object.isUndefined(nodes[transition.from])) { nodes[transition.from] = { count_in: 0, count_out: 0, primary: false }; }
+			if (Object.isUndefined(nodes[transition.to])) { nodes[transition.to] = { count_in: 0, count_out: 0, primary: false }; }
 
-			nodes[transition.from].out = [nodes[transition.from].out, transition.stats.start].max();
-			nodes[transition.to].in += transition.stats.end;
+			nodes[transition.from].count_out = [nodes[transition.from].count_out, transition.stats.start_count].max();
+			nodes[transition.to].count_in += transition.stats.end_count;
 			nodes[transition.to].primary = transition.to_primary;
 
-			$(transition.from+'_to_'+transition.to+'_edge').update(transition.stats.end);
+			$(transition.from+'_to_'+transition.to+'_edge').update(transition.stats.end_count);
 		});
 
 		// Then, iterate through the node data, setting the node labels
 		$H(nodes).each(function(pair){
-		  var node_html = "<div class='entering'>"+pair.value.in+"&rarr;</div>"
+		  var node_html = "<div class='entering'>"+pair.value.count_in+"&rarr;</div>"
 		  node_html += "<div class='label'>"+pair.key+"</div>"
-		  node_html += "<div class='exiting'>"+pair.value.out+"&rarr;</div>"
+		  node_html += "<div class='exiting'>"+pair.value.count_out+"&rarr;</div>"
 			$(pair.key+'_node').update(node_html)
 			if (pair.value.primary) { $(pair.key+'_node').addClassName('primary'); }
 		});
