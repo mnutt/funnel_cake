@@ -386,8 +386,8 @@ var ConversionDiagram = Class.create(FunnelCakeWidget, {
 
 		// First, iterate through the transitions, setting the edge labels and recording the node data
 		$A(rawdata).each(function(transition){
-			if (Object.isUndefined(nodes[transition.from])) { nodes[transition.from] = { in: 0, out: 0, primary: false }; }
-			if (Object.isUndefined(nodes[transition.to])) { nodes[transition.to] = { in: 0, out: 0, primary: false }; }
+			if (Object.isUndefined(nodes[transition.from])) { nodes[transition.from] = { 'in': 0, out: 0, primary: false }; }
+			if (Object.isUndefined(nodes[transition.to])) { nodes[transition.to] = { 'in': 0, out: 0, primary: false }; }
 
 			nodes[transition.from].out = [nodes[transition.from].out, transition.stats.start].max();
 			nodes[transition.to].in += transition.stats.end;
