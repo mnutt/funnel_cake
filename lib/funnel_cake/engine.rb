@@ -361,6 +361,7 @@ module FunnelCake
 
     # Query the Rails cache, sheparded through our memcached namespace hack
     def self.cache_fetch(key, options, &block)
+      FunnelCake::DataHash  # Preload the class so we don't get any memcache marshalling errors
       Rails.cache.fetch(cache_key_for(key), options, &block)
     end
 
