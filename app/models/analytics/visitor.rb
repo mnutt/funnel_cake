@@ -32,8 +32,9 @@ class Analytics::Visitor
   self.extend FunnelCake::UserStates
   initialize_states
 
-  # Add association for User model
-  belongs_to :user, :class_name=>'User', :foreign_key=>:user_id
+  # Add association for User model, manually b/c the User model is AR
+  def user; User.find_by_id(user_id); end
+  def user=(u); self.user_id = u.id; end
 
   # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)
