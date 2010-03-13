@@ -62,7 +62,7 @@ class Analytics::Visitor
 
   def to_funnelcake
     attrs = attributes.clone
-    attrs.merge(user.to_funnelcake) if user and user.responds_to?(:to_funnelcake)
+    attrs.merge(user.to_funnelcake) if user and user.respond_to?(:to_funnelcake)
     attrs[:recent_event_date] = visitor.events.last.created_at.to_s(:short)
   end
 
