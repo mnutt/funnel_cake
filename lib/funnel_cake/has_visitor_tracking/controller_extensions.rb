@@ -103,7 +103,7 @@ module FunnelCake
         # - We create a new Analytics::Visitor here, using a new random hex key
         # - Set the cookie value for this visitor
         def register_funnel_visitor
-          @current_visitor = FunnelCake::Engine.visitor_class.create(
+          @current_visitor = FunnelCake.engine.visitor_class.create(
                               :ip=>request.remote_ip.to_s
                               )
           @current_visitor.user_id = current_user.id if logged_in?
@@ -129,13 +129,13 @@ module FunnelCake
             cookie = cookies[self.class.read_inheritable_attribute(:cookie_name)].gsub(/[^0-9a-f]/,'')
             if cookie
               if cookie.length > '000000000000000000000000'.length
-                @current_visitor = FunnelCake::Engine.visitor_class.find_by_key(cookie)
+                @current_visitor = FunnelCake.engine.visitor_class.find_by_key(cookie)
                 cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
                   :value => @current_visitor.id,
                   :expires => 1.year.from_now
                 }
               else
-                @current_visitor = FunnelCake::Engine.visitor_class.find(cookie)
+                @current_visitor = FunnelCake.engine.visitor_class.find(cookie)
               end
             end
           end

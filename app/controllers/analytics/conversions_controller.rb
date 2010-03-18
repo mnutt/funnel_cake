@@ -21,12 +21,12 @@ class Analytics::ConversionsController < Analytics::CommonController
 
         @date_range = grab_date_range
         @options = add_filter_options({:date_range=>@date_range, :attrition_period=>1.month})
-        json[:stats] = FunnelCake::Engine.conversion_stats(@start_state, @end_state, @options)
+        json[:stats] = FunnelCake.engine.conversion_stats(@start_state, @end_state, @options)
 
         if params[:show_previous_period]=='true'
           @previous_date_range = previous_date_range(@date_range, duration_of(@date_range)==30)
           @previous_options = add_filter_options({:date_range=>@previous_date_range, :attrition_period=>1.month})
-          json[:previous_stats] = FunnelCake::Engine.conversion_stats(@start_state, @end_state, @previous_options)
+          json[:previous_stats] = FunnelCake.engine.conversion_stats(@start_state, @end_state, @previous_options)
         end
 
         render :json=>json.to_json and return
@@ -52,10 +52,10 @@ class Analytics::ConversionsController < Analytics::CommonController
     @options = add_filter_options({:time_period=>@time_period, :stat=>stat})
     respond_to do |format|
       format.json do
-        render :json=>FunnelCake::Engine.conversion_history(@start_state, @end_state, @options).to_json and return
+        render :json=>FunnelCake.engine.conversion_history(@start_state, @end_state, @options).to_json and return
       end
       format.csv do
-        send_data(FunnelCake::Engine.conversion_history(@start_state, @end_state, @options).to_csv,
+        send_data(FunnelCake.engine.conversion_history(@start_state, @end_state, @options).to_csv,
               :type => 'text/csv; charset=utf-8; header=present',
               :filename => "#{@state}-#{params[:time_period]}day_history.csv") and return
       end

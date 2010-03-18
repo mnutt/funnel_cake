@@ -46,9 +46,13 @@ describe FunnelCake::Config do
       end
       it 'should set the data_store' do
         module FunnelCake::DataStore::MyCustomDatastore; end
+        module FunnelCake::DataStore::MyCustomDatastore::Engine; end
         module FunnelCake::DataStore::MyCustomDatastore::Event; end
         module FunnelCake::DataStore::MyCustomDatastore::Visitor; end
         module FunnelCake::DataStore::MyCustomDatastore::Ignore; end
+        FunnelCake::DataStore::MyCustomDatastore::Engine.stub!(:user_class=)
+        FunnelCake::DataStore::MyCustomDatastore::Engine.stub!(:visitor_class=)
+        FunnelCake::DataStore::MyCustomDatastore::Engine.stub!(:event_class=)                
         FunnelCake.configure { data_store :my_custom_datastore }
         FunnelCake.configuration.data_store.should == :my_custom_datastore
       end
@@ -115,9 +119,9 @@ describe FunnelCake::Config do
     end
     describe 'when applying the configuration settings' do
       it 'should set the engine classes' do
-        FunnelCake::Engine.should_receive(:user_class=).with(FunnelCakeConfigDummy)
-        FunnelCake::Engine.should_receive(:visitor_class=).with(FunnelCakeConfigDummy)      
-        FunnelCake::Engine.should_receive(:event_class=).with(FunnelCakeConfigDummy)      
+        FunnelCake.engine.should_receive(:user_class=).with(FunnelCakeConfigDummy)
+        FunnelCake.engine.should_receive(:visitor_class=).with(FunnelCakeConfigDummy)      
+        FunnelCake.engine.should_receive(:event_class=).with(FunnelCakeConfigDummy)      
         FunnelCake.configure do
           user_class    FunnelCakeConfigDummy
           visitor_class FunnelCakeConfigDummy
@@ -181,6 +185,12 @@ describe FunnelCake::Config do
               data_store :mongo_mapper
               visitor_class FunnelCakeConfigDummy
             end
+          end
+          it 'should set the engine' do
+            FunnelCake.configure do
+              data_store :mongo_mapper
+            end
+            FunnelCake.engine.should == FunnelCake::DataStore::MongoMapper::Engine
           end
         end
       end

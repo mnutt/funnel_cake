@@ -2,9 +2,10 @@ require 'spec_helper'
 
 class UserDummy; end
 
-describe FunnelCake::Engine do
+describe FunnelCake::DataStore::MongoMapper::Engine do
   before(:each) do
     FunnelCake.configure do
+      data_store :mongo_mapper
       state :page_visited, :primary=>true
       event :view_page do
         transitions :from=>:unknown,       :to=>:page_visited
@@ -21,14 +22,14 @@ describe FunnelCake::Engine do
 
   describe 'when setting the engine classes' do
     it 'should use the defaults' do
-      FunnelCake::Engine.user_class.should be_nil # User is not defined
-      FunnelCake::Engine.visitor_class.should == Analytics::Visitor
-      FunnelCake::Engine.event_class.should == Analytics::Event
+      FunnelCake.engine.user_class.should be_nil # User is not defined
+      FunnelCake.engine.visitor_class.should == Analytics::Visitor
+      FunnelCake.engine.event_class.should == Analytics::Event
     end
     it 'should set custom classes' do
-      FunnelCake::Engine.user_class.should be_nil # User is not defined
-      FunnelCake::Engine.user_class = UserDummy
-      FunnelCake::Engine.user_class.should == UserDummy
+      FunnelCake.engine.user_class.should be_nil # User is not defined
+      FunnelCake.engine.user_class = UserDummy
+      FunnelCake.engine.user_class.should == UserDummy
     end
   end
 
@@ -50,10 +51,10 @@ describe FunnelCake::Engine do
         end
       end
       it 'should return visitors who entered the state MINUS those who exited the state' do
-        FunnelCake::Engine.eligible_to_move_from_state(:a_started).find.should only_have_objects([ @b ])
+        FunnelCake.engine.eligible_to_move_from_state(:a_started).find.should only_have_objects([ @b ])
       end
       it 'should count visitors who entered the state MINUS those who exited the state' do
-        FunnelCake::Engine.eligible_to_move_from_state(:a_started).count.should == 1
+        FunnelCake.engine.eligible_to_move_from_state(:a_started).count.should == 1
       end
     end
     describe 'for a given date range' do
@@ -87,20 +88,20 @@ describe FunnelCake::Engine do
         @opts = { :date_range=>@date_range }
       end
       it 'should return the visitors who entered the state before the end MINUS those who exited before the start' do
-        FunnelCake::Engine.eligible_to_move_from_state(:a_started, @opts).find.should only_have_objects([ 
+        FunnelCake.engine.eligible_to_move_from_state(:a_started, @opts).find.should only_have_objects([ 
           @visitors[1], @visitors[2],
         ])
       end
       it 'should count the visitors who entered the state before the end MINUS those who exited before the start' do
-        FunnelCake::Engine.eligible_to_move_from_state(:a_started, @opts).count.should == 2
+        FunnelCake.engine.eligible_to_move_from_state(:a_started, @opts).count.should == 2
       end
       describe 'with a has_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+            @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
               @opts.merge( :has_event_with=>{:referer=>'aaa'} )
             )
-            @finder_b = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+            @finder_b = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
               @opts.merge( :has_event_with=>{:referer=>'bbb'} )
             )
           end
@@ -115,10 +116,10 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+            @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
               @opts.merge( :has_event_with=>{:referer=>/a+/} )
             )
-            @finder_b = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+            @finder_b = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
               @opts.merge( :has_event_with=>{:referer=>/b+/} )
             )
           end        
@@ -135,7 +136,7 @@ describe FunnelCake::Engine do
       describe 'with a first_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+            @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
               @opts.merge( :first_event_with=>{:referer=>'aaa'} )
             )
           end        
@@ -148,7 +149,7 @@ describe FunnelCake::Engine do
         end
         # describe 'for a regex match' do
         #   before(:each) do
-        #     @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+        #     @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
         #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
         #     )
         #   end        
@@ -163,7 +164,7 @@ describe FunnelCake::Engine do
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+            @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
               @opts.merge( :visitor_with=>{:ip=>'AAA'} )
             )
           end        
@@ -176,7 +177,7 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.eligible_to_move_from_state(:a_started, 
+            @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
               @opts.merge( :visitor_with=>{:ip=>/A+/} )
             )
           end        
@@ -190,7 +191,7 @@ describe FunnelCake::Engine do
       end
       describe 'with an attrition period' do
         before(:each) do
-          @finder = FunnelCake::Engine.eligible_to_move_from_state(:a_started,
+          @finder = FunnelCake.engine.eligible_to_move_from_state(:a_started,
             @opts.merge( :attrition_period=>14.days )        
           )
         end
@@ -222,10 +223,10 @@ describe FunnelCake::Engine do
         end
       end
       it 'should return visitors who entered the state' do
-        FunnelCake::Engine.moved_to_state(:a_started).find.should only_have_objects([ @a, @b ])
+        FunnelCake.engine.moved_to_state(:a_started).find.should only_have_objects([ @a, @b ])
       end
       it 'should count visitors who entered the state' do
-        FunnelCake::Engine.moved_to_state(:a_started).count.should == 2
+        FunnelCake.engine.moved_to_state(:a_started).count.should == 2
       end
     end
     describe 'for a given date range' do
@@ -259,20 +260,20 @@ describe FunnelCake::Engine do
         @opts = { :date_range=>@date_range }
       end
       it 'should return the visitors who entered the state during the date range' do
-        FunnelCake::Engine.moved_to_state(:b_started, @opts).find.should only_have_objects([ 
+        FunnelCake.engine.moved_to_state(:b_started, @opts).find.should only_have_objects([ 
           @visitors[1], @visitors[6],
         ])
       end
       it 'should return the visitors who entered the state during the date range' do
-        FunnelCake::Engine.moved_to_state(:b_started, @opts).count.should == 2
+        FunnelCake.engine.moved_to_state(:b_started, @opts).count.should == 2
       end
       describe 'with a has_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_to_state(:b_started, 
+            @finder_a = FunnelCake.engine.moved_to_state(:b_started, 
               @opts.merge( :has_event_with=>{:referer=>'aaa'} )
             )
-            @finder_b = FunnelCake::Engine.moved_to_state(:b_started, 
+            @finder_b = FunnelCake.engine.moved_to_state(:b_started, 
               @opts.merge( :has_event_with=>{:referer=>'bbb'} )
             )
           end
@@ -287,10 +288,10 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_to_state(:b_started, 
+            @finder_a = FunnelCake.engine.moved_to_state(:b_started, 
               @opts.merge( :has_event_with=>{:referer=>/a+/} )
             )
-            @finder_b = FunnelCake::Engine.moved_to_state(:b_started, 
+            @finder_b = FunnelCake.engine.moved_to_state(:b_started, 
               @opts.merge( :has_event_with=>{:referer=>/b+/} )
             )
           end
@@ -307,7 +308,7 @@ describe FunnelCake::Engine do
       describe 'with a first_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_to_state(:b_started,
+            @finder_a = FunnelCake.engine.moved_to_state(:b_started,
               @opts.merge( :first_event_with=>{:referer=>'aaa'} )
             )
           end        
@@ -320,7 +321,7 @@ describe FunnelCake::Engine do
         end      
         # describe 'for a regex match' do
         #   before(:each) do
-        #     @finder_a = FunnelCake::Engine.moved_to_state(:b_started,
+        #     @finder_a = FunnelCake.engine.moved_to_state(:b_started,
         #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
         #     )
         #   end        
@@ -335,7 +336,7 @@ describe FunnelCake::Engine do
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_to_state(:b_started,
+            @finder_a = FunnelCake.engine.moved_to_state(:b_started,
               @opts.merge( :visitor_with=>{:ip=>'AAA'} )
             )
           end        
@@ -348,7 +349,7 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_to_state(:b_started,
+            @finder_a = FunnelCake.engine.moved_to_state(:b_started,
               @opts.merge( :visitor_with=>{:ip=>/A+/} )
             )
           end        
@@ -381,10 +382,10 @@ describe FunnelCake::Engine do
         end
       end
       it 'should return visitors who entered the state' do
-        FunnelCake::Engine.moved_from_state(:a_started).find.should only_have_objects([ @a, @c ])
+        FunnelCake.engine.moved_from_state(:a_started).find.should only_have_objects([ @a, @c ])
       end
       it 'should count visitors who entered the state' do
-        FunnelCake::Engine.moved_from_state(:a_started).count.should == 2
+        FunnelCake.engine.moved_from_state(:a_started).count.should == 2
       end
     end
     describe 'for a given date range' do
@@ -418,20 +419,20 @@ describe FunnelCake::Engine do
         @opts = { :date_range=>@date_range }
       end
       it 'should return the visitors who exited the state during the date range' do
-        FunnelCake::Engine.moved_from_state(:a_started, @opts).find.should only_have_objects([ 
+        FunnelCake.engine.moved_from_state(:a_started, @opts).find.should only_have_objects([ 
           @visitors[1], @visitors[6],
         ])
       end
       it 'should count the visitors who exited the state during the date range' do
-        FunnelCake::Engine.moved_from_state(:a_started, @opts).count.should == 2
+        FunnelCake.engine.moved_from_state(:a_started, @opts).count.should == 2
       end
       describe 'with a has_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
+            @finder_a = FunnelCake.engine.moved_from_state(:a_started,
               @opts.merge( :has_event_with=>{:referer=>'aaa'} )
             )
-            @finder_b = FunnelCake::Engine.moved_from_state(:a_started,
+            @finder_b = FunnelCake.engine.moved_from_state(:a_started,
               @opts.merge( :has_event_with=>{:referer=>'bbb'} )
             )
           end
@@ -446,10 +447,10 @@ describe FunnelCake::Engine do
         end      
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
+            @finder_a = FunnelCake.engine.moved_from_state(:a_started,
               @opts.merge( :has_event_with=>{:referer=>/b+/} )
             )
-            @finder_b = FunnelCake::Engine.moved_from_state(:a_started,
+            @finder_b = FunnelCake.engine.moved_from_state(:a_started,
               @opts.merge( :has_event_with=>{:referer=>/b+/} )
             )
           end
@@ -466,7 +467,7 @@ describe FunnelCake::Engine do
       describe 'with a first_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
+            @finder_a = FunnelCake.engine.moved_from_state(:a_started,
               @opts.merge( :first_event_with=>{:referer=>'aaa'} )
             )
           end
@@ -479,7 +480,7 @@ describe FunnelCake::Engine do
         end      
         # describe 'for a regex match' do
         #   before(:each) do
-        #     @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
+        #     @finder_a = FunnelCake.engine.moved_from_state(:a_started,
         #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
         #     )
         #   end
@@ -494,7 +495,7 @@ describe FunnelCake::Engine do
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
+            @finder_a = FunnelCake.engine.moved_from_state(:a_started,
               @opts.merge( :visitor_with=>{:ip=>'AAA'} )
             )
           end        
@@ -507,7 +508,7 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_from_state(:a_started,
+            @finder_a = FunnelCake.engine.moved_from_state(:a_started,
               @opts.merge( :visitor_with=>{:ip=>/A+/} )
             )
           end        
@@ -540,10 +541,10 @@ describe FunnelCake::Engine do
         end
       end
       it 'should return visitors who moved between states' do
-        FunnelCake::Engine.moved_between_states(:a_started, :b_started).find.should only_have_objects([ @a, @c ])
+        FunnelCake.engine.moved_between_states(:a_started, :b_started).find.should only_have_objects([ @a, @c ])
       end
       it 'should count visitors who moved between states' do
-        FunnelCake::Engine.moved_between_states(:a_started, :b_started).count.should == 2
+        FunnelCake.engine.moved_between_states(:a_started, :b_started).count.should == 2
       end
     end
     describe 'for a given date range' do
@@ -577,32 +578,32 @@ describe FunnelCake::Engine do
         @opts = { :date_range=>@date_range }
       end
       it 'should return the visitors who exited the start state and entered the end state during the date range' do
-        FunnelCake::Engine.moved_between_states(:a_started, :b_started, @opts).find.should only_have_objects([ 
+        FunnelCake.engine.moved_between_states(:a_started, :b_started, @opts).find.should only_have_objects([ 
           @visitors[1], @visitors[6],
         ])
       end
       it 'should count the visitors who exited the start state and entered the end state during the date range' do
-        FunnelCake::Engine.moved_between_states(:a_started, :b_started, @opts).count.should == 2
+        FunnelCake.engine.moved_between_states(:a_started, :b_started, @opts).count.should == 2
       end
       describe 'with states in between' do
         it 'should return the visitors who exited the start state and entered the end state during the date range' do
           @opts = { :date_range=>build_date(:days=>-31)..build_date(:days=>0) }
-          FunnelCake::Engine.moved_between_states(:page_visited, :b_started, @opts).find.should only_have_objects([ 
+          FunnelCake.engine.moved_between_states(:page_visited, :b_started, @opts).find.should only_have_objects([ 
             @visitors[0], @visitors[1],
           ])
         end
         it 'should count the visitors who exited the start state and entered the end state during the date range' do
           @opts = { :date_range=>build_date(:days=>-31)..build_date(:days=>0) }
-          FunnelCake::Engine.moved_between_states(:page_visited, :b_started, @opts).count.should == 2
+          FunnelCake.engine.moved_between_states(:page_visited, :b_started, @opts).count.should == 2
         end
       end
       describe 'with a has_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>'aaa'} )
             )
-            @finder_b = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+            @finder_b = FunnelCake.engine.moved_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>'bbb'} )
             )
           end
@@ -617,10 +618,10 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>/a+/} )
             )
-            @finder_b = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+            @finder_b = FunnelCake.engine.moved_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>/b+/} )
             )
           end        
@@ -637,7 +638,7 @@ describe FunnelCake::Engine do
       describe 'with a first_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
               @opts.merge( :first_event_with=>{:referer=>'aaa'} )
             )
           end        
@@ -650,7 +651,7 @@ describe FunnelCake::Engine do
         end
         # describe 'for a regex match' do
         #   before(:each) do
-        #     @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+        #     @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
         #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
         #     )
         #   end        
@@ -665,7 +666,7 @@ describe FunnelCake::Engine do
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
               @opts.merge( :visitor_with=>{:ip=>'AAA'} )
             )
           end        
@@ -678,7 +679,7 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
               @opts.merge( :visitor_with=>{:ip=>/A+/} )
             )
           end        
@@ -711,10 +712,10 @@ describe FunnelCake::Engine do
         end
       end
       it 'should return visitors who moved between states' do
-        FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started).find.should only_have_objects([ @a, @c ])
+        FunnelCake.engine.moved_directly_between_states(:a_started, :b_started).find.should only_have_objects([ @a, @c ])
       end
       it 'should count visitors who moved between states' do
-        FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started).count.should == 2
+        FunnelCake.engine.moved_directly_between_states(:a_started, :b_started).count.should == 2
       end
     end
     describe 'for a given date range' do
@@ -748,30 +749,30 @@ describe FunnelCake::Engine do
         @opts = { :date_range=>@date_range }
       end
       it 'should return the visitors who exited the start state and entered the end state during the date range' do
-        FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started, @opts).find.should only_have_objects([ 
+        FunnelCake.engine.moved_directly_between_states(:a_started, :b_started, @opts).find.should only_have_objects([ 
           @visitors[1], @visitors[6],
         ])
       end
       it 'should count the visitors who exited the start state and entered the end state during the date range' do
-        FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started, @opts).count.should == 2
+        FunnelCake.engine.moved_directly_between_states(:a_started, :b_started, @opts).count.should == 2
       end
       describe 'with states in between' do
         it 'should return no visitors' do
           @opts = { :date_range=>build_date(:days=>-31)..build_date(:days=>0) }
-          FunnelCake::Engine.moved_directly_between_states(:page_visited, :b_started, @opts).find.should only_have_objects([])
+          FunnelCake.engine.moved_directly_between_states(:page_visited, :b_started, @opts).find.should only_have_objects([])
         end
         it 'should count no visitors' do
           @opts = { :date_range=>build_date(:days=>-31)..build_date(:days=>0) }
-          FunnelCake::Engine.moved_directly_between_states(:page_visited, :b_started, @opts).count.should == 0
+          FunnelCake.engine.moved_directly_between_states(:page_visited, :b_started, @opts).count.should == 0
         end
       end
       describe 'with a has_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>'aaa'} )
             )
-            @finder_b = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+            @finder_b = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>'bbb'} )
             )
           end
@@ -786,10 +787,10 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>/a+/} )
             )
-            @finder_b = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+            @finder_b = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
               @opts.merge( :has_event_with=>{:referer=>/b+/} )
             )
           end        
@@ -806,7 +807,7 @@ describe FunnelCake::Engine do
       describe 'with a first_event_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
               @opts.merge( :first_event_with=>{:referer=>'aaa'} )
             )
           end        
@@ -819,7 +820,7 @@ describe FunnelCake::Engine do
         end
         # describe 'for a regex match' do
         #   before(:each) do
-        #     @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+        #     @finder_a = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
         #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
         #     )
         #   end        
@@ -834,7 +835,7 @@ describe FunnelCake::Engine do
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
               @opts.merge( :visitor_with=>{:ip=>'AAA'} )
             )
           end        
@@ -847,7 +848,7 @@ describe FunnelCake::Engine do
         end
         describe 'for a regex match' do
           before(:each) do
-            @finder_a = FunnelCake::Engine.moved_directly_between_states(:a_started, :b_started,
+            @finder_a = FunnelCake.engine.moved_directly_between_states(:a_started, :b_started,
               @opts.merge( :visitor_with=>{:ip=>/A+/} )
             )
           end        
@@ -867,21 +868,21 @@ describe FunnelCake::Engine do
       before(:each) do
         @start = mock(:start, :find=>[1, 2, 3, 4, 5, 6], :count=>6)
         @end = mock(:end, :find=>[1, 2, 3], :count=>3)
-        FunnelCake::Engine.stub!(:eligible_to_move_from_state).and_return(@start)
-        FunnelCake::Engine.stub!(:moved_to_state).and_return(@end)
+        FunnelCake.engine.stub!(:eligible_to_move_from_state).and_return(@start)
+        FunnelCake.engine.stub!(:moved_to_state).and_return(@end)
         @date_range = build_date(:days=>-14)..build_date(:days=>0)
         @opts = { :date_range=>@date_range }
       end
       it 'should query the visitors eligible to move' do
-        FunnelCake::Engine.should_receive(:eligible_to_move_from_state).with(:a_started, @opts).once.and_return(@start)
-        FunnelCake::Engine.conversion_visitors(:a_started, :b_started, @opts)
+        FunnelCake.engine.should_receive(:eligible_to_move_from_state).with(:a_started, @opts).once.and_return(@start)
+        FunnelCake.engine.conversion_visitors(:a_started, :b_started, @opts)
       end
       it 'should query the visitors who moved' do
-        FunnelCake::Engine.should_receive(:moved_to_state).with(:b_started, @opts).once.and_return(@end)
-        FunnelCake::Engine.conversion_visitors(:a_started, :b_started, @opts)
+        FunnelCake.engine.should_receive(:moved_to_state).with(:b_started, @opts).once.and_return(@end)
+        FunnelCake.engine.conversion_visitors(:a_started, :b_started, @opts)
       end
       it 'should return the list of converted visitors' do
-        FunnelCake::Engine.conversion_visitors(:a_started, :b_started, @opts).should == {
+        FunnelCake.engine.conversion_visitors(:a_started, :b_started, @opts).should == {
           :start=>[1, 2, 3, 4, 5, 6],
           :end=>[1, 2, 3],
         }
@@ -891,21 +892,21 @@ describe FunnelCake::Engine do
       before(:each) do
         @start = mock(:start, :find=>[1, 2, 3, 4, 5, 6], :count=>6)
         @end = mock(:end, :find=>[1, 2, 3], :count=>3)
-        FunnelCake::Engine.stub!(:eligible_to_move_from_state).and_return(@start)
-        FunnelCake::Engine.stub!(:moved_to_state).and_return(@end)
+        FunnelCake.engine.stub!(:eligible_to_move_from_state).and_return(@start)
+        FunnelCake.engine.stub!(:moved_to_state).and_return(@end)
         @date_range = build_date(:days=>-14)..build_date(:days=>0)
         @opts = { :date_range=>@date_range }
       end
       it 'should query the visitors eligible to move' do
-        FunnelCake::Engine.should_receive(:eligible_to_move_from_state).with(:a_started, @opts).once.and_return(@start)
-        FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts)
+        FunnelCake.engine.should_receive(:eligible_to_move_from_state).with(:a_started, @opts).once.and_return(@start)
+        FunnelCake.engine.conversion_stats(:a_started, :b_started, @opts)
       end
       it 'should query the visitors who moved' do
-        FunnelCake::Engine.should_receive(:moved_to_state).with(:b_started, @opts).once.and_return(@end)
-        FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts)
+        FunnelCake.engine.should_receive(:moved_to_state).with(:b_started, @opts).once.and_return(@end)
+        FunnelCake.engine.conversion_stats(:a_started, :b_started, @opts)
       end
       it 'should return the stats' do
-        FunnelCake::Engine.conversion_stats(:a_started, :b_started, @opts).should == FunnelCake::DataHash[{
+        FunnelCake.engine.conversion_stats(:a_started, :b_started, @opts).should == FunnelCake::DataHash[{
           :start=>6,
           :end=>3,
           :rate=>0.5,        
@@ -914,12 +915,12 @@ describe FunnelCake::Engine do
     end  
     describe 'rate only' do  
       it 'should return the rate' do
-        FunnelCake::Engine.should_receive(:conversion_stats).with(:a_started, :b_started, @opts).once.and_return({
+        FunnelCake.engine.should_receive(:conversion_stats).with(:a_started, :b_started, @opts).once.and_return({
           :start=>6,
           :end=>3,
           :rate=>0.5,        
         })      
-        FunnelCake::Engine.conversion_rate(:a_started, :b_started, @opts).should == 0.5
+        FunnelCake.engine.conversion_rate(:a_started, :b_started, @opts).should == 0.5
       end
     end
     describe 'for history over a period of time' do
@@ -932,29 +933,29 @@ describe FunnelCake::Engine do
               :time_period=>2.weeks,
             }
             @data = FunnelCake::DataHash[{:start=>6, :end=>3, :rate=>0.5}]
-            FunnelCake::Engine.stub!(:conversion_stats).and_return(@data)
+            FunnelCake.engine.stub!(:conversion_stats).and_return(@data)
           end
           after(:each) { Timecop.return }
           it 'should return the right number of stats' do
-            FunnelCake::Engine.conversion_history(:a_started, :b_started, @opts).values.length.should == 8
+            FunnelCake.engine.conversion_history(:a_started, :b_started, @opts).values.length.should == 8
           end
           it 'should query the right dates' do
             period_end = DateTime.civil(1978, 1, 29, 12, 0, 0, Rational(-5, 24)).to_date
             0.upto(7) do |i|
               topts = @opts.merge(:date_range=>period_end.advance(:weeks=>(-1-i)*2)...period_end.advance(:weeks=>-i*2), :attrition_period=>2.weeks)
-              FunnelCake::Engine.should_receive(:conversion_stats).with(:a_started, :b_started, topts).and_return(@data)
+              FunnelCake.engine.should_receive(:conversion_stats).with(:a_started, :b_started, topts).and_return(@data)
             end
-            FunnelCake::Engine.conversion_history(:a_started, :b_started, @opts)
+            FunnelCake.engine.conversion_history(:a_started, :b_started, @opts)
           end
         end
         describe 'with a custom history length' do
           before(:each) do
             DateTime.stub!(:now).and_return(build_date(:days=>0))
             @opts = { :time_period=>2.weeks, :max_history=>3 }
-            FunnelCake::Engine.stub!(:conversion_stats).and_return(FunnelCake::DataHash[{:start=>6, :end=>3, :rate=>0.5}])
+            FunnelCake.engine.stub!(:conversion_stats).and_return(FunnelCake::DataHash[{:start=>6, :end=>3, :rate=>0.5}])
           end
           it 'should return the right number of stats' do
-            FunnelCake::Engine.conversion_history(:a_started, :b_started, @opts).values.length.should == 6
+            FunnelCake.engine.conversion_history(:a_started, :b_started, @opts).values.length.should == 6
           end
         end
       end

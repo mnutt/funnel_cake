@@ -21,10 +21,10 @@ class Analytics::StatesController < Analytics::CommonController
     respond_to do |format|
       format.html # show.html.erb
       format.json do
-        render :json=>FunnelCake::Engine.conversion_history(start_state, end_state, options).to_json and return
+        render :json=>FunnelCake.engine.conversion_history(start_state, end_state, options).to_json and return
       end
       format.csv do
-        render :inline=>FunnelCake::Engine.conversion_history(start_state, end_state, options).to_csv and return
+        render :inline=>FunnelCake.engine.conversion_history(start_state, end_state, options).to_csv and return
       end
     end
   end

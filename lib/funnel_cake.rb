@@ -9,6 +9,7 @@ module FunnelCake
       @event_class = Analytics::Event
       @ignore_class = Analytics::Ignore
       @data_store = :mongo_mapper
+      @engine = FunnelCake::Engine
       @states = { :unknown=>{} }
       @events = {}
     end
@@ -19,6 +20,7 @@ module FunnelCake
     attr_accessor :user_class, :visitor_class, :event_class, :ignore_class
     attr_accessor :data_store
     attr_accessor :states, :events
+    attr_accessor :engine
 
     # DSL Methods
     class DSL
@@ -73,7 +75,6 @@ module FunnelCake
       @@configuration = Config.new
       configuration_dsl = Config::DSL.new(@@configuration)
       configuration_dsl.instance_eval(&block)
-      apply_configuration!
       initialize_datastore_hooks!
       initialize_state_machine!
     end
@@ -89,13 +90,6 @@ module FunnelCake
     end
 
     private
-
-    def apply_configuration!
-      FunnelCake::Engine.user_class = @@configuration.user_class
-      FunnelCake::Engine.visitor_class = @@configuration.visitor_class
-      FunnelCake::Engine.event_class = @@configuration.event_class
-
-    end
 
     def initialize_state_machine!
       @@configuration.visitor_class.send :extend, FunnelCake::ActsAsFunnelStateMachine::ActMacro
@@ -124,6 +118,10 @@ module FunnelCake
       @@configuration.visitor_class.class_eval do
         include "#{datastore_module}::Visitor".constantize
       end
+      @@configuration.engine = "#{datastore_module}::Engine".constantize
+      @@configuration.engine.user_class = @@configuration.user_class
+      @@configuration.engine.visitor_class = @@configuration.visitor_class
+      @@configuration.engine.event_class = @@configuration.event_class
     end
 
   end
