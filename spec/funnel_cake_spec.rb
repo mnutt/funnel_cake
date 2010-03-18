@@ -2,6 +2,9 @@ require 'spec_helper'
 
 describe FunnelCake::Config do
   describe 'when configuring funnelcake' do
+    before(:each) do
+      FunnelCake.reset_configuration
+    end
     class FunnelCakeConfigDummy
       def self.before_create(*args); end
       def self.after_create(*args); end      
@@ -10,6 +13,7 @@ describe FunnelCake::Config do
     it 'should construct the configuration class' do
       @config = FunnelCake::Config.new
       FunnelCake::Config.should_receive(:new).and_return(@config)
+      FunnelCake.configuration = nil
       FunnelCake.configure {}
       FunnelCake.configuration.should == @config
     end
@@ -119,14 +123,14 @@ describe FunnelCake::Config do
     end
     describe 'when applying the configuration settings' do
       it 'should set the engine classes' do
-        FunnelCake.engine.should_receive(:user_class=).with(FunnelCakeConfigDummy)
-        FunnelCake.engine.should_receive(:visitor_class=).with(FunnelCakeConfigDummy)      
-        FunnelCake.engine.should_receive(:event_class=).with(FunnelCakeConfigDummy)      
         FunnelCake.configure do
           user_class    FunnelCakeConfigDummy
           visitor_class FunnelCakeConfigDummy
           event_class   FunnelCakeConfigDummy                    
         end
+        FunnelCake.engine.user_class.should == FunnelCakeConfigDummy
+        FunnelCake.engine.visitor_class.should == FunnelCakeConfigDummy
+        FunnelCake.engine.event_class.should == FunnelCakeConfigDummy
       end
       describe 'when initializing the funnel state machine' do
         it 'should initialize the states' do
