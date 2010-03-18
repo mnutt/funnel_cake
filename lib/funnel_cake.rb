@@ -57,7 +57,16 @@ module FunnelCake
     def configuration=(config); @@configuration = config; end
 
     # Configuration constructor, takes a block that implements the
-    # config DSL in FunnelCake::Config
+    # config DSL in FunnelCake::Config... looks like:
+    #
+    # FunnelCake.configure do
+    #   enable
+    #   user_class 'MyUserClass'
+    #   state :converted, :primary=>true
+    #   event :convert do
+    #     transitions :from=>:unknown, :to=>:converted
+    #   end
+    # end
     def configure(&block)
       @@configuration = Config.new
       configuration_dsl = Config::DSL.new(@@configuration)

@@ -37,22 +37,6 @@ ActiveSupport::Dependencies.load_paths.unshift File.expand_path(File.join(File.d
 ActiveSupport::Dependencies.load_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'funnel_cake'))
 ActiveSupport::Dependencies.load_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'app', 'models'))
 
-module FunnelCake::UserStates
-  def initialize_states
-    funnel_state :page_visited, :primary=>true
-    funnel_event :view_page do
-      transitions :from=>:unknown,       :to=>:page_visited
-      transitions :from=>:page_visited,  :to=>:page_visited
-    end
-    funnel_event :start_a do
-      transitions :from=>:page_visited,  :to=>:a_started
-    end
-    funnel_event :start_b do
-      transitions :from=>:a_started,     :to=>:b_started
-    end
-  end
-end
-
 gem 'factory_girl'
 require 'factory_girl'
 

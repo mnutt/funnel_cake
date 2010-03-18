@@ -1,6 +1,5 @@
 class Analytics::Visitor
   include MongoMapper::Document
-  include FunnelCake::ActsAsFunnelStateMachine
   include FunnelCake::HasFunnel::UserExtensions
 
   timestamps!
@@ -22,15 +21,6 @@ class Analytics::Visitor
 
   # Set up the Analytics::Event model association
   many :events, :class_name=>'Analytics::Event', :dependent=>:destroy, :foreign_key=>:visitor_id
-
-
-  # Set up state machine
-  acts_as_funnel_state_machine :initial=>:unknown, :validate_on_transitions=>false,
-                                :log_transitions=>true,
-                                :error_on_invalid_transition=>false
-  funnel_state :unknown
-  self.extend FunnelCake::UserStates
-  initialize_states
 
   # Add association for User model, manually b/c the User model is AR
   def user; User.find_by_id(user_id); end
