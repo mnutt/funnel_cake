@@ -61,7 +61,7 @@ module FunnelCake
         # - Bails out if not logged in
         # - otherwise, sets the .user of the current_visitor
         def sync_funnel_visitor
-          return unless FunnelCake::Config.enabled
+          return unless FunnelCake.enabled?
 
           if not logged_in?
             logger.info "Couldn't sync Analytics::Visitor to nil User"
@@ -79,7 +79,7 @@ module FunnelCake
 
         # should we ignore this visitor?
         def ignore_funnel_tracking?
-          return true unless FunnelCake::Config.enabled
+          return true unless FunnelCake.enabled?
 
           # check user-overrideable methods
           return true if respond_to?(:ignore_funnel_visitor?) and ignore_funnel_visitor?

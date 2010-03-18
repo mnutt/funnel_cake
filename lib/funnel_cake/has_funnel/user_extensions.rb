@@ -22,11 +22,11 @@ module FunnelCake
         # - First check if the event is legal... if not, log an error I guess!
         # - Second, send() the event method with the accompanying data
         def log_funnel_event(event, data={})
-          self.visitor.log_funnel_event(event, data) if self.visitor and FunnelCake::Config.enabled
+          self.visitor.log_funnel_event(event, data) if self.visitor and FunnelCake.enabled?
         end
 
         def visitor
-          Analytics::Visitor.find_by_user_id(id) if FunnelCake::Config.enabled
+          Analytics::Visitor.find_by_user_id(id) if FunnelCake.enabled?
         end
 
       end
