@@ -40,7 +40,15 @@ describe FunnelCake::Config do
         FunnelCake.configure { event_class FunnelCakeConfigDummy }
         FunnelCake.configuration.event_class.should == FunnelCakeConfigDummy
       end
+      it 'should set the ignore class as a constant' do
+        FunnelCake.configure { ignore_class FunnelCakeConfigDummy }
+        FunnelCake.configuration.ignore_class.should == FunnelCakeConfigDummy
+      end
       it 'should set the data_store' do
+        module FunnelCake::DataStore::MyCustomDatastore; end
+        module FunnelCake::DataStore::MyCustomDatastore::Event; end
+        module FunnelCake::DataStore::MyCustomDatastore::Visitor; end
+        module FunnelCake::DataStore::MyCustomDatastore::Ignore; end
         FunnelCake.configure { data_store :my_custom_datastore }
         FunnelCake.configuration.data_store.should == :my_custom_datastore
       end
@@ -77,7 +85,6 @@ describe FunnelCake::Config do
         FunnelCake.configuration.enabled?.should be_true
       end
       it 'should set the user class' do
-        Object.should_receive(:const_defined?).with('User').and_return(false)
         FunnelCake.configure {}
         FunnelCake.configuration.user_class.should == nil # User isn't defined yet
       end
@@ -88,6 +95,10 @@ describe FunnelCake::Config do
       it 'should set the event class' do
         FunnelCake.configure {}
         FunnelCake.configuration.event_class.should == Analytics::Event
+      end
+      it 'should set the ignore class' do
+        FunnelCake.configure {}
+        FunnelCake.configuration.ignore_class.should == Analytics::Ignore
       end
       it 'should set the datastore' do
         FunnelCake.configure {}
@@ -143,6 +154,34 @@ describe FunnelCake::Config do
             :b=>[:event_b], 
             :c=>[],
           }
+        end
+      end
+      describe 'when initializing the datastore hooks' do
+        describe 'for mongo_mapper' do
+          before(:each) do
+            FunnelCakeConfigDummy.stub!(:include)
+          end
+          it 'should mixin the event module' do
+            FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Event)
+            FunnelCake.configure do
+              data_store :mongo_mapper
+              event_class FunnelCakeConfigDummy              
+            end
+          end
+          it 'should mixin the ignore module' do
+            FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Ignore)            
+            FunnelCake.configure do
+              data_store :mongo_mapper
+              ignore_class FunnelCakeConfigDummy              
+            end
+          end
+          it 'should mixin the visitor module' do
+            FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Visitor)            
+            FunnelCake.configure do
+              data_store :mongo_mapper
+              visitor_class FunnelCakeConfigDummy
+            end
+          end
         end
       end
     end

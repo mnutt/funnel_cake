@@ -7,6 +7,7 @@ module FunnelCake
       @user_class = User if Object.const_defined?('User')
       @visitor_class = Analytics::Visitor
       @event_class = Analytics::Event
+      @ignore_class = Analytics::Ignore
       @data_store = :mongo_mapper
       @states = { :unknown=>{} }
       @events = {}
@@ -15,7 +16,7 @@ module FunnelCake
     # Configuration Accessors
     attr_accessor :enabled
     def enabled?; @enabled; end
-    attr_accessor :user_class, :visitor_class, :event_class
+    attr_accessor :user_class, :visitor_class, :event_class, :ignore_class
     attr_accessor :data_store
     attr_accessor :states, :events
 
@@ -31,6 +32,7 @@ module FunnelCake
       def user_class(klass); @config.user_class = class_from(klass); end
       def visitor_class(klass); @config.visitor_class = class_from(klass); end
       def event_class(klass); @config.event_class = class_from(klass); end
+      def ignore_class(klass); @config.ignore_class = class_from(klass); end
 
       def data_store(store); @config.data_store = store; end
 
@@ -72,6 +74,7 @@ module FunnelCake
       configuration_dsl = Config::DSL.new(@@configuration)
       configuration_dsl.instance_eval(&block)
       apply_configuration!
+      initialize_datastore_hooks!
       initialize_state_machine!
     end
 
@@ -107,6 +110,19 @@ module FunnelCake
         event_opts = opts.clone
         block = event_opts.delete(:block)
         @@configuration.visitor_class.funnel_event name, event_opts, &block
+      end
+    end
+
+    def initialize_datastore_hooks!
+      datastore_module = "FunnelCake::DataStore::#{@@configuration.data_store.to_s.classify}"
+      @@configuration.event_class.class_eval do
+        include "#{datastore_module}::Event".constantize
+      end
+      @@configuration.ignore_class.class_eval do
+        include "#{datastore_module}::Ignore".constantize
+      end
+      @@configuration.visitor_class.class_eval do
+        include "#{datastore_module}::Visitor".constantize
       end
     end
 
