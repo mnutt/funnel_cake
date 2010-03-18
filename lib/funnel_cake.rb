@@ -4,10 +4,10 @@ module FunnelCake
   class Config
     def initialize(opts={})
       @enabled = true
-      @user_class = User if Object.const_defined?('User')
-      @visitor_class = Analytics::Visitor
-      @event_class = Analytics::Event
-      @ignore_class = Analytics::Ignore
+      @user_class = 'User'
+      @visitor_class = 'Analytics::Visitor'
+      @event_class = 'Analytics::Event'
+      @ignore_class = 'Analytics::Ignore'
       @data_store = :mongo_mapper
       @engine = FunnelCake::Engine
       @states = { :unknown=>{} }
@@ -31,10 +31,10 @@ module FunnelCake
       def enable; @config.enabled = true; end
       def disable; @config.enabled = false; end
 
-      def user_class(klass); @config.user_class = class_from(klass); end
-      def visitor_class(klass); @config.visitor_class = class_from(klass); end
-      def event_class(klass); @config.event_class = class_from(klass); end
-      def ignore_class(klass); @config.ignore_class = class_from(klass); end
+      def user_class(klass); @config.user_class = klass.to_s; end
+      def visitor_class(klass); @config.visitor_class = klass.to_s; end
+      def event_class(klass); @config.event_class = klass.to_s; end
+      def ignore_class(klass); @config.ignore_class = klass.to_s; end
 
       def data_store(store); @config.data_store = store; end
 
@@ -42,20 +42,12 @@ module FunnelCake
       def event(name, opts={}, &block)
         @config.events[name] = opts.merge(:block=>block)
       end
-
-      private
-
-      def class_from(constant_or_string)
-        if constant_or_string.is_a?(String)
-          constant_or_string.constantize
-        else
-          constant_or_string
-        end
-      end
     end
   end
 
   class << self
+    @@configuration = nil
+
     # Accessors for FunnelCake's configuration settings
     def configuration; @@configuration; end
     def configuration=(config); @@configuration = config; end
@@ -101,36 +93,36 @@ module FunnelCake
     private
 
     def initialize_state_machine!
-      @@configuration.visitor_class.send :extend, FunnelCake::ActsAsFunnelStateMachine::ActMacro
-      @@configuration.visitor_class.acts_as_funnel_state_machine({
+      @@configuration.visitor_class.constantize.send :extend, FunnelCake::ActsAsFunnelStateMachine::ActMacro
+      @@configuration.visitor_class.constantize.acts_as_funnel_state_machine({
         :initial=>:unknown, :validate_on_transitions=>false,
         :log_transitions=>true, :error_on_invalid_transition=>false
       })
       @@configuration.states.each do |name, opts|
-        @@configuration.visitor_class.funnel_state name, opts
+        @@configuration.visitor_class.constantize.funnel_state name, opts
       end
       @@configuration.events.each do |name, opts|
         event_opts = opts.clone
         block = event_opts.delete(:block)
-        @@configuration.visitor_class.funnel_event name, event_opts, &block
+        @@configuration.visitor_class.constantize.funnel_event name, event_opts, &block
       end
     end
 
     def initialize_datastore_hooks!
       datastore_module = "FunnelCake::DataStore::#{@@configuration.data_store.to_s.classify}"
-      @@configuration.event_class.class_eval do
+      @@configuration.event_class.constantize.class_eval do
         include "#{datastore_module}::Event".constantize
       end
-      @@configuration.ignore_class.class_eval do
+      @@configuration.ignore_class.constantize.class_eval do
         include "#{datastore_module}::Ignore".constantize
       end
-      @@configuration.visitor_class.class_eval do
+      @@configuration.visitor_class.constantize.class_eval do
         include "#{datastore_module}::Visitor".constantize
       end
       @@configuration.engine = "#{datastore_module}::Engine".constantize
-      @@configuration.engine.user_class = @@configuration.user_class
-      @@configuration.engine.visitor_class = @@configuration.visitor_class
-      @@configuration.engine.event_class = @@configuration.event_class
+      @@configuration.engine.user_class = @@configuration.user_class.constantize
+      @@configuration.engine.visitor_class = @@configuration.visitor_class.constantize
+      @@configuration.engine.event_class = @@configuration.event_class.constantize
     end
 
   end

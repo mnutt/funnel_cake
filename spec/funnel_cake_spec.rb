@@ -30,23 +30,23 @@ describe FunnelCake::Config do
       end
       it 'should set the user class as a string' do
         FunnelCake.configure { user_class 'FunnelCakeConfigDummy' }
-        FunnelCake.configuration.user_class.should == FunnelCakeConfigDummy
+        FunnelCake.configuration.user_class.should == 'FunnelCakeConfigDummy'
       end
       it 'should set the user class as a constant' do
         FunnelCake.configure { user_class FunnelCakeConfigDummy }
-        FunnelCake.configuration.user_class.should == FunnelCakeConfigDummy
+        FunnelCake.configuration.user_class.should == 'FunnelCakeConfigDummy'
       end
       it 'should set the visitor class as a constant' do
         FunnelCake.configure { visitor_class FunnelCakeConfigDummy }
-        FunnelCake.configuration.visitor_class.should == FunnelCakeConfigDummy
+        FunnelCake.configuration.visitor_class.should == 'FunnelCakeConfigDummy'
       end
       it 'should set the event class as a constant' do
         FunnelCake.configure { event_class FunnelCakeConfigDummy }
-        FunnelCake.configuration.event_class.should == FunnelCakeConfigDummy
+        FunnelCake.configuration.event_class.should == 'FunnelCakeConfigDummy'
       end
       it 'should set the ignore class as a constant' do
         FunnelCake.configure { ignore_class FunnelCakeConfigDummy }
-        FunnelCake.configuration.ignore_class.should == FunnelCakeConfigDummy
+        FunnelCake.configuration.ignore_class.should == 'FunnelCakeConfigDummy'
       end
       it 'should set the data_store' do
         module FunnelCake::DataStore::MyCustomDatastore; end
@@ -94,19 +94,19 @@ describe FunnelCake::Config do
       end
       it 'should set the user class' do
         FunnelCake.configure {}
-        FunnelCake.configuration.user_class.should == nil # User isn't defined yet
+        FunnelCake.configuration.user_class.should == 'User'
       end
       it 'should set the visitor class' do
         FunnelCake.configure {}
-        FunnelCake.configuration.visitor_class.should == Analytics::Visitor
+        FunnelCake.configuration.visitor_class.should == 'Analytics::Visitor'
       end
       it 'should set the event class' do
         FunnelCake.configure {}
-        FunnelCake.configuration.event_class.should == Analytics::Event
+        FunnelCake.configuration.event_class.should == 'Analytics::Event'
       end
       it 'should set the ignore class' do
         FunnelCake.configure {}
-        FunnelCake.configuration.ignore_class.should == Analytics::Ignore
+        FunnelCake.configuration.ignore_class.should == 'Analytics::Ignore'
       end
       it 'should set the datastore' do
         FunnelCake.configure {}

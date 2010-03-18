@@ -133,7 +133,7 @@ module FunnelCake
                 cookies[self.class.read_inheritable_attribute(:cookie_name)] = {
                   :value => @current_visitor.id,
                   :expires => 1.year.from_now
-                }
+                } if @current_visitor
               else
                 @current_visitor = FunnelCake.engine.visitor_class.find(cookie)
               end

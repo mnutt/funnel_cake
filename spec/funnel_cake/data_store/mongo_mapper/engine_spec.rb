@@ -23,12 +23,12 @@ describe FunnelCake::DataStore::MongoMapper::Engine do
 
   describe 'when setting the engine classes' do
     it 'should use the defaults' do
-      FunnelCake.engine.user_class.should be_nil # User is not defined
+      FunnelCake.engine.user_class.should == User
       FunnelCake.engine.visitor_class.should == Analytics::Visitor
       FunnelCake.engine.event_class.should == Analytics::Event
     end
     it 'should set custom classes' do
-      FunnelCake.engine.user_class.should be_nil # User is not defined
+      FunnelCake.engine.user_class.should == User
       FunnelCake.engine.user_class = UserDummy
       FunnelCake.engine.user_class.should == UserDummy
     end

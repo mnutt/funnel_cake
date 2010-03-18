@@ -52,6 +52,7 @@ end
 MongoMapper.connection = Mongo::Connection.new '127.0.0.1', 27017 #, :logger => Logger.new(STDOUT)
 MongoMapper.database = 'funnelcake_test'
 
+class User; end
 
 
 Spec::Matchers.define :only_have_objects do |expected|

@@ -28,7 +28,7 @@ module FunnelCake
             ensure_index 'events.url'
 
             # Set up the Analytics::Event model association
-            many :events, :class_name=>'Analytics::Event', :dependent=>:destroy, :foreign_key=>:visitor_id
+            many :events, :class_name=>FunnelCake.event_class.to_s, :dependent=>:destroy, :foreign_key=>:visitor_id
           end
         end
 

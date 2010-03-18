@@ -18,17 +18,18 @@ module FunnelCake
 
             #timestamps!
             key :created_at, Time
+
+            def self.create(attrs={})
+              _new = new(attrs)
+              _new.update_timestamp!
+              _new
+            end
+
           end
         end
 
         def update_timestamp!
           self.created_at = Time.now
-        end
-
-        def self.create(attrs={})
-          _new = new(attrs)
-          _new.update_timestamp!
-          _new
         end
 
         def visitor
