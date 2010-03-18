@@ -117,13 +117,11 @@ module FunnelCake                   #:nodoc:
           true
         end
 
-        def transitions(from, to, trans_opts={})
-          @parent.funnel_state(from) unless @parent.states.include?(from)
-          @parent.funnel_state(to) unless @parent.states.include?(to)
-          trans_opts[:from] = from
-          trans_opts[:to] = to
-          Array(trans_opts[:from]).each do |s|
-            @transitions << SupportingClasses::StateTransition.new(trans_opts.merge({:from => s.to_sym, :event => @name}))
+        def transitions(opts={})
+          @parent.funnel_state(opts[:from]) unless @parent.states.include?(opts[:from])
+          @parent.funnel_state(opts[:to]) unless @parent.states.include?(opts[:to])
+          Array(opts[:from]).each do |s|
+            @transitions << SupportingClasses::StateTransition.new(opts.merge({:from => s.to_sym, :event => @name}))
           end
         end
       end
@@ -260,7 +258,7 @@ module FunnelCake                   #:nodoc:
       #   state :closed
       #
       #   funnel_event :close_order do
-      #     transitions :to => :closed, :from => :open
+      #     transitions :from => :open, :to => :closed
       #   end
       # end
       #

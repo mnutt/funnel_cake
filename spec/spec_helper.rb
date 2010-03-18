@@ -41,14 +41,14 @@ module FunnelCake::UserStates
   def initialize_states
     funnel_state :page_visited, :primary=>true
     funnel_event :view_page do
-      transitions :unknown,       :page_visited
-      transitions :page_visited,  :page_visited
+      transitions :from=>:unknown,       :to=>:page_visited
+      transitions :from=>:page_visited,  :to=>:page_visited
     end
     funnel_event :start_a do
-      transitions :page_visited,  :a_started
+      transitions :from=>:page_visited,  :to=>:a_started
     end
     funnel_event :start_b do
-      transitions :a_started,     :b_started
+      transitions :from=>:a_started,     :to=>:b_started
     end
   end
 end
