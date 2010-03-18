@@ -1,10 +1,10 @@
 require 'spec_helper'
 
 describe FunnelCake::Config do
+  before(:each) do
+    FunnelCake.reset_configuration
+  end
   describe 'when configuring funnelcake' do
-    before(:each) do
-      FunnelCake.reset_configuration
-    end
     class FunnelCakeConfigDummy
       def self.before_create(*args); end
       def self.after_create(*args); end      
@@ -121,81 +121,79 @@ describe FunnelCake::Config do
         FunnelCake.configuration.events.should == {}
       end
     end
-    describe 'when applying the configuration settings' do
-      it 'should set the engine classes' do
+  end
+  describe 'when applying the configuration settings' do
+    it 'should set the engine classes' do
+      FunnelCake.configure do
+        user_class    FunnelCakeConfigDummy
+        visitor_class FunnelCakeConfigDummy
+        event_class   FunnelCakeConfigDummy                    
+      end
+      FunnelCake.run
+      FunnelCake.engine.user_class.should == FunnelCakeConfigDummy
+      FunnelCake.engine.visitor_class.should == FunnelCakeConfigDummy
+      FunnelCake.engine.event_class.should == FunnelCakeConfigDummy
+    end
+    describe 'when initializing the funnel state machine' do
+      it 'should initialize the states' do
         FunnelCake.configure do
-          user_class    FunnelCakeConfigDummy
           visitor_class FunnelCakeConfigDummy
-          event_class   FunnelCakeConfigDummy                    
+          state :state_a
+          state :state_b, :some=>:option
         end
-        FunnelCake.engine.user_class.should == FunnelCakeConfigDummy
-        FunnelCake.engine.visitor_class.should == FunnelCakeConfigDummy
-        FunnelCake.engine.event_class.should == FunnelCakeConfigDummy
+        FunnelCake.run
+        FunnelCakeConfigDummy.states.size.should == 3
+        FunnelCakeConfigDummy.states.include?(:unknown).should be_true
+        FunnelCakeConfigDummy.states.include?(:state_a).should be_true
+        FunnelCakeConfigDummy.states.include?(:state_b).should be_true          
+        FunnelCakeConfigDummy.state_options(:state_b).should == {:some=>:option}
       end
-      describe 'when initializing the funnel state machine' do
-        it 'should initialize the states' do
-          FunnelCake.configure do
-            visitor_class FunnelCakeConfigDummy
-            state :state_a
-            state :state_b, :some=>:option
+      it 'should initialize the events' do
+        block_dummy = lambda { puts 'dummy lambda' }
+        FunnelCake.configure do
+          visitor_class FunnelCakeConfigDummy
+          event :event_a do
+            transitions :from=>:a, :to=>:b
           end
-          FunnelCakeConfigDummy.states.size.should == 3
-          FunnelCakeConfigDummy.states.include?(:unknown).should be_true
-          FunnelCakeConfigDummy.states.include?(:state_a).should be_true
-          FunnelCakeConfigDummy.states.include?(:state_b).should be_true          
-          FunnelCakeConfigDummy.state_options(:state_b).should == {:some=>:option}
+          event :event_b, :some=>:option do
+            transitions :from=>:b, :to=>:c
+          end              
         end
-        it 'should initialize the events' do
-          block_dummy = lambda { puts 'dummy lambda' }
-          FunnelCake.configure do
-            visitor_class FunnelCakeConfigDummy
-            event :event_a do
-              transitions :from=>:a, :to=>:b
-            end
-            event :event_b, :some=>:option do
-              transitions :from=>:b, :to=>:c
-            end              
-          end
-          FunnelCakeConfigDummy.state_events_table.should == {
-            :unknown=>[],
-            :a=>[:event_a], 
-            :b=>[:event_b], 
-            :c=>[],
-          }
-        end
+        FunnelCake.run
+        FunnelCakeConfigDummy.state_events_table.should == {
+          :unknown=>[],
+          :a=>[:event_a], 
+          :b=>[:event_b], 
+          :c=>[],
+        }
       end
-      describe 'when initializing the datastore hooks' do
-        describe 'for mongo_mapper' do
-          before(:each) do
-            FunnelCakeConfigDummy.stub!(:include)
+    end
+    describe 'when initializing the datastore hooks' do
+      describe 'for mongo_mapper' do
+        before(:each) do
+          FunnelCakeConfigDummy.stub!(:include)
+          FunnelCake.configure do
+            data_store :mongo_mapper
+            event_class FunnelCakeConfigDummy              
+            ignore_class FunnelCakeConfigDummy                          
+            visitor_class FunnelCakeConfigDummy            
           end
-          it 'should mixin the event module' do
-            FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Event)
-            FunnelCake.configure do
-              data_store :mongo_mapper
-              event_class FunnelCakeConfigDummy              
-            end
-          end
-          it 'should mixin the ignore module' do
-            FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Ignore)            
-            FunnelCake.configure do
-              data_store :mongo_mapper
-              ignore_class FunnelCakeConfigDummy              
-            end
-          end
-          it 'should mixin the visitor module' do
-            FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Visitor)            
-            FunnelCake.configure do
-              data_store :mongo_mapper
-              visitor_class FunnelCakeConfigDummy
-            end
-          end
-          it 'should set the engine' do
-            FunnelCake.configure do
-              data_store :mongo_mapper
-            end
-            FunnelCake.engine.should == FunnelCake::DataStore::MongoMapper::Engine
-          end
+        end
+        it 'should mixin the event module' do
+          FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Event)
+          FunnelCake.run
+        end
+        it 'should mixin the ignore module' do
+          FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Ignore)            
+          FunnelCake.run
+        end
+        it 'should mixin the visitor module' do
+          FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Visitor)            
+          FunnelCake.run
+        end
+        it 'should set the engine' do
+          FunnelCake.run
+          FunnelCake.engine.should == FunnelCake::DataStore::MongoMapper::Engine
         end
       end
     end
@@ -204,8 +202,7 @@ describe FunnelCake::Config do
     it 'should delegate to the configuration object' do
       @config = FunnelCake::Config.new
       @config.enabled = 'dummy'
-      FunnelCake::Config.should_receive(:new).and_return(@config)
-      FunnelCake.configure {}
+      FunnelCake.configuration = @config
       FunnelCake.enabled.should == 'dummy'
     end
   end

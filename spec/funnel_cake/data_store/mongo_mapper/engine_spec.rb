@@ -18,6 +18,7 @@ describe FunnelCake::DataStore::MongoMapper::Engine do
         transitions :from=>:a_started,     :to=>:b_started
       end
     end    
+    FunnelCake.run
   end
 
   describe 'when setting the engine classes' do

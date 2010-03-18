@@ -75,13 +75,17 @@ module FunnelCake
       @@configuration ||= Config.new
       configuration_dsl = Config::DSL.new(@@configuration)
       configuration_dsl.instance_eval(&block)
-      initialize_datastore_hooks!
-      initialize_state_machine!
     end
 
     # Resets the configuration object, useful for tests
     def reset_configuration
       @@configuration = Config.new
+    end
+
+    # Initializes the FunnelCake library, and applies the configuration settings
+    def run
+      initialize_datastore_hooks!
+      initialize_state_machine!
     end
 
     # Delegate missed methods to the configuration object,
