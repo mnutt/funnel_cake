@@ -185,7 +185,7 @@ var ConversionFunnel = Class.create(FunnelCakeWidget, {
 					thiz.startCount.update(data.stats.start);
 					thiz.endCount.update(data.stats.end);
 					thiz.rate.update(Math.round(data.stats.rate*100)+'%');
-					thiz.previousRate.update('(' + Math.round(data.previous_stats.rate*100) + '%)');
+					thiz.previousRate.update('' + Math.round(data.previous_stats.rate*100) + '%');
 					thiz.spinner.fade({duration: 0.5});
 				}
 			}

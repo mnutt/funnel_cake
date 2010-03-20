@@ -62,12 +62,12 @@ div.funnel_conversion span.count {
 	font-size: 11px;
 }
 div.funnel_conversion span.rate {
-	font-weight: bold;
-	font-size: 12px;
-}
-div.funnel_conversion span.previous {
 	font-weight: normal;
 	font-size: 10px;
+}
+div.funnel_conversion span.previous {
+	font-weight: bold;
+	font-size: 12px;
 }
 div.funnel_conversion .hidden {
 	display: none;
