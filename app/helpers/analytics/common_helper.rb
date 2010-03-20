@@ -27,4 +27,10 @@ module Analytics::CommonHelper
     end.flatten]
   end
 
+  def global_statistic_options_for_select(stat, options={})
+    options = options.reverse_merge(:limit=>20)
+    arr = FunnelCake.engine.global_statistic_results(stat, options).collect{|doc| [doc['_id'], doc['_id']]}
+    options_for_select([['', '']] + arr, :selected=>'')
+  end
+
 end
