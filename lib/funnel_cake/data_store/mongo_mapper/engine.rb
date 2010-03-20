@@ -238,6 +238,15 @@ module FunnelCake::DataStore::MongoMapper
     end
 
 
+    #
+    # Methods for querying global stats
+    #
+    def self.global_statistic_results(stat, limit=20)
+      MongoMapper.database.collection("analytics.statistics.#{stat.to_s.pluralize}").
+      		find.sort(['value.count','descending']).limit(limit)
+    end
+
+
     private
 
     def self.mongo_date(datetime)

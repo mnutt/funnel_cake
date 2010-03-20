@@ -159,7 +159,6 @@ module FunnelCake
       end
     end
 
-
     # Clears the cached data, by performing the memcached namespace hack
     # We find the FunnelCake namespace key, and increment it
     def self.clear_cached_data
@@ -167,6 +166,13 @@ module FunnelCake
         rand(10000)
       end
       Rails.cache.write("FC.namespace_key", (namespace_key.to_i + 1).to_s)
+    end
+
+    #
+    # Methods for querying global stats
+    #
+    def self.global_statistic(stat, limit=20)
+      raise NotImplementedError, 'Method not implemented in the Engine superclass'
     end
 
 
