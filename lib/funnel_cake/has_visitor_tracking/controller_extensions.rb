@@ -86,7 +86,7 @@ module FunnelCake
 
           # ignore search engine bots
           return true if request.env["HTTP_USER_AGENT"] and request.env["HTTP_USER_AGENT"][/Googlebot|msnbot|Yahoo|Baidu|Teoma/]
-          return true if funnel_browser_name=='other'
+          return true if funnel_browser_is_bot?
 
           # check funnel-ignore list
           return true unless Analytics::Ignore.find_by_ip(request.remote_ip.to_s).nil?
@@ -149,7 +149,10 @@ module FunnelCake
             ua = request.env['HTTP_USER_AGENT'] || ''
             ua.downcase!
 
-            if ua.index('msie') && ua.length>4 && !ua.index('opera') && !ua.index('webtv')
+            robots = /Googlebot|msnbot|Yahoo|Baidu|Teoma|robot|trada|scoutjet|crawl|tagoobot/i
+            if ua[robots]
+              'robot'
+            elsif ua.index('msie') && ua.length>4 && !ua.index('opera') && !ua.index('webtv')
               'ie'+ua[ua.index('msie')+5].chr
             elsif ua.index('gecko/')
               'gecko'
@@ -165,6 +168,11 @@ module FunnelCake
               'other'
             end
           end
+        end
+
+        def funnel_browser_is_bot?
+          return true if ['other', 'robot'].include?(funnel_browser_name)
+          false
         end
 
       end
