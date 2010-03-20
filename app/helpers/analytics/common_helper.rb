@@ -22,7 +22,9 @@ module Analytics::CommonHelper
 
   def state_graph_visitors(start_state, end_state, opts)
     visitors = FunnelCake.engine.moved_to_state(end_state, opts).find.to_a
-    FunnelCake::DataHash[*visitors.collect { |visitor| [visitor.id, FunnelCake::DataHash[visitor.to_funnelcake]] }.flatten]
+    FunnelCake::DataHash[*visitors.collect do |visitor|
+      [visitor.id, FunnelCake::DataHash[visitor.to_funnelcake]]
+    end.flatten]
   end
 
 end

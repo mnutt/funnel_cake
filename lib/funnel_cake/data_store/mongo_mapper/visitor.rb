@@ -39,7 +39,9 @@ module FunnelCake
         def to_funnelcake
           attrs = attributes.clone
           attrs.merge(user.to_funnelcake) if user and user.respond_to?(:to_funnelcake)
-          attrs[:recent_event_date] = visitor.events.last.created_at.to_s(:short)
+          attrs[:recent_event_date] = events.last.created_at.to_s(:short)
+          attrs[:id] = attrs.delete('_id')
+          attrs
         end
 
       end
