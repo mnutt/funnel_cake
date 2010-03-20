@@ -1,0 +1,9 @@
+<div class='section'>
+	<h1>Analytics Global Statistics</h1>
+	<% [:landing_page, :referer, :user_agent].each do |stat| %>
+		<div class='section fullwidth'>
+			<h2><%= stat.to_s.pluralize.titleize %> - Top 20</h2>
+			<%= render 'global_stat_table', :stat=>stat %>
+		</div>
+	<% end %>
+</div>

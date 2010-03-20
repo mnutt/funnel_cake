@@ -1,0 +1,8 @@
+<% limit = 20 if local_assigns[:limit].nil? %>
+<table class='admin_table nice_margins'>
+	<tr><th>Count</th><th><%= stat.to_s.humanize %></th></tr>
+<%- MongoMapper.database.collection("analytics.statistics.#{stat.to_s.pluralize}").
+		find.sort(['value.count','descending']).limit(limit).each_with_index do |doc,i| -%>
+	<tr class='<%=alt_row(i)%>'><td class='right-align'><%= doc['value']['count'].to_i %></td><td><%= doc['_id'] %></td></tr>
+<%- end -%>
+</table>
