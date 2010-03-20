@@ -16,6 +16,8 @@ module FunnelCake
             key :state, String
             key :ip, String
 
+            ensure_index :created_at
+            ensure_index :updated_at
             ensure_index :user_id
             ensure_index :key
             ensure_index :state
@@ -26,6 +28,7 @@ module FunnelCake
             ensure_index 'events.referer'
             ensure_index 'events.user_agent'
             ensure_index 'events.url'
+            ensure_index 'events.created_at'
 
             # Set up the Analytics::Event model association
             many :events, :class_name=>FunnelCake.event_class.to_s, :dependent=>:destroy, :foreign_key=>:visitor_id
