@@ -36,49 +36,36 @@ namespace :funnel_cake do
       'url'         =>'landing_page',
     }
 
-    def send_to_mongo(code)
-      IO.popen("mongo", "w+") do |mongo|
-        mongo.write(code.join("\n"))
-        mongo.close_write
-        puts mongo.read
-      end
-    end
-
     desc 'Run map-reduce aggregations on existing visitor data to build statistics collections'
-    task :build_statistics do
+    task :build_statistics => :environment do
       ATTRIB_HASH.each do |attrib, collection|
         puts "---------- Building collection #{collection} from events[0].#{attrib}..."
-        code = []
-        code << 'use funnelcake;'
-        code << "m = function(){ emit( (this.events && this.events[0] && this.events[0].#{attrib}) ? this.events[0].#{attrib} : null, {count: 1}) };"
-        code << "r = function( key , values ){  var total = 0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count : total }; };"
-        code << "db.analytics.visitors.mapReduce(m, r, {out: 'analytics.statistics.#{collection.pluralize}'});"
-        code << "db.analytics.statistics.#{collection.pluralize}.ensureIndex({'value.count':-1});"
 
-        send_to_mongo(code)
+        map = "function(){ emit( (this.events && this.events[0] && this.events[0].#{attrib}) ? this.events[0].#{attrib} : null, {count: 1}) };"
+        reduce = "function( key , values ){  var total = 0; for ( var i=0; i<values.length; i++) { total += values[i].count; } return { count : total }; };"
+        MongoMapper.database.collection("analytics.visitors").map_reduce map, reduce,
+          :out=>"analytics.statistics.#{collection.pluralize}",
+          :query=>{:created_at=>{:'$gt'=>1.month.ago.utc}}
+
+        MongoMapper.database.create_index "analytics.statistics.#{collection.pluralize}", ['value.count', Mongo::DESCENDING]
+
         puts "---------- DONE. moving on...."
       end
     end
 
     desc 'Drop existing visitor statistics collections'
-    task :clear_statistics do
+    task :clear_statistics => :environment do
       ATTRIB_HASH.values.each do |collection|
         puts "---------- Dropping collection #{collection} ..."
-        code = []
-        code << 'use funnelcake;'
-        code << "db.analytics.statistics.#{collection.pluralize}.drop();"
-        send_to_mongo(code)
+        MongoMapper.database.drop_collection "analytics.statistics.#{collection.pluralize}"
         puts "---------- DONE. moving on...."
       end
     end
 
     desc 'Remove robot visitors'
-    task :clear_robot_visitors do
-      robots = '/Googlebot|msnbot|Yahoo|Baidu|Teoma|robot|trada|scoutjet|crawl|tagoobot/i'
-      code = []
-      code << 'use funnelcake;'
-      code << "db.analytics.visitors.remove({'events.user_agent': #{robots}});"
-      send_to_mongo(code)
+    task :clear_robot_visitors => :environment do
+      robots = /Googlebot|msnbot|Yahoo|Baidu|Teoma|robot|trada|scoutjet|crawl|tagoobot/i
+      MongoMapper.database.collection("analytics.visitors").remove 'events.user_agent'=>robots
     end
 
   end
