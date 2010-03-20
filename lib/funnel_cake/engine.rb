@@ -31,7 +31,6 @@ module FunnelCake
       raise NotImplementedError, 'Method not implemented in the Engine superclass'
     end
 
-
     # Method for finding visitors who moved
     # from a given state, for a given time period
     # (Used in calculating conversion rates)
