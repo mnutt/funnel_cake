@@ -241,9 +241,12 @@ module FunnelCake::DataStore::MongoMapper
     #
     # Methods for querying global stats
     #
-    def self.global_statistic_results(stat, limit=20)
-      MongoMapper.database.collection("analytics.statistics.#{stat.to_s.pluralize}").
-      		find.sort(['value.count','descending']).limit(limit)
+    def self.global_statistic_results(stat, options={})
+      cache_fetch("global_statistic_results:#{stat}-#{self.hash_options(options)}", :expires_in=>1.day) do
+        options = options.reverse_merge(:limit=>20)
+        MongoMapper.database.collection("analytics.statistics.#{stat.to_s.pluralize}").
+        		find.sort(['value.count','descending']).limit(options[:limit]).to_a
+    	end
     end
 
 
