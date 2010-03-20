@@ -284,15 +284,15 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 		var ymax = $H(rawdata).values().collect(function(e){return e[thiz.options.stat]}).max();
 		var yaxis_min = ymin;
 		var yaxis_max = ymax;
+	  var range = yaxis_max-yaxis_min;
 		if (this.options.yaxis_is_percentage) {
-  		yaxis_min = yaxis_min/2.0;
-  		yaxis_max = yaxis_max*2.0;
+  		yaxis_min = yaxis_min - range*1.5;
+  		yaxis_max = yaxis_max + range*1.5;
       yaxis_min = $A([yaxis_min, 0.0]).max();
   		yaxis_max = $A([yaxis_max, 100.0]).min();
   		yaxis_min = (yaxis_min < 10.0) ? 0.0 : yaxis_min;
   		yaxis_max = (yaxis_max > 90.0) ? 100.0 : yaxis_max;
 		} else {
-		  var range = yaxis_max-yaxis_min;
   		yaxis_min = yaxis_min - range/2.0;
   		yaxis_max = yaxis_max + range/2.0;
       yaxis_min = $A([yaxis_min, 0.0]).max();
