@@ -208,12 +208,14 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 			dataUrl: '/analytics/conversions/ID/history',
 			stat: 'number',
 			yaxis_min: null,
-			yaxis_max: null
+			yaxis_max: null,
+			yaxis_is_percentage: null,
 		}).merge(options).toObject();
 		if (!options.startState) { console.error("ConversionGraph missing required 'startState'"); }
 		if (!options.endState) { console.error("ConversionGraph missing required 'endState'"); }
 		if (!options.stat) { console.error("ConversionGraph missing required 'stat'"); }
 
+    options.yaxis_is_percentage = (options.stat=='rate') ? true : options.yaxis_is_percentage;
 		options.dataUrl = options.dataUrl.replace('ID', options.startState+'-'+options.endState);
 		options.style = options.style ? options.style : '';
 
@@ -278,6 +280,23 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 	constructFlotrData: function(rawdata) {
 		var thiz = this;
 		var sortedData = $H(rawdata).values().sortBy(function(e){return e.index});
+		var ymin = $H(rawdata).values().collect(function(e){return e[thiz.options.stat]}).min();
+		var ymax = $H(rawdata).values().collect(function(e){return e[thiz.options.stat]}).max();
+		var yaxis_min = ymin;
+		var yaxis_max = ymax;
+		if (this.options.yaxis_is_percentage) {
+  		yaxis_min = yaxis_min/2.0;
+  		yaxis_max = yaxis_max*2.0;
+      yaxis_min = $A([yaxis_min, 0.0]).max();
+  		yaxis_max = $A([yaxis_max, 100.0]).min();
+  		yaxis_min = (yaxis_min < 10.0) ? 0.0 : yaxis_min;
+  		yaxis_max = (yaxis_max > 90.0) ? 100.0 : yaxis_max;
+		} else {
+		  var range = yaxis_max-yaxis_min;
+  		yaxis_min = yaxis_min - range/2.0;
+  		yaxis_max = yaxis_max + range/2.0;
+      yaxis_min = $A([yaxis_min, 0.0]).max();
+		}
 		return {
 			data: [{
 				  data: sortedData.collect(function(e){return [e.index, e[thiz.options.stat]]}),
@@ -299,8 +318,8 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 					noTicks: 5,		// => number of ticks for automagically generated ticks
 					tickFormatter: function(n){ return n; },
 					tickDecimals: 0,	// => no. of decimals, null means auto
-					min: this.options.yaxis_min,		// => min. value to show, null means set automatically
-					max: this.options.yaxis_max,		// => max. value to show, null means set automatically
+					min: this.options.yaxis_min || yaxis_min,		// => min. value to show, null means set automatically
+					max: this.options.yaxis_max || yaxis_max,		// => max. value to show, null means set automatically
 					autoscaleMargin: 0	// => margin in % to add if auto-setting min/max
 			  }
 			}
