@@ -3,6 +3,8 @@ class Analytics::Visitor
 
   # Create a Analytics::Event, as a callback to a state_machine transition
   def log_transition(from, to, event, data, opts)
+    update_statistics(data) if events.empty?  # if this is the first event, update the global statistics
+
     self.events << Analytics::Event.create({
       :from=>from.to_s, :to=>to.to_s,
       :url=>data[:url],

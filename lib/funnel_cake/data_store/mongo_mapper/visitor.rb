@@ -47,6 +47,15 @@ module FunnelCake
           attrs
         end
 
+        def update_statistics(data)
+          increment_statistic('referers', data[:referer])
+          increment_statistic('user_agents', data[:user_agent])
+          increment_statistic('landing_pages', data[:url])
+        end
+        def increment_statistic(collection, stat)
+          MongoMapper.database.collection("analytics.statistics.#{collection}").update({'_id'=>stat}, {'$inc'=>{'value.count'=>1}})
+        end
+
       end
     end
   end
