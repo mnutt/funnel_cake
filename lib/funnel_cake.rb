@@ -10,8 +10,8 @@ module FunnelCake
       @ignore_class = 'Analytics::Ignore'
       @data_store = :mongo_mapper
       @engine = FunnelCake::Engine
-      @states = { :unknown=>{} }
-      @events = {}
+      @states = ActiveSupport::OrderedHash.new.merge({ :unknown=>{} })
+      @events = ActiveSupport::OrderedHash.new
     end
 
     # Configuration Accessors
