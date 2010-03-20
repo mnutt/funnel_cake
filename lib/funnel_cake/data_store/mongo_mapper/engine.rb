@@ -110,7 +110,7 @@ module FunnelCake::DataStore::MongoMapper
       date_range = opts[:date_range]
       attrition_period = opts.delete(:attrition_period)
       attrition_period = visitor_class.state_options(state)[:attrition_period] unless visitor_class.state_options(state)[:attrition_period].nil?
-      attrition_period = (date_range.end - date_range.begin)*2.0 if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0)
+      attrition_period = ((date_range.end - date_range.begin)*2.0).days if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0).days
 
       js_condition = "x.from == '#{state}'"
       js_condition += " && x.created_at < new Date('#{mongo_date(date_range.begin)}')" if date_range
@@ -131,7 +131,7 @@ module FunnelCake::DataStore::MongoMapper
       Finder.new(visitor_class, opts) do
         to state
         created_at :lt=>date_range.end if date_range
-        created_at :gt=>(date_range.end - attrition_period) if date_range and attrition_period
+        created_at :gt=>(date_range.begin - attrition_period) if date_range and attrition_period
         where where_javascript
       end
     end
