@@ -20,8 +20,19 @@ class Analytics::CommonController < ApplicationController
   def add_filter_options(options)
     return options if params[:filter_data].blank?
     data = ActiveSupport::JSON.decode(params[:filter_data])
-    data = data.inject({}) { |h, (k, v)| h[k.to_sym] = v; h }
+    data = data.inject({}) do |h, (k, v)|
+      v = convert_hash_values_to_regexes(v) if v.is_a?(Hash)
+      h[k.to_sym] = v unless v.blank?
+      h
+    end
     options.merge(data)
+  end
+
+  def convert_hash_values_to_regexes(hash)
+    hash.inject({}) do |h, (k,v)|
+      h[k.to_sym] = v[/^\/.*\/$/].blank? ? v : /#{v[1..-2]}/ unless v.blank?
+      h
+    end
   end
 
   def grab_date_range
