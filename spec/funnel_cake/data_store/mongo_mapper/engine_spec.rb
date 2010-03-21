@@ -148,19 +148,19 @@ describe FunnelCake::DataStore::MongoMapper::Engine do
             @finder_a.count.should == 1
           end
         end
-        describe 'for a regex match' do
-          before(:each) do
-            @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
-              @opts.merge( :first_event_with=>{:referer=>/a+/} )
-            )
-          end        
-          it 'should return the visitors' do
-            @finder_a.find.should only_have_objects([ @visitors[1] ])
-          end
-          it 'should count the visitors' do
-            @finder_a.count.should == 1
-          end
-        end
+        # describe 'for a regex match' do
+        #   before(:each) do
+        #     @finder_a = FunnelCake.engine.eligible_to_move_from_state(:a_started, 
+        #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
+        #     )
+        #   end        
+        #   it 'should return the visitors' do
+        #     @finder_a.find.should only_have_objects([ @visitors[1] ])
+        #   end
+        #   it 'should count the visitors' do
+        #     @finder_a.count.should == 1
+        #   end
+        # end
       end
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
@@ -320,19 +320,19 @@ describe FunnelCake::DataStore::MongoMapper::Engine do
             @finder_a.count.should == 1
           end
         end      
-        describe 'for a regex match' do
-          before(:each) do
-            @finder_a = FunnelCake.engine.moved_to_state(:b_started,
-              @opts.merge( :first_event_with=>{:referer=>/a+/} )
-            )
-          end        
-          it 'should return the visitors' do
-            @finder_a.find.should only_have_objects([ @visitors[1] ])
-          end
-          it 'should count the visitors' do
-            @finder_a.count.should == 1
-          end
-        end      
+        # describe 'for a regex match' do
+        #   before(:each) do
+        #     @finder_a = FunnelCake.engine.moved_to_state(:b_started,
+        #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
+        #     )
+        #   end        
+        #   it 'should return the visitors' do
+        #     @finder_a.find.should only_have_objects([ @visitors[1] ])
+        #   end
+        #   it 'should count the visitors' do
+        #     @finder_a.count.should == 1
+        #   end
+        # end      
       end
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
@@ -479,19 +479,19 @@ describe FunnelCake::DataStore::MongoMapper::Engine do
             @finder_a.count.should == 1
           end  
         end      
-        describe 'for a regex match' do
-          before(:each) do
-            @finder_a = FunnelCake.engine.moved_from_state(:a_started,
-              @opts.merge( :first_event_with=>{:referer=>/a+/} )
-            )
-          end
-          it 'should return the visitors' do
-            @finder_a.find.should only_have_objects([ @visitors[1] ])
-          end  
-          it 'should count the visitors' do
-            @finder_a.count.should == 1
-          end  
-        end      
+        # describe 'for a regex match' do
+        #   before(:each) do
+        #     @finder_a = FunnelCake.engine.moved_from_state(:a_started,
+        #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
+        #     )
+        #   end
+        #   it 'should return the visitors' do
+        #     @finder_a.find.should only_have_objects([ @visitors[1] ])
+        #   end  
+        #   it 'should count the visitors' do
+        #     @finder_a.count.should == 1
+        #   end  
+        # end      
       end
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
@@ -650,19 +650,19 @@ describe FunnelCake::DataStore::MongoMapper::Engine do
             @finder_a.count.should == 1
           end
         end
-        describe 'for a regex match' do
-          before(:each) do
-            @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
-              @opts.merge( :first_event_with=>{:referer=>/a+/} )
-            )
-          end        
-          it 'should return the visitors' do
-            @finder_a.find.should only_have_objects([ @visitors[1] ])
-          end
-          it 'should count the visitors' do
-            @finder_a.count.should == 1
-          end
-        end
+        # describe 'for a regex match' do
+        #   before(:each) do
+        #     @finder_a = FunnelCake.engine.moved_between_states(:a_started, :b_started,
+        #       @opts.merge( :first_event_with=>{:referer=>/a+/} )
+        #     )
+        #   end        
+        #   it 'should return the visitors' do
+        #     @finder_a.find.should only_have_objects([ @visitors[1] ])
+        #   end
+        #   it 'should count the visitors' do
+        #     @finder_a.count.should == 1
+        #   end
+        # end
       end
       describe 'with a visitor_with filter' do
         describe 'for an exact match' do
