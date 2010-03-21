@@ -67,8 +67,10 @@ var ConversionFunnel = Class.create(FunnelCakeWidget, {
 
 	build: function() {
 		// Create funnel parts
-		this.topLabel = new Element('div', {'class': this.classesWithHidden('label top', this.options.topLabel)}).update(this.options.startState);
-		this.bottomLabel = new Element('div', {'class': this.classesWithHidden('label bottom', this.options.bottomLabel)}).update(this.options.endState);
+		this.options.topLabelText = (this.options.topLabel==true) ? this.options.startState : this.options.topLabel;
+		this.options.bottomLabelText = (this.options.bottomLabel==true) ? this.options.endState : this.options.bottomLabel;
+		this.topLabel = new Element('div', {'class': this.classesWithHidden('label top', this.options.topLabel)}).update(this.options.topLabelText);
+		this.bottomLabel = new Element('div', {'class': this.classesWithHidden('label bottom', this.options.bottomLabel)}).update(this.options.bottomLabelText);
 		this.startCount = new Element('span', {'class': this.classesWithHidden('count start', this.options.startCount)});
 		this.endCount = new Element('span', {'class': this.classesWithHidden('count end', this.options.endCount)});
 		this.rate = new Element('span', {'class': this.classesWithHidden('rate', this.options.rate)});

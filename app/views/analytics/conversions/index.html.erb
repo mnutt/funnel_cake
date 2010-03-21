@@ -9,7 +9,8 @@
 	<%- prev_state = previous_state_from(state) -%>
 	<div class="section full_width">
 		<div class="column span-3">
-				<%= render 'analytics/conversions/conversion', :start_state=>prev_state, :end_state=>state, :options=>{:topLabel=>(i==0)} %>
+				<%= render 'analytics/conversions/conversion', :start_state=>prev_state, :end_state=>state,
+						:options=>{:topLabel=>(i==0 ? prev_state.to_s.titleize : false), :bottomLabel=>link_to(state.to_s.titleize, analytics_conversion_path("#{prev_state}-#{state}"))} %>
 		</div>
 		<div class="column span-6">
 			<b><%=prev_state%> to <%=state%> Rate History</b>
