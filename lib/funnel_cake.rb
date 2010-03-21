@@ -46,7 +46,7 @@ module FunnelCake
   end
 
   class << self
-    @@configuration = nil
+    @@configuration ||= nil
 
     # Accessors for FunnelCake's configuration settings
     def configuration; @@configuration; end
@@ -76,6 +76,7 @@ module FunnelCake
 
     # Initializes the FunnelCake library, and applies the configuration settings
     def run
+      return unless enabled?
       initialize_datastore_hooks!
       initialize_state_machine!
     end
