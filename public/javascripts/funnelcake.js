@@ -279,11 +279,38 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 		this.exports.update(new Element('a', {'href': this.options.dataUrl+'.csv?'+params.toQueryString()}).update('csv'));
 	},
 
+  // Data Format:
+  // {
+  //   a: {
+  //      "0": {"date":"03/26","number":26,"rate":1.51869158878505,"index":0},
+  //      "1":{"date":"12/18","number":28,"rate":1.30963517305893,"index":1},
+  //   },
+  //   b: {
+  //      "0": {"date":"03/26","number":26,"rate":1.51869158878505,"index":0},
+  //      "1":{"date":"12/18","number":28,"rate":1.30963517305893,"index":1},
+  //   }
+  // }
 	constructFlotrData: function(rawdata) {
 		var thiz = this;
-		var sortedData = $H(rawdata).values().sortBy(function(e){return e.index});
-		var ymin = $H(rawdata).values().collect(function(e){return e[thiz.options.stat]}).min();
-		var ymax = $H(rawdata).values().collect(function(e){return e[thiz.options.stat]}).max();
+		var dataHash = $H(rawdata);
+
+		var sortedData = dataHash.values().collect(function(series){
+		  return $H(series).values().sortBy(function(e){return e.index});
+		});
+    var flotrData = sortedData.collect(function(series){
+      return {
+        data: series.collect(function(e){return [e.index, e[thiz.options.stat]]}),
+		    lines: {show: true, fill: true},
+		    points: {show: true}
+	    };
+    });
+
+    var ymin = sortedData.collect(function(series){
+      return series.collect(function(e){return e[thiz.options.stat]}).min();
+    }).min();
+    var ymax = sortedData.collect(function(series){
+      return series.collect(function(e){return e[thiz.options.stat]}).max();
+    }).max();
 		var yaxis_min = ymin;
 		var yaxis_max = ymax;
 	  var range = yaxis_max-yaxis_min;
@@ -300,14 +327,10 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
       yaxis_min = $A([yaxis_min, 0.0]).max();
 		}
 		return {
-			data: [{
-				  data: sortedData.collect(function(e){return [e.index, e[thiz.options.stat]]}),
-			    lines: {show: true, fill: true},
-			    points: {show: true}
-			}],
+			data: flotrData,
 			options: {
 	  	  xaxis: {
-					ticks: sortedData.collect(function(e){return [e.index, e.date]}),		// => format: either [1, 3] or [[1, 'a'], 3]
+					ticks: sortedData[0].collect(function(e){return [e.index, e.date]}),		// => format: either [1, 3] or [[1, 'a'], 3]
 					noTicks: 5,		// => number of ticks for automagically generated ticks
 					tickFormatter: function(n){ return n; },
 					tickDecimals: 0,	// => no. of decimals, null means auto
@@ -329,7 +352,6 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 	}
 
 });
-
 
 
 //

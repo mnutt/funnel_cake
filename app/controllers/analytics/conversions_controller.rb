@@ -13,6 +13,12 @@ class Analytics::ConversionsController < Analytics::CommonController
     end
   end
 
+  def compare
+    respond_to do |format|
+      format.html # show.html.erb
+    end
+  end
+
   def show
     respond_to do |format|
       format.html # show.html.erb

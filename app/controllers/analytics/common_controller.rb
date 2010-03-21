@@ -18,14 +18,22 @@ class Analytics::CommonController < ApplicationController
   private
 
   def add_filter_options(options)
-    return options if params[:filter_data].blank?
-    data = ActiveSupport::JSON.decode(params[:filter_data])
+    data = {}
+    if params[:compare]
+      compare = ActiveSupport::JSON.decode(params[:compare])
+      data = {:compare=>compare.collect {|cur_filter_data| process_filter_data(cur_filter_data)}}
+    end
+    data = process_filter_data(ActiveSupport::JSON.decode(params[:filter_data])) if params[:filter_data]
+    options.merge(data)
+  end
+
+  def process_filter_data(data)
     data = data.inject({}) do |h, (k, v)|
       v = convert_hash_values_to_regexes(v) if v.is_a?(Hash)
       h[k.to_sym] = v unless v.blank?
       h
     end
-    options.merge(data)
+    data
   end
 
   def convert_hash_values_to_regexes(hash)

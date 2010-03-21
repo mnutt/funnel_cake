@@ -1,0 +1,54 @@
+<div class="section">
+	<h1>Compare <span>Conversion Rates</span></h1>
+	<div class="section full_width">
+		<h2>Filter Controls</h2>
+		<%= render :partial => 'analytics/common/daterange_label' %>
+	</div>
+	<div class="section full_width">
+		<%= render 'analytics/common/filter_fields_input', :style=>'font-size: 12px', :compare=>'A' %>
+		<%= render 'analytics/common/filter_fields_input', :style=>'font-size: 12px', :compare=>'B' %>
+	</div>
+	<%- Analytics::Visitor.primary_states[1..-1].each_with_index do |state, i| -%>
+		<%- prev_state = previous_state_from(state) -%>
+		<div class="section full_width">
+			<div class="column span-6">
+				<b><%=prev_state%> to <%=state%> Rate History</b>
+				<%= render 'analytics/conversions/graph', :start_state=>prev_state, :end_state=>state, :stat=>:rate %>
+			</div>
+			<div class="column span-6">
+				<b><%=prev_state%> to <%=state%> Absolute History</b>
+				<%= render 'analytics/conversions/graph', :start_state=>prev_state, :end_state=>state %>
+			</div>
+		</div>
+	<%- end -%>
+</div>
+<script type='text/javascript'>
+<%= render 'analytics/common/filter_fields_update.js' %>
+<%= render 'analytics/common/stats_update.js' %>
+
+	var updateAnalyticsStats = function() {
+		var period = $('date_period').value;
+		var opts = {
+			compare: [
+				$H({
+					first_event_with: { url: $('landing_page_matchA').value, referer: $('referer_matchA').value },
+					has_event_with: { url: $('visited_page_matchA').value }
+				}),
+				$H({
+					first_event_with: { url: $('landing_page_matchB').value, referer: $('referer_matchB').value },
+					has_event_with: { url: $('visited_page_matchB').value }
+				})
+			].toJSON()
+		};
+		opts.time_period = periodDays(period);
+		opts.period_start = periodStart(period);
+		opts.period_end = periodEnd(period);
+
+		setPeriodLabel(period);
+		FunnelCakeWidget.update(opts);
+	}
+
+	FunnelCakeWidget.draw();
+	updateAnalyticsStats();
+
+</script>

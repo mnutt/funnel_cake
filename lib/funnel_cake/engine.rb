@@ -133,6 +133,7 @@ module FunnelCake
     end
 
     def self.conversion_history(start_state, end_state, options={})
+      return compound_conversion_history(start_state, end_state, options) if options[:compare]
       cache_fetch("conversion_history:#{start_state}-#{end_state}-#{self.hash_options(options)}", :expires_in=>1.day) do
         time_period = options[:time_period]
 
@@ -155,9 +156,21 @@ module FunnelCake
           current_period = previous_date_range(current_period, time_period==30.days)
         end
 
-        data_hash
+        name = options[:name] || "#{start_state}-#{end_state}"
+        FunnelCake::DataHash[{name=>data_hash}]
       end
     end
+
+    def self.compound_conversion_history(start_state, end_state, options={})
+      data_hash = FunnelCake::DataHash.new
+      compares = options.delete(:compare)
+      compares.each_with_index do |cur_options, i|
+        cur_options[:name] = i
+        data_hash.merge! conversion_history(start_state, end_state, cur_options.merge(options))
+      end
+      data_hash
+    end
+
 
     # Clears the cached data, by performing the memcached namespace hack
     # We find the FunnelCake namespace key, and increment it
