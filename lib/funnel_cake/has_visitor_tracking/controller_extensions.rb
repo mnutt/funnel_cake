@@ -13,7 +13,7 @@ module FunnelCake
           write_inheritable_attribute :cookie_name, opts[:cookie_name]
 
           # set up a callback to prefilter visitors and get them registered
-          before_filter :track_visitor_as_user
+          before_filter :track_visitor
 
           # include the instance methods
           include FunnelCake::HasVisitorTracking::ControllerExtensions::InstanceMethods
@@ -26,7 +26,7 @@ module FunnelCake
 
         # This is a before_filter callback for registering new visitors
         # - admin users are ignored
-        def track_visitor_as_user
+        def track_visitor
           return if ignore_funnel_tracking?
           register_funnel_visitor unless visitor_registered?
         end
@@ -35,6 +35,7 @@ module FunnelCake
         # (This is probably how MOST funnel events will be triggered)
         # - checks if we are an admin visitor first
         # - sends the funnel event msg to the current user, if we're logged in
+        #   - sets the url, referer, ua data automatically using the request
         # - otherwise, sends it to the current visitor
         # - if there is no valid current visitor, register one
         # - finally... logs an error if we have no current visitor (because that shouldn't happen!)
@@ -42,6 +43,11 @@ module FunnelCake
           return if ignore_funnel_tracking?
           register_funnel_visitor if current_visitor.nil?
           unless current_visitor.nil?
+            data.reverse_merge!({
+              :url=>request.request_uri,
+              :referer=>request.referer,
+              :user_agent=>request.env["HTTP_USER_AGENT"].to_s
+            })
             current_visitor.log_funnel_event(event, data)
             return
           end
@@ -49,11 +55,8 @@ module FunnelCake
         end
 
         # Utility method for logging a page visit
-        # - sets the url data string automatically using the request_uri
         def log_funnel_page_visit
-          log_funnel_event(:view_page, {:url=>request.request_uri,
-                                        :referer=>request.referer,
-                                        :user_agent=>request.env["HTTP_USER_AGENT"].to_s})
+          log_funnel_event(:view_page)
         end
 
         # Utility method for syncing the current visitor to the current user
