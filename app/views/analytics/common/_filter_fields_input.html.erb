@@ -11,9 +11,19 @@
 	<%= select_tag 'landing_page_match', global_statistic_options_for_select(:landing_page), :onchange=>"updateAnalyticsStats();", :style=>"#{style}; width: 200px;" %>
 	<br />
 	<h3 style='display: inline;'>Referer:</h3>
-	<%#= text_field_tag 'referer_match', '',
-		:onchange=>"updateAnalyticsStats();", :style=>"#{style}" %>
 	<%= select_tag 'referer_match', global_statistic_options_for_select(:referer), :onchange=>"updateAnalyticsStats();", :style=>"#{style}; width: 200px;" %>
+	<%#= text_field_tag 'text_referer_match', '', :style=>"#{style}" %>
+	<%#= hidden_field_tag 'referer_match', '' %>
+	<!--script type='text/javascript'>
+		$('select_referer_match').observe('change', function(ev){
+			$('referer_match').value = $('select_referer_match').value + $('text_referer_match').value;
+			updateAnalyticsStats();
+		});
+		$('text_referer_match').observe('change', function(ev){
+			$('referer_match').value = $('select_referer_match').value + $('text_referer_match').value;
+			updateAnalyticsStats();
+		});
+	</script-->
 	<br />
 	<h3 style='display: inline;'>Visited Page:</h3>
 	<%= text_field_tag 'visited_page_match', '',
