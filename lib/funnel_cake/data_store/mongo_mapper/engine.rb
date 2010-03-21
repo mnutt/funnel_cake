@@ -14,7 +14,7 @@ module FunnelCake::DataStore::MongoMapper
     #   where 'something'
     # end.find
     class Finder
-      attr_accessor :options, :klass
+      attr_accessor :options, :klass, :finder_options
 
       def initialize(_klass, _options={}, &block)
         @options = _options
@@ -78,6 +78,11 @@ module FunnelCake::DataStore::MongoMapper
         @finder_options['$where'] = _where unless _where.blank?
       end
 
+      def not_including(&block)
+        not_finder = Finder.new(@klass, {}, &block)
+        @finder_options[:events]['$not'] = not_finder.finder_options[:events]
+      end
+
       private
 
       def process_options!
@@ -112,27 +117,15 @@ module FunnelCake::DataStore::MongoMapper
       attrition_period = visitor_class.state_options(state)[:attrition_period] unless visitor_class.state_options(state)[:attrition_period].nil?
       attrition_period = ((date_range.end - date_range.begin)*2.0).days if attrition_period and attrition_period > ((date_range.end - date_range.begin)*2.0).days
 
-      js_condition = "x.from == '#{state}'"
-      js_condition += " && x.created_at < new Date('#{mongo_date(date_range.begin)}')" if date_range
-      where_javascript = <<-eos
-        function() {
-          qual=true;
-          this.events.forEach(
-            function(x) {
-              if( #{js_condition} ) {
-                qual=false;
-              }
-            }
-          )
-          return qual;
-        }
-      eos
-
       Finder.new(visitor_class, opts) do
         to state
         created_at :lt=>date_range.end if date_range
         created_at :gt=>(date_range.begin - attrition_period) if date_range and attrition_period
-        where where_javascript
+        # where where_javascript
+        not_including do
+          created_at :lt=>date_range.begin if date_range
+          from state
+        end
       end
     end
 
