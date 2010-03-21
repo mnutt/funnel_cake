@@ -47,6 +47,9 @@ class Rails
   def self.fetch(a=nil, b=nil, &block)
     yield
   end
+  def self.logger
+    @logger ||= Logger.new(STDOUT)
+  end
 end
 
 MongoMapper.connection = Mongo::Connection.new '127.0.0.1', 27017 #, :logger => Logger.new(STDOUT)
