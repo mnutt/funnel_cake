@@ -138,7 +138,11 @@ module FunnelCake
                   :expires => 1.year.from_now
                 } if @current_visitor
               else
-                @current_visitor = FunnelCake.engine.visitor_class.find(cookie)
+                begin
+                  @current_visitor = FunnelCake.engine.visitor_class.find(cookie)
+                rescue Mongo::InvalidObjectID => e
+                  Rails.logger.info e
+                end
               end
             end
           end
