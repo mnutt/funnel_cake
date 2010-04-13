@@ -52,8 +52,8 @@ var ConversionFunnel = Class.create(FunnelCakeWidget, {
 		options = $H({
 			topLabel: true,
 			bottomLabel: true,
-			startCount: false,
-			endCount: false,
+			startCount: true,
+			endCount: true,
 			rate: true,
 			previousRate: true,
 			dataUrl: '/analytics/conversions/'
@@ -346,7 +346,14 @@ var ConversionGraph = Class.create(FunnelCakeWidget, {
 					min: this.options.yaxis_min || yaxis_min,		// => min. value to show, null means set automatically
 					max: this.options.yaxis_max || yaxis_max,		// => max. value to show, null means set automatically
 					autoscaleMargin: 0	// => margin in % to add if auto-setting min/max
-			  }
+			  },
+        mouse: {
+          track: true,
+          color: 'blue',
+          sensibility: 3, // => distance to show point get's smaller
+          trackDecimals: 2,
+          trackFormatter: function(obj){ return obj.y; }
+        }
 			}
 		};
 	}
