@@ -24,7 +24,9 @@ class Analytics::StatesController < Analytics::CommonController
         render :json=>FunnelCake.engine.conversion_history(start_state, end_state, options).to_json and return
       end
       format.csv do
-        render :inline=>FunnelCake.engine.conversion_history(start_state, end_state, options).to_csv and return
+        send_data(FunnelCake.engine.conversion_history(start_state, end_state, options).values.first.to_csv,
+              :type => 'text/csv; charset=utf-8; header=present',
+              :filename => "#{@state}-#{params[:time_period]}day_details.csv") and return
       end
     end
   end
@@ -45,7 +47,9 @@ class Analytics::StatesController < Analytics::CommonController
         render :json=>visitors.to_json and return
       end
       format.csv do
-        render :inline=>visitors.to_csv and return
+        send_data(visitors.to_csv,
+              :type => 'text/csv; charset=utf-8; header=present',
+              :filename => "#{@state}-#{params[:time_period]}day_visitors.csv") and return
       end
     end
   end

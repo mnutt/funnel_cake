@@ -61,7 +61,7 @@ class Analytics::ConversionsController < Analytics::CommonController
         render :json=>FunnelCake.engine.conversion_history(@start_state, @end_state, @options).to_json and return
       end
       format.csv do
-        send_data(FunnelCake.engine.conversion_history(@start_state, @end_state, @options).to_csv,
+        send_data(FunnelCake.engine.conversion_history(@start_state, @end_state, @options).values.first.to_csv,
               :type => 'text/csv; charset=utf-8; header=present',
               :filename => "#{@state}-#{params[:time_period]}day_history.csv") and return
       end
