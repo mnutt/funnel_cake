@@ -60,6 +60,10 @@ div.funnel_conversion .stats_container {
 div.funnel_conversion span.count {
 	color: #666;
 	font-size: 11px;
+	display: none;
+}
+div.funnel_conversion:hover span.count {
+	display: inline;
 }
 div.funnel_conversion span.rate {
 	font-weight: normal;
@@ -162,6 +166,9 @@ div.big_stat h2 {
 	padding-bottom: 0em;
 	background: none;
 	display: inline;
+	border: none;
+  position: relative;
+  top: 2px;
 }
 div.big_stat h3 {
 	display: inline;
