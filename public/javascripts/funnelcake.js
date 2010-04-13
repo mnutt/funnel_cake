@@ -537,7 +537,7 @@ var DataTable = Class.create(FunnelCakeWidget, {
 
 	insertTableData: function(rawdata) {
 		var thiz = this;
-		var sortedData = $H(rawdata).values().sortBy(function(e){return e.index});
+		var sortedData = $H($H(rawdata).values()[0]).values().sortBy(function(e){return e.index});
 		sortedData.each(function(elem) {
 			var row = new Element('tr', {'class': 'data'});
 
