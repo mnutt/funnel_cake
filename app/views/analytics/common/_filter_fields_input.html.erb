@@ -16,12 +16,12 @@
 	<%= text_field_tag 'text_referer_match', '', :style=>"width: 75px; #{style}" %>
 	<%= hidden_field_tag 'referer_match', '' %>
 	<script type='text/javascript'>
-		$('select_referer_match').observe('change', function(ev){
-			$('referer_match').value = $('select_referer_match').value + $('text_referer_match').value;
+		$('select_referer_match<%=compare%>').observe('change', function(ev){
+			$('referer_match<%=compare%>').value = $('select_referer_match<%=compare%>').value + $('text_referer_match<%=compare%>').value;
 			updateAnalyticsStats();
 		});
-		$('text_referer_match').observe('change', function(ev){
-			$('referer_match').value = $('select_referer_match').value + $('text_referer_match').value;
+		$('text_referer_match<%=compare%>').observe('change', function(ev){
+			$('referer_match<%=compare%>').value = $('select_referer_match<%=compare%>').value + $('text_referer_match<%=compare%>').value;
 			updateAnalyticsStats();
 		});
 	</script>
