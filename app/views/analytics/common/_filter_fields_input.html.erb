@@ -13,8 +13,8 @@
 	<br />
 	<h3 style='display: inline;'>Referer:</h3><br />
 	<%= select_tag "select_referer_match#{compare}", global_statistic_options_for_select(:referer), :onchange=>"updateAnalyticsStats();", :style=>"#{style}; width: 200px;" %> or
-	<%= text_field_tag 'text_referer_match', '', :style=>"width: 75px; #{style}" %>
-	<%= hidden_field_tag 'referer_match', '' %>
+	<%= text_field_tag "text_referer_match#{compare}", '', :style=>"width: 75px; #{style}" %>
+	<%= hidden_field_tag "referer_match#{compare}", '' %>
 	<script type='text/javascript'>
 		$('select_referer_match<%=compare%>').observe('change', function(ev){
 			$('referer_match<%=compare%>').value = $('select_referer_match<%=compare%>').value + $('text_referer_match<%=compare%>').value;
