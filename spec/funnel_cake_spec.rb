@@ -7,9 +7,9 @@ describe FunnelCake::Config do
   describe 'when configuring funnelcake' do
     class FunnelCakeConfigDummy
       def self.before_create(*args); end
-      def self.after_create(*args); end      
+      def self.after_create(*args); end
     end
-    
+
     it 'should construct the configuration class' do
       @config = FunnelCake::Config.new
       FunnelCake::Config.should_receive(:new).and_return(@config)
@@ -21,12 +21,12 @@ describe FunnelCake::Config do
       it 'should enable' do
         FunnelCake.configure { enable }
         FunnelCake.configuration.enabled.should be_true
-        FunnelCake.configuration.enabled?.should be_true        
+        FunnelCake.configuration.enabled?.should be_true
       end
       it 'should disable' do
         FunnelCake.configure { disable }
         FunnelCake.configuration.enabled.should be_false
-        FunnelCake.configuration.enabled?.should be_false        
+        FunnelCake.configuration.enabled?.should be_false
       end
       it 'should set the user class as a string' do
         FunnelCake.configure { user_class 'FunnelCakeConfigDummy' }
@@ -56,13 +56,13 @@ describe FunnelCake::Config do
         module FunnelCake::DataStore::MyCustomDatastore::Ignore; end
         FunnelCake::DataStore::MyCustomDatastore::Engine.stub!(:user_class=)
         FunnelCake::DataStore::MyCustomDatastore::Engine.stub!(:visitor_class=)
-        FunnelCake::DataStore::MyCustomDatastore::Engine.stub!(:event_class=)                
+        FunnelCake::DataStore::MyCustomDatastore::Engine.stub!(:event_class=)
         FunnelCake.configure { data_store :my_custom_datastore }
         FunnelCake.configuration.data_store.should == :my_custom_datastore
       end
       describe 'when configuring then funnel' do
         it 'should set the states' do
-          FunnelCake.configure do 
+          FunnelCake.configure do
             state :completed_a
             state :completed_b, :some=>:option
           end
@@ -73,7 +73,7 @@ describe FunnelCake::Config do
           }
         end
         it 'should set the events' do
-          FunnelCake.configure do 
+          FunnelCake.configure do
             event :complete_a do
               transitions :from=>:unknown, :to=>:completed_a
             end
@@ -83,7 +83,7 @@ describe FunnelCake::Config do
           end
           FunnelCake.configuration.events[:complete_a][:block].should_not be_nil
           FunnelCake.configuration.events[:complete_b][:some].should == :option
-          FunnelCake.configuration.events[:complete_b][:block].should_not be_nil          
+          FunnelCake.configuration.events[:complete_b][:block].should_not be_nil
         end
       end
     end
@@ -127,7 +127,7 @@ describe FunnelCake::Config do
       FunnelCake.configure do
         user_class    FunnelCakeConfigDummy
         visitor_class FunnelCakeConfigDummy
-        event_class   FunnelCakeConfigDummy                    
+        event_class   FunnelCakeConfigDummy
       end
       FunnelCake.run
       FunnelCake.engine.user_class.should == FunnelCakeConfigDummy
@@ -145,7 +145,7 @@ describe FunnelCake::Config do
         FunnelCakeConfigDummy.states.size.should == 3
         FunnelCakeConfigDummy.states.include?(:unknown).should be_true
         FunnelCakeConfigDummy.states.include?(:state_a).should be_true
-        FunnelCakeConfigDummy.states.include?(:state_b).should be_true          
+        FunnelCakeConfigDummy.states.include?(:state_b).should be_true
         FunnelCakeConfigDummy.state_options(:state_b).should == {:some=>:option}
       end
       it 'should initialize the events' do
@@ -157,13 +157,13 @@ describe FunnelCake::Config do
           end
           event :event_b, :some=>:option do
             transitions :from=>:b, :to=>:c
-          end              
+          end
         end
         FunnelCake.run
         FunnelCakeConfigDummy.state_events_table.should == {
           :unknown=>[],
-          :a=>[:event_a], 
-          :b=>[:event_b], 
+          :a=>[:event_a],
+          :b=>[:event_b],
           :c=>[],
         }
       end
@@ -174,9 +174,9 @@ describe FunnelCake::Config do
           FunnelCakeConfigDummy.stub!(:include)
           FunnelCake.configure do
             data_store :mongo_mapper
-            event_class FunnelCakeConfigDummy              
-            ignore_class FunnelCakeConfigDummy                          
-            visitor_class FunnelCakeConfigDummy            
+            event_class FunnelCakeConfigDummy
+            ignore_class FunnelCakeConfigDummy
+            visitor_class FunnelCakeConfigDummy
           end
         end
         it 'should mixin the event module' do
@@ -184,11 +184,11 @@ describe FunnelCake::Config do
           FunnelCake.run
         end
         it 'should mixin the ignore module' do
-          FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Ignore)            
+          FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Ignore)
           FunnelCake.run
         end
         it 'should mixin the visitor module' do
-          FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Visitor)            
+          FunnelCakeConfigDummy.should_receive(:include).with(FunnelCake::DataStore::MongoMapper::Visitor)
           FunnelCake.run
         end
         it 'should set the engine' do

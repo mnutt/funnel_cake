@@ -6,6 +6,6 @@ class AddStatsToFunnel < ActiveRecord::Migration
 
   def self.down
     remove_column :funnel_visitors, :ip
-    remove_column :funnel_events, :referer    
+    remove_column :funnel_events, :referer
   end
 end

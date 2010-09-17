@@ -3,7 +3,7 @@ class AddIndices < ActiveRecord::Migration
     add_index :funnel_events, :funnel_visitor_id
     add_index :funnel_events, :to
     add_index :funnel_events, :from
-    
+
     add_index :funnel_visitors, :user_id
     add_index :funnel_visitors, :state
     add_index :funnel_visitors, :key
@@ -13,7 +13,7 @@ class AddIndices < ActiveRecord::Migration
     remove_index :funnel_events, :funnel_visitor_id
     remove_index :funnel_events, :to
     remove_index :funnel_events, :from
-    
+
     remove_index :funnel_visitors, :user_id
     remove_index :funnel_visitors, :state
     remove_index :funnel_visitors, :key

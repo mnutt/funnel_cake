@@ -4,6 +4,6 @@ class AddUaToFunnel < ActiveRecord::Migration
   end
 
   def self.down
-    remove_column :funnel_events, :user_agent    
+    remove_column :funnel_events, :user_agent
   end
 end
