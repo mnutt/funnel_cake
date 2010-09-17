@@ -1,10 +1,7 @@
-require 'spec'
+require 'rspec'
 require 'active_support'
-
-gem 'timecop'
+require 'active_support/dependencies'
 require 'timecop'
-
-gem 'mongo_mapper'
 require 'mongo_mapper'
 
 module EngineMacros
@@ -24,7 +21,7 @@ module EngineMacros
   end
 end
 
-Spec::Runner.configure do |config|
+RSpec.configure do |config|
   config.before(:each) do
     MongoMapper.database.collections.each do |coll|
       coll.remove
@@ -33,12 +30,12 @@ Spec::Runner.configure do |config|
   config.include(EngineMacros)
 end
 
-ActiveSupport::Dependencies.load_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
-ActiveSupport::Dependencies.load_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'funnel_cake'))
-ActiveSupport::Dependencies.load_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'app', 'models'))
+ActiveSupport::Dependencies.autoload_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+ActiveSupport::Dependencies.autoload_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib', 'funnel_cake'))
+ActiveSupport::Dependencies.autoload_paths.unshift File.expand_path(File.join(File.dirname(__FILE__), '..', 'app', 'models'))
 
-gem 'factory_girl'
 require 'factory_girl'
+Dir["#{File.dirname(__FILE__)}/factories/**/*.rb"].each {|f| require f}
 
 class Rails
   def self.cache
@@ -58,7 +55,7 @@ MongoMapper.database = 'funnelcake_test'
 class User; end
 
 
-Spec::Matchers.define :only_have_objects do |expected|
+RSpec::Matchers.define :only_have_objects do |expected|
   match do |actual|
     actual.sort{|a,b| a._id.to_s<=>b._id.to_s} == expected.sort{|a,b| a._id.to_s<=>b._id.to_s}
   end

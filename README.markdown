@@ -62,7 +62,7 @@ Here is an example of sales funnel visualization using FunnelCake:
 
 ## Configuration
 
-Configuration of FunnelCake is fairly simple.  First of all, you need to be on Rails 2.3.  It is possible that this plugin might work with the rails engine plugin and earlier versions of rails... but I make no guarantees.
+Configuration of FunnelCake is fairly simple.  First of all, you need to be on Rails 3.0.
 
 ### Installation
 

@@ -3,3 +3,5 @@ debug.log
 .tmp*
 spec/database.yml
 *.swp
+.bundle
+bin/*
