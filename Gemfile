@@ -11,6 +11,7 @@ group :development do
   gem 'rspec', "2.0.0.beta.19", :require => "rspec/rails"
   gem 'timecop'
   gem 'factory_girl'
+  gem 'jeweler'
 end
 
 # gem "rails"
