@@ -212,10 +212,10 @@ module FunnelCake
       Rails.cache.fetch(cache_key_for(key), options, &block)
     end
 
-		# Returns a MD5 hash code from the inspected options hash
-		def self.hash_options(options)
-			Digest::MD5.hexdigest(options.inspect)
-		end
+    # Returns a MD5 hash code from the inspected options hash
+    def self.hash_options(options)
+      Digest::MD5.hexdigest(options.inspect)
+    end
 
   end
 end
