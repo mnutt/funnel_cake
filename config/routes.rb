@@ -1,24 +1,42 @@
 #
 # Routes for FunnelCake rails engine
 #
-ActionController::Routing::Routes.draw do |map|
+Rails.application.routes.draw do
 
-  # Uncomment these, or copy them to your own config/routes.rb
-  # map.namespace :analytics do |analytics|
-  #   analytics.resources :events
-  #   analytics.resources :conversions, :member=>{:history=>:get, :visitors=>:get}
-  #   analytics.resources :states, :member=>{:visitors=>:get}
-  #   analytics.resources :ignores
-  #   analytics.resources :visitors
-  #   analytics.resources :stats
-  #   analytics.resources :dashboards, :collection=>{
-  #     :main=>:get,
-  #     :cec=>:get,
-  #     :diagram=>:get,
-  #     :overview=>:get,
-  #     :clear_cache=>:get,
-  #     :customers=>:get,
-  #   }
-  # end
+  match 'analytics', :to => "Analytics::Dashboards#overview"
+
+  namespace :analytics do
+    resources :events
+    
+    resources :conversions do
+      member do
+        get :history
+        get :visitors
+      end
+    end
+
+    resources :states do
+      member do
+        get :visitors
+      end
+    end
+
+    resources :ignores
+    
+    resources :visitors
+    
+    resources :stats
+    
+    resources :dashboards do
+      collection do
+        get :main
+        get :cec
+        get :diagram
+        get :overview
+        get :clear_cache
+        get :customers
+      end
+    end
+  end
 
 end
