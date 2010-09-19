@@ -66,9 +66,11 @@ Configuration of FunnelCake is fairly simple.  First of all, you need to be on R
 
 ### Installation
 
-As a rails engine plugin... FunnelCake comes mostly pre-packaged.  Simply install it in your plugins directory, and you are 95% of the way there.  One remaining issue though: you will need to copy over the public assets and database migrations.  Running this rake command should get you there:
+Simply add the following to your Gemfile:
 
-	rake funnel_cake:setup
+  gem 'funnel_cake'
+
+Rails serves FunnelCake's static assets automatically.  In production environments you'll want to copy them to your public/ directory so that they can be served by your webserver.
 
 ### User Model Setup
 
