@@ -1,16 +1,14 @@
 namespace :funnel_cake do
-  desc 'Copy migration files into main app'
-  task :setup => :environment do
-    dest = "#{RAILS_ROOT}/db/migrate"
-    src = Dir.glob(File.dirname(__FILE__) + "/../db/migrate/*.rb")
-    puts "Copying migrations to #{dest}"
-    FileUtils.cp(src, dest)
-
-    dest = "#{RAILS_ROOT}/public"
+  desc 'Copy assets into main app'
+  task :copy_assets => :environment do
+    dest = "#{Rails.root.to_s}/public"
     src = Dir.glob(File.dirname(__FILE__) + "/../public/*")
     puts "Copying assets to #{dest}"
     FileUtils.cp_r(src, dest)
+  end
 
+  desc 'Generate xdot'
+  task :generate_xdot => :environment do
     #
     # Generate xdot code
     #
