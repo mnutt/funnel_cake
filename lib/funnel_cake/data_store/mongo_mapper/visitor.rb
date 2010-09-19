@@ -1,5 +1,7 @@
 require 'mongo_mapper'
 
+MongoMapper.database = 'funnel_cake'
+
 module FunnelCake
   module DataStore
     module MongoMapper

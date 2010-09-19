@@ -1,4 +1,24 @@
+require 'rails'
+
 module FunnelCake
+
+  class RailsEngine < Rails::Engine
+    rake_tasks do
+      load File.join(File.dirname(__FILE__), '../tasks/funnel_cake_tasks.rake')
+    end
+
+    initializer "requires", :before => :add_view_paths do |app|
+      require 'funnel_cake/has_funnel/user_extensions'
+      require 'funnel_cake/acts_as_funnel_state_machine'
+      require 'funnel_cake/data_store/mongo_mapper/engine'
+      require 'funnel_cake/data_hash'
+    end
+
+
+    initializer "static assets" do |app|
+      app.middleware.insert_after ActionDispatch::Static, ActionDispatch::Static, "#{root}/public"
+    end
+  end
 
   # Configuration class, defines a simple DSL for setting up FunnelCake
   class Config
@@ -9,6 +29,7 @@ module FunnelCake
       @event_class = 'Analytics::Event'
       @ignore_class = 'Analytics::Ignore'
       @data_store = :mongo_mapper
+      require 'funnel_cake/engine'
       @engine = FunnelCake::Engine
       @states = ActiveSupport::OrderedHash.new.merge({ :unknown=>{} })
       @events = ActiveSupport::OrderedHash.new

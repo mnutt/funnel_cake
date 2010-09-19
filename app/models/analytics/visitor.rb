@@ -1,4 +1,7 @@
-class Analytics::Visitor
+require 'funnel_cake/has_funnel/user_extensions'
+
+module Analytics
+  class Visitor
   include FunnelCake::HasFunnel::UserExtensions
 
   # Create a Analytics::Event, as a callback to a state_machine transition
@@ -27,4 +30,5 @@ class Analytics::Visitor
     self.send(event.to_s+"!", data)
   end
 
+  end
 end
