@@ -30,6 +30,11 @@ begin
     gem.email = "joshuakrall@pobox.com"
     gem.homepage = "http://github.com/jkrall/funnel_cake"
     gem.files = Dir["{lib}/**/*", "{app}/**/*", "{config}/**/*", "{public}/**/*", "{tasks}/**/*", "{doc}/**/*"]
+
+    gem.add_dependency 'mongo_mapper'
+    gem.add_dependency 'bson_ext'
+    gem.add_dependency 'diff-lcs'
+    gem.add_dependency 'fastercsv'
   end
 rescue
   puts "Jeweler or one of its dependencies is not installed."

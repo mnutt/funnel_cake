@@ -9,7 +9,7 @@ Gem::Specification.new do |s|
 
   s.required_rubygems_version = Gem::Requirement.new(">= 0") if s.respond_to? :required_rubygems_version=
   s.authors = ["Joshua Krall"]
-  s.date = %q{2010-09-17}
+  s.date = %q{2010-09-19}
   s.email = %q{joshuakrall@pobox.com}
   s.executables = ["autospec", "b2json", "edit_json.rb", "erubis", "htmldiff", "j2bson", "jeweler", "ldiff", "mmconsole", "prettify_json.rb", "rackup", "rails", "rake", "rake2thor", "rspec", "rubyforge", "thor", "tt"]
   s.extra_rdoc_files = [
@@ -82,6 +82,7 @@ Gem::Specification.new do |s|
      "lib/funnel_cake/engine.rb",
      "lib/funnel_cake/has_funnel/user_extensions.rb",
      "lib/funnel_cake/has_visitor_tracking/controller_extensions.rb",
+     "lib/funnel_cake/rails_engine.rb",
      "lib/funnel_cake/random_id.rb",
      "lib/funnel_cake/state_period_helpers.rb",
      "public/images/ajax-loader.gif",
@@ -117,9 +118,21 @@ Gem::Specification.new do |s|
     s.specification_version = 3
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
+      s.add_runtime_dependency(%q<mongo_mapper>, [">= 0"])
+      s.add_runtime_dependency(%q<bson_ext>, [">= 0"])
+      s.add_runtime_dependency(%q<diff-lcs>, [">= 0"])
+      s.add_runtime_dependency(%q<fastercsv>, [">= 0"])
     else
+      s.add_dependency(%q<mongo_mapper>, [">= 0"])
+      s.add_dependency(%q<bson_ext>, [">= 0"])
+      s.add_dependency(%q<diff-lcs>, [">= 0"])
+      s.add_dependency(%q<fastercsv>, [">= 0"])
     end
   else
+    s.add_dependency(%q<mongo_mapper>, [">= 0"])
+    s.add_dependency(%q<bson_ext>, [">= 0"])
+    s.add_dependency(%q<diff-lcs>, [">= 0"])
+    s.add_dependency(%q<fastercsv>, [">= 0"])
   end
 end
 
