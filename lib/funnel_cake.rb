@@ -2,21 +2,24 @@ require 'rails'
 
 module FunnelCake
 
+  autoload :HasFunnel, 'funnel_cake/has_funnel/user_extensions'
+  autoload :ActsAsFunnelStateMachine, 'funnel_cake/acts_as_funnel_state_machine'
+  autoload :DataStore, 'funnel_cake/data_store/mongo_mapper/engine'
+  autoload :DataHash, 'funnel_cake/data_hash'
+
   class RailsEngine < Rails::Engine
     rake_tasks do
       load File.join(File.dirname(__FILE__), '../tasks/funnel_cake_tasks.rake')
     end
 
-    initializer "requires", :before => :add_view_paths do |app|
-      require 'funnel_cake/has_funnel/user_extensions'
-      require 'funnel_cake/acts_as_funnel_state_machine'
-      require 'funnel_cake/data_store/mongo_mapper/engine'
-      require 'funnel_cake/data_hash'
-    end
-
+    config.autoload_once_paths << "#{root}/app/models"
 
     initializer "static assets" do |app|
       app.middleware.insert_after ActionDispatch::Static, ActionDispatch::Static, "#{root}/public"
+    end
+
+    initializer "disable autoload" do |app|
+      ActiveSupport::Dependencies.autoloaded_constants.reject! {|mod| mod == "Analytics" }
     end
   end
 
