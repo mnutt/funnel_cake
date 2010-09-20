@@ -3,6 +3,7 @@ require 'active_support'
 require 'active_support/dependencies'
 require 'timecop'
 require 'mongo_mapper'
+require 'funnel_cake'
 
 module EngineMacros
   def build_date(offset={})
@@ -37,7 +38,7 @@ ActiveSupport::Dependencies.autoload_paths.unshift File.expand_path(File.join(Fi
 require 'factory_girl'
 Dir["#{File.dirname(__FILE__)}/factories/**/*.rb"].each {|f| require f}
 
-class Rails
+module Rails
   def self.cache
     self
   end
