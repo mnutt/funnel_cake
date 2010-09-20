@@ -1,11 +1,7 @@
 require 'digest/md5'
-require 'funnel_cake/engine'
 require 'funnel_cake/data_store/mongo_mapper/event'
 require 'funnel_cake/data_store/mongo_mapper/ignore'
 require 'funnel_cake/data_store/mongo_mapper/visitor'
-
-# gem 'rainbow'
-# require 'rainbow'
 
 module FunnelCake::DataStore::MongoMapper
   class Engine < FunnelCake::Engine

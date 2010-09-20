@@ -1,9 +1,6 @@
 require 'digest/md5'
 require 'funnel_cake/state_period_helpers'
 
-# gem 'rainbow'
-# require 'rainbow'
-
 module FunnelCake
   class Engine
 
